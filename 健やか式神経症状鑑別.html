@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健やか式神経症状鑑別 Ver.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap');
+
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2563a8;
+    --accent: #e85d26;
+    --accent2: #2ecc96;
+    --accent3: #f0a500;
+    --step1: #2563a8;
+    --step2: #d63636;
+    --step3: #2eaa6e;
+    --step4: #7c3aed;
+    --bg: #f4f6fa;
+    --bg-card: #ffffff;
+    --text: #1a202c;
+    --text-sub: #4a5568;
+    --border: #e2e8f0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 24px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(26,58,92,0.25);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .header-icon { font-size: 36px; }
+  .header-text h1 { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em; }
+  .header-text p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+
+  /* ===== MAIN ===== */
+  .app-main { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ===== STEP INDICATOR ===== */
+  .step-nav {
+    display: flex;
+    gap: 0;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .step-nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #a0aec0;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .step-nav-item.active {
+    color: white;
+  }
+  .step-nav-item[data-step="1"].active { background: var(--step1); border-bottom-color: var(--step1); }
+  .step-nav-item[data-step="2"].active { background: var(--step2); border-bottom-color: var(--step2); }
+  .step-nav-item[data-step="3"].active { background: var(--step3); border-bottom-color: var(--step3); }
+  .step-nav-item[data-step="4"].active { background: var(--step4); border-bottom-color: var(--step4); }
+  .step-nav-item.done { color: var(--text-sub); background: #f0f4ff; border-bottom-color: #c3d0e8; }
+  .step-num { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+
+  /* ===== SECTIONS ===== */
+  .step-section { display: none; animation: fadeIn 0.35s ease; }
+  .step-section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 900;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .step-badge.s1 { background: var(--step1); }
+  .step-badge.s2 { background: var(--step2); }
+  .step-badge.s3 { background: var(--step3); }
+  .step-badge.s4 { background: var(--step4); }
+
+  .section-title h2 { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+  .section-subtitle { font-size: 0.83rem; color: var(--text-sub); margin-top: 2px; }
+
+  /* ===== REGION CARDS (STEP 1) ===== */
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .region-card {
+    background: var(--bg-card);
+    border: 2.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 12px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .region-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+  .region-card.selected { border-color: var(--primary-light); background: #eef3ff; box-shadow: 0 0 0 3px rgba(37,99,168,0.18); }
+  .region-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+  .region-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+
+  /* ===== SUBREGION GRID (STEP 2) ===== */
+  .subregion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .subregion-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .subregion-card:hover { border-color: var(--step2); background: #fff5f5; }
+  .subregion-card.selected { border-color: var(--step2); background: #fff5f5; box-shadow: 0 0 0 3px rgba(214,54,54,0.12); }
+  .subregion-label { font-weight: 700; font-size: 0.9rem; color: var(--step2); margin-bottom: 4px; }
+  .subregion-desc { font-size: 0.78rem; color: var(--text-sub); }
+
+  /* ===== BACK BUTTON ===== */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 99px;
+    background: white;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 20px;
+  }
+  .back-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
+
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.83rem;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .breadcrumb .crumb { font-weight: 600; color: var(--primary); }
+  .breadcrumb .sep { color: #cbd5e0; }
+
+  /* ===== TEST CARDS (STEP 3) ===== */
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .test-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .test-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .test-card.checked .test-checkbox { background: var(--step3); border-color: var(--step3); }
+  .test-card.checked .test-checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: 700; }
+  .test-info { flex: 1; }
+  .test-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+  .test-purpose { font-size: 0.78rem; color: var(--text-sub); margin-top: 3px; }
+  .test-category-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .badge-ortho { background: #e0f0ff; color: #1a5fa8; }
+  .badge-palpation { background: #fff0e0; color: #a85a00; }
+  .badge-neurological { background: #f0e8ff; color: #6830b0; }
+  .badge-rom { background: #e8fff0; color: #0a8040; }
+  .badge-mmt { background: #fff0f5; color: #b0286a; }
+  .badge-posture { background: #f5f5e8; color: #6b5a00; }
+  .badge-reflex { background: #e0fff7; color: #0a7d6b; }
+  .badge-central { background: #ffe5e5; color: #b91c1c; }
+
+  /* Result selector */
+  .test-result-panel {
+    display: none;
+    padding: 0 16px 14px 52px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .test-card.checked .test-result-panel { display: flex; }
+  .result-label { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); }
+  .result-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .result-btn {
+    padding: 6px 16px;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.18s;
+    color: var(--text-sub);
+  }
+  .result-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .result-btn.active-positive { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+  .result-btn.active-false { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+  .result-btn.active-negative { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+
+  /* ===== EVALUATE BUTTON ===== */
+  .evaluate-btn-wrap { margin-top: 24px; text-align: center; }
+  .evaluate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    transition: all 0.22s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .evaluate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.4); }
+  .evaluate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== RESULT SECTION (STEP 4) ===== */
+  .result-header {
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.25);
+  }
+  .result-header .result-tag { font-size: 0.8rem; opacity: 0.85; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .result-header h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+  .result-header .result-confidence {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .result-blocks { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-block {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .result-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f8f9fc;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+  }
+  .result-block-icon { font-size: 1.2rem; }
+  .result-block-body { padding: 16px; font-size: 0.88rem; line-height: 1.9; color: var(--text); }
+  .result-block-body strong { color: var(--primary); }
+
+  .cause-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cause-item:last-child { border-bottom: none; }
+  .cause-pct {
+    font-size: 1.0rem;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .cause-text { flex: 1; }
+  .cause-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
+  .cause-detail { font-size: 0.82rem; color: var(--text-sub); }
+
+  /* Evidence table */
+  .evidence-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .evidence-table th { background: #f0f4ff; color: var(--primary); padding: 8px 12px; text-align: left; font-weight: 700; }
+  .evidence-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+  .evidence-table tr:last-child td { border-bottom: none; }
+  .ev-pos { color: #b91c1c; font-weight: 700; }
+  .ev-false { color: #854d0e; font-weight: 700; }
+  .ev-neg { color: #15803d; font-weight: 700; }
+
+  /* Caution box */
+  .caution-box {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.83rem;
+    color: #78350f;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .caution-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* Red flag box */
+  .redflag-block .result-block-header { background: linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; }
+  .redflag-list { list-style:none; margin:0; padding:0; }
+  .redflag-list li { position:relative; padding:9px 0 9px 26px; border-bottom:1px solid #fdeaea; line-height:1.7; font-size:0.88rem; }
+  .redflag-list li:last-child { border-bottom:none; }
+  .redflag-list li::before { content:'🚩'; position:absolute; left:2px; top:8px; font-size:0.85rem; }
+
+  /* New eval button */
+  .new-eval-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: white;
+    border: 2.5px solid var(--primary-light);
+    border-radius: 99px;
+    color: var(--primary-light);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 24px;
+  }
+  .new-eval-btn:hover { background: var(--primary-light); color: white; }
+
+  /* No selection message */
+  .info-msg {
+    background: #eef3ff;
+    border: 1.5px solid #c3d0e8;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 0.88rem;
+    color: var(--primary);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-sub);
+  }
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+  /* ===== REFERENCE (早見表) ===== */
+  .ref-toggle {
+    margin: 26px 0 0;
+    width: 100%;
+    text-align: left;
+    background: var(--bg-card);
+    border: 2px dashed #c3d0e8;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ref-toggle:hover { background: #eef3ff; }
+  .ref-panel { display: none; margin-top: 12px; }
+  .ref-panel.open { display: block; }
+  .ref-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .ref-card h4 {
+    background: #f8f9fc;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+  }
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .ref-table th { background: #eef3ff; color: var(--primary); padding: 7px 10px; text-align: left; font-weight: 700; white-space: nowrap; }
+  .ref-table td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-sub); }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table td.lv { font-weight: 800; color: var(--accent); white-space: nowrap; }
+  .ref-note { padding: 12px 16px; font-size: 0.82rem; color: var(--text-sub); line-height: 1.8; }
+  .ref-note b { color: var(--primary); }
+
+  @media (max-width: 600px) {
+    .app-header { padding: 16px 16px 14px; }
+    .header-text h1 { font-size: 1.2rem; }
+    .app-main { padding: 20px 12px 60px; }
+    .region-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .subregion-grid { grid-template-columns: 1fr; }
+    .step-nav-item { font-size: 0.68rem; padding: 10px 4px; }
+    .ref-table { font-size: 0.72rem; }
+    .ref-table th, .ref-table td { padding: 6px 7px; }
+  }
+
+  .tx-block .result-block-header { background: linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
+  .tx-list { list-style:none; margin:0; padding:0; }
+  .tx-list li { position:relative; padding:9px 0 9px 24px; border-bottom:1px solid #eef2f4; line-height:1.7; font-size:0.9rem; }
+  .tx-list li:last-child { border-bottom:none; }
+  .tx-list li::before { content:''; position:absolute; left:5px; top:16px; width:9px; height:9px; border-radius:50%; background:#0f766e; }
+  .tx-name { font-weight:700; color:#1f2d3a; }
+  .tx-note { display:block; font-size:0.8rem; color:#9a6b00; margin-top:3px; }
+  .tx-foot { margin-top:12px; font-size:0.8rem; color:#8a97a0; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <span class="header-icon">🧠</span>
+    <div class="header-text">
+      <h1>健やか式神経症状鑑別 Ver.</h1>
+      <p>しびれ・感覚障害・筋力低下の鑑別を支援する臨床推論ツール｜神経根症・末梢神経絞扼・中枢性／全身性の見極めを構造化</p>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- Step Navigation -->
+  <nav class="step-nav">
+    <div class="step-nav-item active" data-step="1" onclick="goStep(1)">
+      <span class="step-num">①</span>症状領域
+    </div>
+    <div class="step-nav-item" data-step="2" onclick="goStep(2)">
+      <span class="step-num">②</span>病態パターン
+    </div>
+    <div class="step-nav-item" data-step="3" onclick="goStep(3)">
+      <span class="step-num">③</span>神経学的評価
+    </div>
+    <div class="step-nav-item" data-step="4" onclick="goStep(4)">
+      <span class="step-num">④</span>鑑別結果
+    </div>
+  </nav>
+
+  <!-- ===== STEP 1: Region Selection ===== -->
+  <section class="step-section active" id="step-1">
+    <div class="section-title">
+      <span class="step-badge s1">1</span>
+      <div>
+        <h2>症状の領域を選択してください</h2>
+        <p class="section-subtitle">しびれ・感覚障害・筋力低下がどこに出ていますか？分布パターンから入ることもできます。</p>
+      </div>
+    </div>
+    <div class="region-grid">
+      <div class="region-card" onclick="selectRegion('cervical')" id="rc-cervical">
+        <span class="region-icon">🦾</span>
+        <div class="region-name">頸部・上肢</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">頸椎神経根・上肢末梢神経</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('lumbar')" id="rc-lumbar">
+        <span class="region-icon">🦵</span>
+        <div class="region-name">腰部・下肢</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">腰椎神経根・下肢末梢神経</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('pattern')" id="rc-pattern">
+        <span class="region-icon">🗺️</span>
+        <div class="region-name">分布パターンから</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">神経根性／末梢性／手袋靴下型</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('central')" id="rc-central">
+        <span class="region-icon">🚨</span>
+        <div class="region-name">中枢性・緊急の除外</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">脊髄症・馬尾・急速進行</div>
+      </div>
+    </div>
+
+    <!-- 早見表 -->
+    <button class="ref-toggle" onclick="toggleRef()">📖 髄節・デルマトーム早見表を開く／閉じる（上肢・下肢・鑑別の考え方）</button>
+    <div class="ref-panel" id="ref-panel">
+
+      <div class="ref-card">
+        <h4>上肢の髄節早見表（感覚・主な筋・反射）</h4>
+        <table class="ref-table">
+          <tr><th>髄節</th><th>感覚（デルマトーム）</th><th>主な筋（myotome）</th><th>反射</th></tr>
+          <tr><td class="lv">C5</td><td>上腕外側</td><td>肩外転（三角筋）・肘屈曲</td><td>上腕二頭筋反射</td></tr>
+          <tr><td class="lv">C6</td><td>前腕橈側・母指・示指</td><td>手関節背屈・肘屈曲（腕橈骨筋）</td><td>腕橈骨筋反射</td></tr>
+          <tr><td class="lv">C7</td><td>中指・手背中央</td><td>肘伸展（三頭筋）・手関節屈曲・指伸展</td><td>上腕三頭筋反射</td></tr>
+          <tr><td class="lv">C8</td><td>環指尺側・小指</td><td>指屈曲・母指伸展</td><td>（明瞭なものなし）</td></tr>
+          <tr><td class="lv">T1</td><td>前腕内側</td><td>手内在筋（指の外転・内転）</td><td>（なし）</td></tr>
+        </table>
+      </div>
+
+      <div class="ref-card">
+        <h4>下肢の髄節早見表（感覚・主な筋・反射）</h4>
+        <table class="ref-table">
+          <tr><th>髄節</th><th>感覚（デルマトーム）</th><th>主な筋（myotome）</th><th>反射</th></tr>
+          <tr><td class="lv">L2</td><td>大腿前面上部</td><td>股関節屈曲</td><td>—</td></tr>
+          <tr><td class="lv">L3</td><td>大腿前面〜膝内側</td><td>膝伸展（大腿四頭筋）</td><td>膝蓋腱反射（L3/L4）</td></tr>
+          <tr><td class="lv">L4</td><td>下腿内側・内果</td><td>足背屈（前脛骨筋）・膝伸展</td><td>膝蓋腱反射</td></tr>
+          <tr><td class="lv">L5</td><td>下腿外側・足背・母趾</td><td>母趾背屈（長母趾伸筋）・股外転（中殿筋）</td><td>内側ハムストリング反射</td></tr>
+          <tr><td class="lv">S1</td><td>足底・足外側・踵</td><td>足底屈（下腿三頭筋）・股伸展</td><td>アキレス腱反射</td></tr>
+        </table>
+      </div>
+
+      <div class="ref-card">
+        <h4>末梢神経（手）の感覚支配の目安</h4>
+        <table class="ref-table">
+          <tr><th>神経</th><th>掌側</th><th>背側</th></tr>
+          <tr><td class="lv">正中神経</td><td>母指〜環指橈側半分</td><td>示指〜環指橈側の末節背側</td></tr>
+          <tr><td class="lv">尺骨神経</td><td>小指・環指尺側半分</td><td>小指・環指尺側＋手背尺側（手背枝）</td></tr>
+          <tr><td class="lv">橈骨神経</td><td>母指球橈側のわずか</td><td>手背橈側・第1〜3指背側基部・第1指間</td></tr>
+        </table>
+      </div>
+
+      <div class="ref-card">
+        <h4>神経根性 vs 末梢神経性 vs 全身性の鑑別ポイント</h4>
+        <div class="ref-note">
+          <b>● 神経根性（radiculopathy）</b>：感覚（デルマトーム）・筋力（myotome）・反射が<b>同一髄節で一致</b>。Spurling／SLRなど神経根誘発テストで再現。帯状・分節性の分布。<br>
+          <b>● 末梢神経性（単神経）</b>：<b>1本の末梢神経支配域に一致</b>（例＝正中：母指〜環指橈側）。絞扼部のTinel signが陽性。支配筋が選択的に弱る。<br>
+          <b>● 二重絞扼（double crush）</b>：頸椎レベルと末梢の絞扼が<b>併存</b>しうる。両方を評価する。<br>
+          <b>● 手袋靴下型（多発神経性）</b>：<b>両側対称・遠位優位</b>。糖尿病・腎不全・アルコール・薬剤・栄養障害などの全身検索が必要。<br>
+          <b>● 中枢性（脊髄・脳）</b>：腱反射<b>亢進</b>・病的反射（Hoffmann／Babinski）・痙性歩行・巧緻運動障害・膀胱直腸障害。デルマトーム/末梢のどちらにも収まらない広がり。<span style="color:#b91c1c;font-weight:700;">→ 緊急性を要するred flag。</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== STEP 2: Subregion ===== -->
+  <section class="step-section" id="step-2">
+    <button class="back-btn" onclick="goStep(1)">← 症状領域へ戻る</button>
+    <div class="section-title">
+      <span class="step-badge s2">2</span>
+      <div>
+        <h2>病態パターンを選択してください</h2>
+        <p class="section-subtitle">分布・主訴に最も近いパターンはどれですか？</p>
+      </div>
+    </div>
+    <div class="subregion-grid" id="subregion-list"></div>
+  </section>
+
+  <!-- ===== STEP 3: Evaluation ===== -->
+  <section class="step-section" id="step-3">
+    <button class="back-btn" onclick="goStep(2)">← 病態パターンへ戻る</button>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="section-title">
+      <span class="step-badge s3">3</span>
+      <div>
+        <h2>神経学的評価を選択・入力してください</h2>
+        <p class="section-subtitle">実施した評価にチェックを入れ、結果（陽性／偽陽性／陰性）を選択してください。複数選択可。</p>
+      </div>
+    </div>
+    <div class="test-list" id="test-list"></div>
+    <div class="evaluate-btn-wrap">
+      <button class="evaluate-btn" onclick="showResult()" id="eval-btn" disabled>
+        🔍 鑑別結果を表示する
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 4: Result ===== -->
+  <section class="step-section" id="step-4">
+    <button class="back-btn" onclick="goStep(3)">← 神経学的評価へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb2"></div>
+    <div class="section-title">
+      <span class="step-badge s4">4</span>
+      <div>
+        <h2>鑑別結果</h2>
+        <p class="section-subtitle">評価結果に基づく鑑別と原因考察・対応の方向性</p>
+      </div>
+    </div>
+    <div id="result-content"></div>
+    <div style="text-align:center">
+      <button class="new-eval-btn" onclick="resetAll()">🔄 新しい評価を開始する</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// DATA DEFINITIONS  ─ 神経症状鑑別
+// ============================================================
+
+const REGIONS = {
+  cervical: { name: '頸部・上肢', icon: '🦾' },
+  lumbar:   { name: '腰部・下肢', icon: '🦵' },
+  pattern:  { name: '分布パターン', icon: '🗺️' },
+  central:  { name: '中枢性・緊急', icon: '🚨' }
+};
+
+const SUBREGIONS = {
+  cervical: [
+    { id:'c5',       label:'C5神経根症パターン',   desc:'上腕外側のしびれ・肩外転/肘屈曲の脱力・上腕二頭筋反射低下' },
+    { id:'c6',       label:'C6神経根症パターン',   desc:'前腕橈側〜母指のしびれ・手関節背屈の脱力・腕橈骨筋反射低下' },
+    { id:'c7',       label:'C7神経根症パターン',   desc:'中指のしびれ・肘伸展(三頭筋)の脱力・上腕三頭筋反射低下' },
+    { id:'c8t1',     label:'C8・T1神経根症パターン', desc:'小指・前腕尺側のしびれ・手内在筋の脱力' },
+    { id:'cts',      label:'手根管症候群（正中・手関節）', desc:'母指〜環指橈側のしびれ・夜間増悪・母指球萎縮' },
+    { id:'cubital',  label:'肘部管症候群（尺骨・肘）', desc:'環指尺側〜小指のしびれ・骨間筋萎縮・鷲手' },
+    { id:'radial',   label:'橈骨／後骨間神経麻痺', desc:'下垂手・下垂指・手背橈側のしびれ' },
+    { id:'tos',      label:'胸郭出口症候群', desc:'上肢全体のだるさ・尺側しびれ・挙上で増悪・血管症状' }
+  ],
+  lumbar: [
+    { id:'l4',       label:'L4神経根症パターン',   desc:'下腿内側のしびれ・膝伸展/足背屈の脱力・膝蓋腱反射低下' },
+    { id:'l5',       label:'L5神経根症パターン',   desc:'下腿外側〜足背・母趾のしびれ・母趾背屈の脱力' },
+    { id:'s1',       label:'S1神経根症パターン',   desc:'足底〜足外側のしびれ・足底屈の脱力・アキレス腱反射低下' },
+    { id:'peroneal', label:'総腓骨神経麻痺',       desc:'下垂足・鶏歩・足背〜第1趾間のしびれ・腓骨頭部の圧痛' },
+    { id:'tarsal',   label:'足根管症候群（後脛骨・内果後方）', desc:'足底のしびれ・灼熱痛・夜間痛・内果後方Tinel' },
+    { id:'meralgia', label:'外側大腿皮神経障害（感覚異常性大腿痛）', desc:'大腿前外側の感覚障害のみ・運動正常' }
+  ],
+  pattern: [
+    { id:'dermatomal',     label:'デルマトーム型（神経根性）', desc:'帯状・分節性で感覚・筋力・反射が同一髄節に一致' },
+    { id:'mononeuropathy', label:'単神経型（末梢神経性）',     desc:'1本の末梢神経支配域に限局・絞扼部Tinel陽性' },
+    { id:'polyneuropathy', label:'手袋靴下型（多発神経性）',   desc:'両側対称・遠位優位・全身性背景の検索が必要' }
+  ],
+  central: [
+    { id:'myelopathy', label:'脊髄症パターン（頸髄症など）', desc:'手指巧緻障害・痙性歩行・腱反射亢進・病的反射' },
+    { id:'cauda',      label:'馬尾・円錐症候群パターン',     desc:'サドル麻痺・膀胱直腸障害・両側下肢症状（緊急）' },
+    { id:'progressive',label:'急速進行・全身性パターン',     desc:'上行性脱力・球麻痺・呼吸/自律神経症状（GBS・ALS等）' }
+  ]
+};
+
+// ============================================================
+// TESTS database
+// ============================================================
+const TESTS = {
+  // ---------- 頸部・上肢：神経根 ----------
+  'c5': [
+    { id:'spurling-c5', name:'Spurling test（頸椎椎間孔圧迫）', category:'provoc', purpose:'頸椎を伸展・患側側屈し軸圧を加え、上肢への放散痛・しびれの再現で椎間孔狭窄による神経根圧迫を評価（陽性＝放散あり）', badge:'badge-ortho' },
+    { id:'sens-c5', name:'C5デルマトーム感覚評価（上腕外側）', category:'sensory', purpose:'上腕外側の感覚低下を確認。腋窩神経領域と重なるため末梢障害との分布の違いに注意', badge:'badge-neurological' },
+    { id:'mmt-c5', name:'三角筋・肘屈曲MMT（C5髄節）', category:'motor', purpose:'肩外転（三角筋）・肘屈曲の筋力低下でC5の運動障害を確認', badge:'badge-mmt' },
+    { id:'reflex-biceps', name:'上腕二頭筋腱反射（C5/C6）', category:'reflex', purpose:'反射の低下・消失でC5/C6神経根障害を示唆', badge:'badge-reflex' }
+  ],
+  'c6': [
+    { id:'spurling-c6', name:'Spurling test（頸椎椎間孔圧迫）', category:'provoc', purpose:'伸展・患側側屈・軸圧で母指側への放散・しびれを再現（陽性＝放散あり）', badge:'badge-ortho' },
+    { id:'sens-c6', name:'C6デルマトーム感覚評価（前腕橈側〜母指・示指）', category:'sensory', purpose:'前腕橈側から母指・示指の感覚低下を確認。手根管症候群（母指〜環指橈側）と分布で鑑別', badge:'badge-neurological' },
+    { id:'mmt-c6', name:'手関節背屈・腕橈骨筋MMT（C6髄節）', category:'motor', purpose:'手関節背屈・肘屈曲（腕橈骨筋）の筋力低下でC6運動障害を確認', badge:'badge-mmt' },
+    { id:'reflex-brachio', name:'腕橈骨筋反射（C6）', category:'reflex', purpose:'反射低下でC6神経根障害を示唆', badge:'badge-reflex' },
+    { id:'cts-overlap', name:'手根管所見の確認（Phalen/Tinel）', category:'provoc', purpose:'末梢（手根管）との二重絞扼を確認。両者陽性なら併存を考慮', badge:'badge-ortho' }
+  ],
+  'c7': [
+    { id:'spurling-c7', name:'Spurling test（頸椎椎間孔圧迫）', category:'provoc', purpose:'伸展・患側側屈・軸圧で中指側への放散・しびれを再現（陽性＝放散あり）', badge:'badge-ortho' },
+    { id:'sens-c7', name:'C7デルマトーム感覚評価（中指・手背中央）', category:'sensory', purpose:'中指・手背中央の感覚低下を確認', badge:'badge-neurological' },
+    { id:'mmt-c7', name:'上腕三頭筋・指伸展MMT（C7髄節）', category:'motor', purpose:'肘伸展（三頭筋）・手関節屈曲・指伸展の筋力低下でC7運動障害を確認', badge:'badge-mmt' },
+    { id:'reflex-triceps', name:'上腕三頭筋腱反射（C7）', category:'reflex', purpose:'反射低下でC7神経根障害を示唆', badge:'badge-reflex' }
+  ],
+  'c8t1': [
+    { id:'spurling-c8', name:'Spurling test（頸椎椎間孔圧迫）', category:'provoc', purpose:'伸展・患側側屈・軸圧で前腕尺側〜小指への放散を再現（陽性＝放散あり）', badge:'badge-ortho' },
+    { id:'sens-c8', name:'C8/T1デルマトーム感覚評価（小指・前腕内側）', category:'sensory', purpose:'小指・前腕尺側の感覚低下を確認。尺骨神経（手背枝含む）との分布差で鑑別', badge:'badge-neurological' },
+    { id:'mmt-intrinsic', name:'手内在筋MMT（骨間筋・指外転：C8/T1）', category:'motor', purpose:'指の開排（外転）筋力低下・母指球/小指球萎縮で下位頸髄節の運動障害を確認', badge:'badge-mmt' },
+    { id:'ulnar-diff', name:'尺骨神経絞扼との鑑別（肘部管Tinel・手背枝感覚）', category:'provoc', purpose:'肘部管Tinel・手背枝感覚の有無で末梢（尺骨神経）か神経根かを鑑別', badge:'badge-ortho' },
+    { id:'horner-t1', name:'Horner徴候・腫瘍red flagの確認', category:'central', purpose:'縮瞳・眼瞼下垂（Horner）や下位頸〜上位胸の進行性T1障害はPancoast腫瘍など占拠性病変を示唆（陽性＝該当・red flag）', badge:'badge-central' }
+  ],
+  // ---------- 頸部・上肢：末梢 ----------
+  'cts': [
+    { id:'phalen', name:'Phalen test', category:'provoc', purpose:'手関節最大掌屈位を60秒保持し正中神経領域のしびれ増悪を確認。手根管内圧上昇による圧迫の評価（陽性＝しびれ増悪）', badge:'badge-ortho' },
+    { id:'tinel-carpal', name:'Tinel sign（手根管部）', category:'provoc', purpose:'手関節掌側（手根管）を叩打し末梢への放散痛・しびれで陽性', badge:'badge-ortho' },
+    { id:'durkan', name:'手根管圧迫テスト（Durkan test）', category:'provoc', purpose:'手根管を母指で30秒圧迫し症状誘発。感度・特異度が比較的高い', badge:'badge-ortho' },
+    { id:'median-sensory', name:'正中神経領域の感覚評価', category:'sensory', purpose:'母指〜環指橈側の感覚低下・2点識別覚を確認。C6神経根（前腕まで及ぶ）との分布差に注意', badge:'badge-neurological' },
+    { id:'thenar-mmt', name:'短母指外転筋MMT・母指球萎縮', category:'motor', purpose:'短母指外転筋の筋力低下・母指球萎縮は重症手根管症候群（軸索障害）を示唆（陽性＝筋力低下/萎縮）', badge:'badge-mmt' }
+  ],
+  'cubital': [
+    { id:'tinel-cubital', name:'Tinel sign（肘部管）', category:'provoc', purpose:'肘内側（尺骨神経溝）の叩打で前腕尺側〜小指への放散痛を確認。肘部管症候群の評価', badge:'badge-ortho' },
+    { id:'elbow-flexion', name:'肘屈曲テスト', category:'provoc', purpose:'肘最大屈曲位を3分保持し尺側のしびれ増悪を確認（陽性＝増悪）', badge:'badge-ortho' },
+    { id:'froment', name:'Froment徴候', category:'motor', purpose:'母指と示指で紙を挟ませると母指IPが屈曲（長母指屈筋で代償）。母指内転筋（尺骨神経深枝）麻痺を示唆（陽性＝IP屈曲）', badge:'badge-mmt' },
+    { id:'ulnar-sensory', name:'尺骨神経領域の感覚評価（手背枝含む）', category:'sensory', purpose:'環指尺側・小指の感覚低下を確認。手背枝領域の障害は肘部管（近位）、温存はGuyon管（遠位）を示唆', badge:'badge-neurological' },
+    { id:'interossei-claw', name:'骨間筋MMT・鷲手変形', category:'motor', purpose:'指の開排筋力低下・鷲手（claw hand）で運動麻痺進行を確認', badge:'badge-mmt' }
+  ],
+  'radial': [
+    { id:'wrist-drop', name:'下垂手の視診（手関節背屈不能）', category:'obs', purpose:'手関節・指の背屈が不能（drop）なら上腕レベルの橈骨神経麻痺を示唆（陽性＝下垂手）', badge:'badge-posture' },
+    { id:'pin-test', name:'後骨間神経麻痺の確認（手関節背屈は保たれ指伸展不能）', category:'motor', purpose:'手関節背屈（橈側手根伸筋）は保たれるがMP伸展・母指外転が不能なら後骨間神経（純粋運動枝）麻痺を示唆（陽性＝下垂指）', badge:'badge-mmt' },
+    { id:'radial-sensory', name:'橈骨神経（浅枝）領域の感覚評価', category:'sensory', purpose:'手背橈側・第1指間の感覚低下を確認。後骨間神経麻痺では感覚は保たれる点が鑑別点', badge:'badge-neurological' },
+    { id:'tinel-frohse', name:'回外筋（Frohse腱弓）部のTinel', category:'provoc', purpose:'前腕近位背側を叩打・圧迫し放散を確認。回外筋症候群（後骨間神経絞扼）の評価', badge:'badge-ortho' },
+    { id:'radial-history', name:'圧迫・骨折の問診（Saturday night palsy等）', category:'provoc', purpose:'上腕骨骨幹部骨折・腕の長時間圧迫（飲酒後の睡眠等）の有無を確認', badge:'badge-ortho' }
+  ],
+  'tos': [
+    { id:'roos', name:'Roos test（EAST・3分挙上）', category:'provoc', purpose:'肩外転外旋90°でグーパーを3分反復し、症状再現・脱力で胸郭出口での神経血管圧迫を評価（陽性＝再現/継続不能）', badge:'badge-ortho' },
+    { id:'wright', name:'Wright test（過外転テスト）', category:'provoc', purpose:'上肢の過外転・外旋で橈骨動脈拍動の減弱・症状再現を確認', badge:'badge-ortho' },
+    { id:'morley', name:'鎖骨上窩の圧痛・放散（Morley）', category:'provoc', purpose:'鎖骨上窩（斜角筋三角）の圧迫で上肢への放散を確認', badge:'badge-ortho' },
+    { id:'tos-c8t1', name:'尺側（C8/T1）の感覚・手内在筋評価', category:'sensory', purpose:'下神経幹型では前腕尺側〜小指の感覚低下と手内在筋筋力低下を呈する', badge:'badge-neurological' },
+    { id:'tos-vascular', name:'血管症状（脈拍減弱・冷感・色調変化）', category:'central', purpose:'鎖骨下動静脈圧迫による冷感・色調変化・腫脹は血管型を示唆し緊急性を要する（陽性＝該当・red flag）', badge:'badge-central' }
+  ],
+  // ---------- 腰部・下肢：神経根 ----------
+  'l4': [
+    { id:'slr-l4', name:'SLR／大腿神経伸張テスト（FNST）', category:'provoc', purpose:'L4はFNST（腹臥位で膝屈曲・股伸展）で大腿前面痛が誘発されやすい。SLRはL5/S1優位。陽性＝再現あり', badge:'badge-ortho' },
+    { id:'sens-l4', name:'L4デルマトーム感覚評価（下腿内側・内果）', category:'sensory', purpose:'下腿内側〜内果の感覚低下を確認', badge:'badge-neurological' },
+    { id:'mmt-l4', name:'前脛骨筋（足背屈）・膝伸展MMT（L4）', category:'motor', purpose:'足背屈・膝伸展の筋力低下でL4運動障害を確認。下垂足様の場合は腓骨神経麻痺と鑑別', badge:'badge-mmt' },
+    { id:'reflex-patella', name:'膝蓋腱反射（L4）', category:'reflex', purpose:'反射低下・消失でL3/L4神経根障害を示唆', badge:'badge-reflex' }
+  ],
+  'l5': [
+    { id:'slr-l5', name:'SLR（下肢伸展挙上テスト）', category:'provoc', purpose:'仰臥位で下肢を挙上し坐骨神経領域の放散痛を確認。L5/S1神経根症で陽性になりやすい（陽性＝70°以下で再現）', badge:'badge-ortho' },
+    { id:'sens-l5', name:'L5デルマトーム感覚評価（下腿外側・足背・母趾）', category:'sensory', purpose:'下腿外側〜足背・母趾の感覚低下を確認', badge:'badge-neurological' },
+    { id:'mmt-l5', name:'長母趾伸筋（母趾背屈）・中殿筋MMT（L5）', category:'motor', purpose:'母趾背屈・股外転（中殿筋）の筋力低下でL5運動障害を確認', badge:'badge-mmt' },
+    { id:'l5-peroneal-diff', name:'総腓骨神経麻痺との鑑別（内反・股外転の評価）', category:'provoc', purpose:'足内反（後脛骨筋）や股外転（中殿筋）の脱力があればL5（神経根）、内反・股外転が保たれれば腓骨神経麻痺を示唆', badge:'badge-ortho' }
+  ],
+  's1': [
+    { id:'slr-s1', name:'SLR（下肢伸展挙上テスト）', category:'provoc', purpose:'坐骨神経領域の放散痛を確認。S1神経根症で陽性になりやすい（陽性＝再現あり）', badge:'badge-ortho' },
+    { id:'sens-s1', name:'S1デルマトーム感覚評価（足底・足外側・踵）', category:'sensory', purpose:'足底・足外側・踵の感覚低下を確認', badge:'badge-neurological' },
+    { id:'mmt-s1', name:'下腿三頭筋（足底屈・つま先立ち）MMT（S1）', category:'motor', purpose:'足底屈・反復つま先立ちの筋力低下でS1運動障害を確認', badge:'badge-mmt' },
+    { id:'reflex-achilles', name:'アキレス腱反射（S1）', category:'reflex', purpose:'反射低下・消失でS1神経根障害を示唆', badge:'badge-reflex' }
+  ],
+  // ---------- 腰部・下肢：末梢 ----------
+  'peroneal': [
+    { id:'steppage', name:'下垂足・鶏歩（steppage gait）の視診', category:'obs', purpose:'足背屈不能で爪先を引きずる歩行（鶏歩）を確認。下垂足の有無を評価（陽性＝下垂足あり）', badge:'badge-posture' },
+    { id:'peroneal-mmt', name:'足背屈・外反MMT（内反＝後脛骨筋は温存）', category:'motor', purpose:'足背屈・外反の脱力を確認。内反（後脛骨筋＝L5/脛骨神経）が保たれれば腓骨神経麻痺を支持し、L5神経根症と鑑別', badge:'badge-mmt' },
+    { id:'tinel-fibula', name:'腓骨頭部のTinel sign', category:'provoc', purpose:'腓骨頭直下（総腓骨神経）を叩打し足背への放散を確認。圧迫部位の同定', badge:'badge-ortho' },
+    { id:'peroneal-sensory', name:'足背・第1趾間の感覚評価', category:'sensory', purpose:'足背（浅腓骨）・第1趾間（深腓骨）の感覚低下を確認', badge:'badge-neurological' }
+  ],
+  'tarsal': [
+    { id:'tinel-tarsal', name:'Tinel sign（内果後方）', category:'provoc', purpose:'内果後方（足根管・後脛骨神経）を叩打し足底への放散を確認（陽性＝放散あり）', badge:'badge-ortho' },
+    { id:'tarsal-sensory', name:'足底の感覚評価（内側・外側足底神経）', category:'sensory', purpose:'足底の灼熱感・しびれ・感覚低下を確認。足背は保たれる点がポイント', badge:'badge-neurological' },
+    { id:'dorsiflex-evert', name:'背屈外反保持テスト', category:'provoc', purpose:'足を背屈・外反位に保持し足根管内圧を高めて症状誘発を確認', badge:'badge-ortho' },
+    { id:'tarsal-night', name:'夜間痛・灼熱痛の問診', category:'sensory', purpose:'安静時・夜間の灼熱痛は足根管症候群の特徴。多発神経障害（両側）との鑑別を要する', badge:'badge-neurological' }
+  ],
+  'meralgia': [
+    { id:'meralgia-sensory', name:'大腿前外側の限局性感覚障害（運動正常）', category:'sensory', purpose:'大腿前外側に限局する感覚障害・灼熱痛を確認。運動麻痺・反射異常を伴わないのが特徴', badge:'badge-neurological' },
+    { id:'inguinal-tinel', name:'鼠径靭帯外側のTinel・圧迫テスト', category:'provoc', purpose:'上前腸骨棘内側下方（外側大腿皮神経の絞扼部）の圧迫で症状再現を確認', badge:'badge-ortho' },
+    { id:'pelvic-compression', name:'骨盤圧迫テスト（pelvic compression）', category:'provoc', purpose:'側臥位で骨盤を下方へ圧迫し神経の緊張を緩めると症状軽快で陽性（絞扼の支持所見）', badge:'badge-ortho' },
+    { id:'meralgia-motor-check', name:'運動機能・膝蓋腱反射の正常確認（鑑別）', category:'motor', purpose:'大腿四頭筋筋力・膝蓋腱反射が正常であることを確認し、L2-4神経根症や大腿神経障害を除外', badge:'badge-mmt' }
+  ],
+  // ---------- 分布パターン ----------
+  'dermatomal': [
+    { id:'derm-distribution', name:'感覚障害がデルマトームに一致するか', category:'sensory', purpose:'帯状・分節性の感覚障害が特定髄節のデルマトームに一致するかを確認（陽性＝一致）', badge:'badge-neurological' },
+    { id:'derm-myotome', name:'同一髄節の筋力低下（myotome）の有無', category:'motor', purpose:'感覚と同じ髄節支配筋に筋力低下があれば神経根性を強く支持', badge:'badge-mmt' },
+    { id:'derm-reflex', name:'該当髄節の反射低下', category:'reflex', purpose:'対応する深部腱反射の低下・消失で神経根障害を支持', badge:'badge-reflex' },
+    { id:'derm-provoc', name:'神経根誘発テスト（Spurling/SLR）', category:'provoc', purpose:'頸椎ならSpurling、腰椎ならSLR/FNSTで放散再現を確認（陽性＝再現あり）', badge:'badge-ortho' }
+  ],
+  'mononeuropathy': [
+    { id:'mono-distribution', name:'単一末梢神経支配域に一致する感覚障害', category:'sensory', purpose:'感覚障害が1本の末梢神経支配域に限局するかを確認（陽性＝末梢神経パターンに一致）', badge:'badge-neurological' },
+    { id:'mono-tinel', name:'絞扼部のTinel sign', category:'provoc', purpose:'想定される絞扼部位の叩打で末梢への放散を確認し圧迫部を同定', badge:'badge-ortho' },
+    { id:'mono-mmt', name:'該当神経支配筋の選択的筋力低下', category:'motor', purpose:'その末梢神経が支配する筋に選択的な筋力低下があるかを確認', badge:'badge-mmt' },
+    { id:'mono-history', name:'反復圧迫・外傷・職業要因の問診', category:'provoc', purpose:'反復動作・外圧・既往骨折など末梢絞扼の誘因を確認', badge:'badge-ortho' }
+  ],
+  'polyneuropathy': [
+    { id:'poly-symmetry', name:'両側対称・遠位優位の感覚障害（手袋靴下型）', category:'sensory', purpose:'四肢遠位から左右対称に進む感覚障害を確認（陽性＝手袋靴下型に一致）', badge:'badge-neurological' },
+    { id:'poly-achilles', name:'アキレス腱反射の両側低下・消失', category:'reflex', purpose:'遠位優位の多発神経障害では両側アキレス腱反射が早期に低下する', badge:'badge-reflex' },
+    { id:'poly-proprioception', name:'振動覚・位置覚の低下（後索系）', category:'sensory', purpose:'音叉での振動覚低下・Romberg陽性は太い線維/後索障害を示唆', badge:'badge-neurological' },
+    { id:'poly-systemic', name:'全身性背景の問診（糖尿病・腎不全・アルコール・薬剤・栄養）', category:'provoc', purpose:'多発神経障害の原因となる全身疾患・生活歴・薬剤歴を確認', badge:'badge-ortho' },
+    { id:'poly-rapid', name:'急速進行・上行性脱力の確認（GBS）', category:'central', purpose:'数日で上行する脱力・反射消失はGuillain-Barré症候群を示唆し緊急対応を要する（陽性＝該当・red flag）', badge:'badge-central' }
+  ],
+  // ---------- 中枢性・緊急 ----------
+  'myelopathy': [
+    { id:'myelo-hand', name:'手指巧緻運動障害（10秒テスト・myelopathy hand）', category:'motor', purpose:'10秒間のグーパー反復回数低下・巧緻動作障害は頸髄症を示唆（陽性＝著明な低下/巧緻障害）', badge:'badge-mmt' },
+    { id:'hoffmann', name:'Hoffmann反射', category:'central', purpose:'中指末節を弾くと母指・示指が屈曲する病的反射。頸髄レベルの錐体路障害を示唆（陽性＝屈曲反応・red flag）', badge:'badge-central' },
+    { id:'hyperreflexia', name:'下肢腱反射亢進・足クローヌス・Babinski', category:'central', purpose:'腱反射亢進・クローヌス・Babinski陽性は錐体路（上位運動ニューロン）障害を示す（陽性＝該当・red flag）', badge:'badge-central' },
+    { id:'spastic-gait', name:'痙性歩行・wide based gaitの視診', category:'obs', purpose:'痙性・不安定な歩行は脊髄症の機能障害を示す', badge:'badge-posture' },
+    { id:'bladder-myelo', name:'膀胱直腸障害の問診', category:'central', purpose:'排尿障害・残尿感は脊髄圧迫の進行を示すred flag（陽性＝該当）', badge:'badge-central' }
+  ],
+  'cauda': [
+    { id:'saddle', name:'サドル領域（会陰部）の感覚障害', category:'central', purpose:'会陰部・肛門周囲・両大腿内側の感覚低下（サドル麻痺）は馬尾症候群の重要徴候（陽性＝該当・緊急）', badge:'badge-central' },
+    { id:'bladder-cauda', name:'膀胱直腸障害（尿閉・失禁・便失禁）', category:'central', purpose:'尿閉・尿便失禁は緊急手術適応を示すred flag（陽性＝該当・緊急）', badge:'badge-central' },
+    { id:'bilateral-slr', name:'両側下肢の筋力低下・両側SLR', category:'motor', purpose:'片側でなく両側性の下肢筋力低下・坐骨神経痛は馬尾レベルの圧迫を示唆', badge:'badge-mmt' },
+    { id:'anal-tone', name:'肛門括約筋トーヌス・球海綿体反射', category:'reflex', purpose:'肛門括約筋トーヌス低下・反射消失は馬尾/円錐障害を示唆（医師評価項目）', badge:'badge-reflex' },
+    { id:'acute-onset', name:'急性発症・進行性の確認', category:'central', purpose:'急性〜亜急性の進行は緊急性が高い。発症様式・進行速度を確認（陽性＝急速進行・緊急）', badge:'badge-central' }
+  ],
+  'progressive': [
+    { id:'onset-speed', name:'進行速度・発症様式の問診', category:'provoc', purpose:'急性（数日）・亜急性（数週）・慢性（数ヶ月）の進行様式を確認し緊急性を判断', badge:'badge-ortho' },
+    { id:'umn-lmn-mix', name:'上位・下位運動ニューロン徴候の混在（ALS）', category:'central', purpose:'筋萎縮・線維束性収縮（下位）と腱反射亢進・病的反射（上位）の混在はALSを示唆（陽性＝混在・red flag）', badge:'badge-central' },
+    { id:'bulbar', name:'球麻痺症状（構音障害・嚥下障害）', category:'central', purpose:'構音・嚥下障害は球麻痺を示し、誤嚥・呼吸リスクを伴うred flag（陽性＝該当）', badge:'badge-central' },
+    { id:'autonomic-resp', name:'自律神経・呼吸症状（GBS）', category:'central', purpose:'血圧変動・不整脈・呼吸困難は重症GBSの緊急徴候（陽性＝該当・緊急）', badge:'badge-central' },
+    { id:'systemic-bg', name:'全身性背景（感染先行・腫瘍・代謝）の問診', category:'provoc', purpose:'先行感染・体重減少・代謝疾患など全身性の原因を確認', badge:'badge-ortho' }
+  ]
+};
+
+// ============================================================
+// DIAGNOSES database
+// ============================================================
+const DIAGNOSES = {
+  // ----- C5 -----
+  'c5': {
+    default: {
+      name: 'C5神経根症パターン（上腕外側のしびれ・肩外転/肘屈曲の脱力）',
+      conditions: [
+        { name: '頸椎症性神経根症（C4/5レベル）', pct:'約55%', cause:'椎間板変性・骨棘によるC5神経根（C4/5椎間孔）の圧迫。頸椎伸展・患側側屈で椎間孔が狭小化し上腕外側への放散・三角筋筋力低下を生じる。中高年に多い。' },
+        { name: '頸椎椎間板ヘルニア（C4/5）', pct:'約25%', cause:'髄核の後外側脱出による神経根圧迫。比較的若年〜中年で急性発症することがある。' },
+        { name: '腋窩神経障害（末梢）との鑑別', pct:'約10%', cause:'四角間隙症候群・肩関節周囲の障害でも上腕外側感覚（C5領域と重複）が障害される。頸部誘発の有無・三頭筋など他髄節の所見で鑑別する。' },
+        { name: '腕神経叢上神経幹障害', pct:'約10%', cause:'外傷・牽引によるC5/6上神経幹障害（Erb型）。複数髄節にまたがる所見となる。' }
+      ],
+      management: '頸椎の安静肢位指導・神経根への伸張/圧迫を避ける姿勢調整（伸展・患側側屈の回避）が基本。頸部深層屈筋の再教育・肩甲帯アライメント改善・神経モビライゼーションを段階的に行う。三角筋の進行性筋力低下や激しい放散痛、夜間痛が持続する場合は画像評価のため整形外科へ紹介する。',
+      redFlags: ['進行する筋力低下・筋萎縮','安静時／夜間に増悪する激しい痛み','両側性の症状・下肢症状や歩行障害の併発（脊髄症の疑い）']
+    },
+    rules: [
+      { tests:['spurling-c5'], result:'positive', boost:{ name:'C5神経根症（椎間孔狭窄）を示唆', pct:'陽性時：神経根性を強く支持', cause:'Spurling test陽性（伸展・患側側屈・軸圧での上腕外側への放散再現）は、C4/5椎間孔での神経根圧迫を強く示唆する。感覚（上腕外側）・筋力（三角筋）・反射（上腕二頭筋）が同一髄節で一致するかを併せて確認し、進行性の運動麻痺があれば画像評価を優先する。' } }
+    ]
+  },
+  // ----- C6 -----
+  'c6': {
+    default: {
+      name: 'C6神経根症パターン（前腕橈側〜母指のしびれ・手関節背屈の脱力）',
+      conditions: [
+        { name: '頸椎症性神経根症（C5/6レベル）', pct:'約55%', cause:'頸椎で最も罹患しやすいレベルの一つ。C6神経根圧迫により前腕橈側〜母指・示指のしびれ、手関節背屈・腕橈骨筋の筋力低下、腕橈骨筋反射低下を呈する。' },
+        { name: '頸椎椎間板ヘルニア（C5/6）', pct:'約20%', cause:'髄核脱出によるC6神経根の急性圧迫。' },
+        { name: '手根管症候群との二重絞扼', pct:'約20%', cause:'C6領域（前腕まで）と正中神経領域（母指〜環指橈側）は遠位で重複するため併存しうる（double crush）。前腕に及ぶ感覚障害・頸部誘発はC6を、夜間増悪・Phalen/Tinel陽性は手根管を支持する。' },
+        { name: '腕橈骨筋反射の評価による局在', pct:'補助所見', cause:'腕橈骨筋反射の低下はC6障害を支持する局在診断の手がかりとなる。' }
+      ],
+      management: '頸椎の伸展・患側側屈を避ける姿勢指導と、頸部深層筋・肩甲帯の再教育が基本。手根管との併存例では手関節中間位スプリント・正中神経滑走運動も併用する。母指球萎縮や進行性の脱力があれば神経伝導検査・画像評価のため整形外科／手の外科へ紹介する。',
+      redFlags: ['母指球の萎縮・進行性の手の筋力低下','安静時・夜間の激しい放散痛','両側症状・巧緻運動障害・歩行障害（脊髄症の疑い）']
+    },
+    rules: [
+      { tests:['spurling-c6','cts-overlap'], result:'positive', boost:{ name:'二重絞扼（C6＋手根管）の併存疑い', pct:'両陽性時：double crushを考慮', cause:'Spurling陽性かつ手根管所見（Phalen/Tinel）も陽性の場合、頸椎C6レベルと手関節の正中神経絞扼が併存する二重絞扼（double crush）の可能性がある。近位（頸椎）の神経流障害が遠位の絞扼に対する脆弱性を高めると考えられ、両部位への評価・介入が必要となる。' } }
+    ]
+  },
+  // ----- C7 -----
+  'c7': {
+    default: {
+      name: 'C7神経根症パターン（中指のしびれ・肘伸展の脱力・三頭筋反射低下）',
+      conditions: [
+        { name: '頸椎症性神経根症（C6/7レベル）', pct:'約60%', cause:'C6/7はC5/6と並んで罹患頻度が高い。C7神経根圧迫により中指・手背中央のしびれ、上腕三頭筋・指伸展の筋力低下、上腕三頭筋反射低下を呈する。' },
+        { name: '頸椎椎間板ヘルニア（C6/7）', pct:'約25%', cause:'髄核脱出によるC7神経根の急性圧迫。' },
+        { name: '後骨間神経麻痺（末梢）との鑑別', pct:'約10%', cause:'指伸展低下は後骨間神経麻痺でも生じる。後者は感覚障害を伴わず手関節背屈は橈側偏位して保たれる点、頸部誘発がない点で鑑別する。' },
+        { name: '腕神経叢中神経幹障害', pct:'約5%', cause:'C7主体の腕神経叢障害。' }
+      ],
+      management: '頸椎の安静肢位・椎間孔狭小化を避ける姿勢調整、頸部・肩甲帯の再教育が基本。神経モビライゼーション・疼痛管理を併用する。進行性の三頭筋筋力低下・激しい放散痛・夜間痛は画像評価のため整形外科へ紹介する。',
+      redFlags: ['進行する筋力低下・筋萎縮','安静時／夜間に増悪する激しい痛み','両側症状・巧緻運動障害・歩行障害（脊髄症の疑い）']
+    },
+    rules: [
+      { tests:['spurling-c7'], result:'positive', boost:{ name:'C7神経根症（椎間孔狭窄）を示唆', pct:'陽性時：神経根性を強く支持', cause:'Spurling test陽性で中指側への放散が再現される場合、C6/7椎間孔でのC7神経根圧迫が強く示唆される。中指の感覚・三頭筋筋力・三頭筋反射が同一髄節で一致するかを確認する。後骨間神経麻痺（感覚正常・頸部誘発なし）との鑑別を行う。' } }
+    ]
+  },
+  // ----- C8/T1 -----
+  'c8t1': {
+    default: {
+      name: 'C8・T1神経根症パターン（小指・前腕尺側のしびれ・手内在筋の脱力）',
+      conditions: [
+        { name: '頸椎症性神経根症（C7/T1レベル）', pct:'約40%', cause:'C8/T1神経根圧迫により小指・前腕尺側のしびれ、手内在筋（骨間筋・小指球）の筋力低下を呈する。' },
+        { name: '肘部管症候群（尺骨神経）との鑑別', pct:'約30%', cause:'尺骨神経障害でも環指尺側・小指のしびれと手内在筋障害を生じる。手背枝領域（手背尺側）の感覚障害があれば末梢（肘部管）を、前腕内側まで及び頸部誘発があれば神経根を支持する。' },
+        { name: '胸郭出口症候群（下神経幹型）', pct:'約20%', cause:'腕神経叢下神経幹（C8/T1）の絞扼で尺側しびれ・手内在筋低下・挙上での増悪を呈する。' },
+        { name: 'Pancoast腫瘍など占拠性病変', pct:'約10%', cause:'肺尖部腫瘍によるT1〜下神経幹浸潤。Horner徴候・進行性の手内在筋萎縮・夜間痛を伴うことがある重要なred flag。' }
+      ],
+      management: '尺骨神経絞扼との鑑別（手背枝感覚・肘部管Tinel・頸部誘発）を優先する。神経根性なら頸椎の安静肢位・姿勢調整を、末梢性なら絞扼部への負荷軽減を行う。進行性の手内在筋萎縮・Horner徴候・夜間痛は占拠性病変を疑い速やかに画像評価・専門医紹介を行う。',
+      redFlags: ['Horner徴候（縮瞳・眼瞼下垂）','進行性の手内在筋萎縮','安静時・夜間に増悪する痛み・体重減少（占拠性病変の疑い）']
+    },
+    rules: [
+      { tests:['horner-t1'], result:'positive', boost:{ name:'占拠性病変の疑い（Pancoast腫瘍等）', pct:'陽性時：専門医評価を推奨', cause:'Horner徴候や進行性のT1領域障害を認める場合、肺尖部腫瘍（Pancoast腫瘍）など下神経幹を浸潤する占拠性病変を見逃さないことが重要である。夜間痛・体重減少・進行性筋萎縮を伴う場合は緊急性が高く、画像評価（胸部・頸椎）と専門医紹介を優先する。' } }
+    ]
+  },
+  // ----- 手根管 -----
+  'cts': {
+    default: {
+      name: '手根管症候群（手関節での正中神経絞扼）',
+      conditions: [
+        { name: '手根管症候群（特発性）', pct:'約65%', cause:'手根管内圧上昇による正中神経絞扼。手関節掌屈/背屈最終域での内圧上昇に加え、妊娠・更年期・反復手作業・透析が誘因。母指〜環指橈側のしびれ、夜間〜早朝の増悪が特徴で、進行で母指球筋萎縮を呈する。' },
+        { name: '頸椎神経根症（C6）・二重絞扼', pct:'約20%', cause:'C6レベルと手関節の絞扼が重複する二重絞扼（double crush）。前腕に及ぶ感覚障害・頸部運動での誘発が鑑別の手がかり。' },
+        { name: '円回内筋症候群（前腕近位の正中神経絞扼）', pct:'約10%', cause:'前腕近位での絞扼。手掌枝領域（母指球部）の感覚障害を伴い、手根管症候群と分布が異なる。' },
+        { name: '全身性背景（糖尿病・甲状腺・透析）', pct:'約5%', cause:'代謝性・内分泌性背景で発症・増悪する。背景疾患の評価が必要。' }
+      ],
+      management: '手関節中間位ナイトスプリント・手関節ROM/腱滑走運動・正中神経滑走運動・前腕回内回外改善が基本。母指球筋萎縮・持続する筋力低下など重症例は神経伝導検査と手の外科へ紹介。頸部由来の重複例は頸部アプローチも併用する。',
+      redFlags: ['母指球筋の萎縮・持続する母指対立の筋力低下','症状の急速な進行']
+    },
+    rules: [
+      { tests:['phalen','tinel-carpal'], result:'positive', boost:{ name:'手根管症候群（正中神経絞扼）確定的疑い', pct:'両テスト陽性で精度向上', cause:'Phalen testとTinel sign（手根管部）がともに陽性の場合、手根管症候群の可能性が高い。手関節掌屈最終域での手根管内圧上昇と正中神経への直接圧迫がしびれ・疼痛を誘発している。母指球筋の萎縮を認める場合は軸索障害が進行しているため、神経伝導検査と手の外科での評価を優先する。' } }
+    ]
+  },
+  // ----- 肘部管 -----
+  'cubital': {
+    default: {
+      name: '肘部管症候群（肘での尺骨神経絞扼）',
+      conditions: [
+        { name: '肘部管症候群', pct:'約55%', cause:'肘部管（内側上顆後方）での尺骨神経絞扼。肘屈曲位での牽引・絞扼増大が関与する。環指尺側・小指のしびれ、進行で骨間筋萎縮・鷲手変形・Froment徴候を呈する。野球・肘酷使・変形性肘関節症が背景。' },
+        { name: 'Guyon管症候群（手関節での尺骨神経絞扼）', pct:'約20%', cause:'豆状骨・有鈎骨鈎間のGuyon管での絞扼。手背枝領域の感覚が保たれる点で肘部管症候群と鑑別できる。サイクリスト・反復圧迫が誘因。' },
+        { name: '頸椎神経根症（C8/T1）・二重絞扼', pct:'約20%', cause:'下位頸髄節と肘部の絞扼が重複しうる。前腕内側まで及ぶ感覚障害・頸部誘発が鑑別の手がかり。' },
+        { name: '胸郭出口症候群（下神経幹型）', pct:'約5%', cause:'腕神経叢下神経幹の絞扼で尺側しびれ・手内在筋低下を呈する。' }
+      ],
+      management: '肘屈曲位の回避・夜間伸展位装具・肘部管への圧迫軽減・尺骨神経滑走運動が基本。手内在筋の筋力維持・鷲手予防を行う。骨間筋萎縮・Froment陽性など運動麻痺進行例は神経伝導検査と手の外科へ紹介する。',
+      redFlags: ['骨間筋・小指球の萎縮、鷲手変形','Froment徴候陽性（運動麻痺の進行）']
+    },
+    rules: [
+      { tests:['froment'], result:'positive', boost:{ name:'尺骨神経麻痺（深枝・母指内転筋）の進行', pct:'陽性時：運動麻痺進行を示唆', cause:'Froment徴候陽性（紙つまみ時に母指IPが屈曲し長母指屈筋で代償する）は母指内転筋（尺骨神経深枝支配）の筋力低下を示す。尺骨神経の運動麻痺が進行している所見であり、肘部管・Guyon管いずれの絞扼かを感覚分布（手背枝の温存）とTinel部位で鑑別し、進行例は神経伝導検査と手の外科評価が必要。' } }
+    ]
+  },
+  // ----- 橈骨/後骨間 -----
+  'radial': {
+    default: {
+      name: '橈骨／後骨間神経麻痺（下垂手・下垂指）',
+      conditions: [
+        { name: '上腕レベルの橈骨神経麻痺（下垂手）', pct:'約45%', cause:'上腕骨骨幹部骨折や腕の長時間圧迫（Saturday night palsy）による橈骨神経麻痺。手関節・指の背屈がともに不能（下垂手）で、手背橈側の感覚障害を伴う。' },
+        { name: '後骨間神経麻痺（回外筋症候群・下垂指）', pct:'約30%', cause:'前腕近位（Frohse腱弓・回外筋）での後骨間神経（純粋運動枝）絞扼。手関節背屈は橈側偏位して保たれるが指MP伸展・母指外転が不能（下垂指）。感覚障害を伴わないのが特徴。' },
+        { name: '橈骨神経浅枝障害（Wartenberg症候群）', pct:'約15%', cause:'前腕遠位での浅枝（感覚枝）絞扼。手背橈側のしびれ・痛みのみで運動麻痺を伴わない。時計バンド・手錠など外圧が誘因。' },
+        { name: 'C7神経根症との鑑別', pct:'約10%', cause:'指伸展低下はC7でも生じる。後骨間神経麻痺は感覚正常・頸部誘発なし・手関節背屈温存で鑑別する。' }
+      ],
+      management: '原因（骨折・外圧・絞扼）の特定と除圧が基本。下垂手にはコックアップスプリントで手関節を機能肢位に保持し、腱・関節拘縮を予防しながら神経回復を待つ。後骨間神経の絞扼が明らかで保存改善しない例、骨折に伴う麻痺は整形外科／手の外科で評価する。',
+      redFlags: ['骨折に伴う急性の麻痺','数ヶ月で回復しない進行性の麻痺・筋萎縮']
+    },
+    rules: [
+      { tests:['pin-test'], result:'positive', boost:{ name:'後骨間神経麻痺（下垂指）を示唆', pct:'陽性時：後骨間神経麻痺を支持', cause:'手関節背屈が（橈側偏位して）保たれるのにMP伸展・母指外転が不能な場合、純粋運動枝である後骨間神経の麻痺が示唆される。感覚障害を伴わない点が上腕レベルの橈骨神経麻痺との鑑別点であり、Frohse腱弓部での絞扼や腫瘤性病変の評価のため整形外科／手の外科紹介を検討する。' } }
+    ]
+  },
+  // ----- 胸郭出口 -----
+  'tos': {
+    default: {
+      name: '胸郭出口症候群（神経血管束の圧迫）',
+      conditions: [
+        { name: '神経型胸郭出口症候群（下神経幹型）', pct:'約85%', cause:'斜角筋三角・肋鎖間隙・小胸筋下での腕神経叢（特に下神経幹C8/T1）の圧迫。上肢の挙上・牽引で増悪し、尺側のしびれ・手のだるさ・脱力を呈する。なで肩・頸肋・姿勢不良が背景。' },
+        { name: '血管型（動脈型・静脈型）', pct:'約10%', cause:'鎖骨下動静脈の圧迫。冷感・色調変化・腫脹・拍動減弱を伴う。静脈型では腫脹・チアノーゼ（Paget-Schroetter）を呈し緊急性が高いred flag。' },
+        { name: '頸椎神経根症（C8/T1）との鑑別・併存', pct:'約5%', cause:'下位頸髄節の神経根症と分布が重なる。頸部誘発・Spurlingの有無で鑑別するが併存もありうる。' }
+      ],
+      management: '姿勢改善（頭部前方位・なで肩の是正）・斜角筋/小胸筋の柔軟性改善・肩甲帯挙上筋の強化・神経モビライゼーションが保存療法の中心。誘発肢位（過外転・重量物挙上）の回避を指導する。血管症状（腫脹・色調変化・拍動減弱）や進行性の手内在筋萎縮を認める場合は血管外科／整形外科へ速やかに紹介する。',
+      redFlags: ['上肢の腫脹・チアノーゼ・拍動減弱（血管型の疑い・緊急）','進行性の手内在筋萎縮']
+    },
+    rules: [
+      { tests:['tos-vascular'], result:'positive', boost:{ name:'血管型胸郭出口症候群の疑い', pct:'陽性時：緊急評価を推奨', cause:'冷感・色調変化・腫脹・拍動減弱などの血管症状は、鎖骨下動静脈の圧迫による血管型胸郭出口症候群を示唆する。静脈血栓（Paget-Schroetter症候群）を含め緊急性が高く、画像評価（血管エコー・造影）と血管外科への速やかな紹介が必要である。' } }
+    ]
+  },
+  // ----- L4 -----
+  'l4': {
+    default: {
+      name: 'L4神経根症パターン（下腿内側のしびれ・膝伸展/足背屈の脱力・膝蓋腱反射低下）',
+      conditions: [
+        { name: '腰椎症性神経根症（L3/4レベル）', pct:'約50%', cause:'椎間板変性・骨棘・椎間孔狭窄によるL4神経根圧迫。下腿内側〜内果のしびれ、膝伸展・足背屈の筋力低下、膝蓋腱反射低下を呈する。' },
+        { name: '腰椎椎間板ヘルニア（L3/4）', pct:'約25%', cause:'髄核脱出によるL4神経根の圧迫。L4はFNST（大腿神経伸張テスト）で大腿前面痛が誘発されやすい。' },
+        { name: '大腿神経障害（末梢）との鑑別', pct:'約15%', cause:'大腿神経障害（腸腰筋血腫・糖尿病性筋萎縮等）でも膝伸展低下・膝蓋腱反射低下を生じる。分布・誘因で鑑別する。' },
+        { name: '変形性関節症など非神経性の膝痛', pct:'約10%', cause:'膝痛が主体の場合は関節由来との鑑別も要する。' }
+      ],
+      management: '腰椎の安静肢位・神経根への伸張/圧迫を避ける姿勢指導（過伸展の調整）が基本。体幹深層筋の再教育・神経モビライゼーション・大腿四頭筋の機能維持を行う。進行する膝折れ・著明な筋力低下・膀胱直腸障害を伴う場合は画像評価のため整形外科へ紹介する。',
+      redFlags: ['進行する大腿四頭筋の筋力低下・膝折れ','膀胱直腸障害・サドル麻痺（馬尾症候群の疑い・緊急）','安静時・夜間に増悪する痛み']
+    },
+    rules: [
+      { tests:['slr-l4','reflex-patella'], result:'positive', boost:{ name:'L4神経根症を示唆', pct:'陽性時：神経根性を支持', cause:'大腿神経伸張テスト（FNST）での大腿前面痛の再現と膝蓋腱反射低下がそろう場合、L3/4レベルのL4神経根障害が示唆される。下腿内側の感覚・膝伸展/足背屈の筋力と髄節が一致するかを確認し、進行性の運動麻痺があれば画像評価を優先する。' } }
+    ]
+  },
+  // ----- L5 -----
+  'l5': {
+    default: {
+      name: 'L5神経根症パターン（下腿外側〜足背・母趾のしびれ・母趾背屈の脱力）',
+      conditions: [
+        { name: '腰椎椎間板ヘルニア（L4/5）', pct:'約45%', cause:'最も頻度の高い腰椎ヘルニアの一つ。L5神経根圧迫で下腿外側〜足背・母趾のしびれ、母趾背屈・足背屈・股外転（中殿筋）の筋力低下を呈する。SLR陽性となりやすい。' },
+        { name: '腰部脊柱管狭窄症（L4/5）', pct:'約30%', cause:'椎間孔・外側陥凹の狭窄によるL5神経根障害。間欠性跛行・前屈で軽快する姿勢依存性が特徴。中高年に多い。' },
+        { name: '総腓骨神経麻痺（末梢）との鑑別', pct:'約15%', cause:'下垂足・足背しびれは腓骨神経麻痺でも生じる。足内反（後脛骨筋）・股外転（中殿筋）の脱力があればL5、保たれれば腓骨神経麻痺を支持する。腓骨頭部Tinelも手がかり。' },
+        { name: '仙腸関節・梨状筋など非神経根性', pct:'約10%', cause:'殿部〜下肢痛が仙腸関節・梨状筋由来のこともあり、神経学的所見の有無で鑑別する。' }
+      ],
+      management: '腰椎の安静肢位・神経根への負荷を避ける姿勢指導が基本。狭窄症では前屈位・除圧肢位の活用、ヘルニアでは伸展で増悪しない範囲での運動療法・神経モビライゼーションを行う。中殿筋・母趾背屈の機能維持を図る。進行する下垂足・膀胱直腸障害は画像評価のため整形外科へ速やかに紹介する。',
+      redFlags: ['進行する下垂足・母趾背屈の筋力低下','膀胱直腸障害・サドル麻痺（馬尾症候群の疑い・緊急）','両側下肢症状']
+    },
+    rules: [
+      { tests:['l5-peroneal-diff'], result:'positive', boost:{ name:'L5神経根症（腓骨神経麻痺との鑑別上位）', pct:'陽性時：神経根性を支持', cause:'足内反（後脛骨筋）や股外転（中殿筋）にも脱力を認める場合、腓骨神経単独麻痺では説明できず、より近位のL5神経根障害が示唆される。腓骨神経麻痺では内反・股外転が保たれるため、この鑑別が局在診断の鍵となる。SLR・足背の感覚分布と併せて評価し、進行例は画像評価を行う。' } }
+    ]
+  },
+  // ----- S1 -----
+  's1': {
+    default: {
+      name: 'S1神経根症パターン（足底〜足外側のしびれ・足底屈の脱力・アキレス腱反射低下）',
+      conditions: [
+        { name: '腰椎椎間板ヘルニア（L5/S1）', pct:'約50%', cause:'頻度の高い腰椎ヘルニア。S1神経根圧迫で足底・足外側・踵のしびれ、足底屈（下腿三頭筋）の筋力低下、アキレス腱反射低下を呈する。SLR陽性となりやすい。' },
+        { name: '腰部脊柱管狭窄症（L5/S1）', pct:'約25%', cause:'狭窄によるS1神経根障害。間欠性跛行・姿勢依存性が特徴。' },
+        { name: '足根管症候群（末梢）との鑑別', pct:'約15%', cause:'足底のしびれは足根管症候群でも生じる。S1は足外側・踵やアキレス腱反射低下・SLR陽性を伴い、足根管は内果後方Tinel・足底限局で鑑別する。' },
+        { name: '仙腸関節・梨状筋症候群', pct:'約10%', cause:'殿部〜下肢後面痛が仙腸関節・梨状筋由来のこともある。' }
+      ],
+      management: '腰椎の安静肢位・S1神経根への負荷を避ける姿勢指導が基本。運動療法・神経モビライゼーション・下腿三頭筋/殿筋の機能維持を行う。狭窄症では除圧肢位を活用する。進行する足底屈筋力低下・膀胱直腸障害は画像評価のため整形外科へ速やかに紹介する。',
+      redFlags: ['進行する足底屈の筋力低下（つま先立ち不能）','膀胱直腸障害・サドル麻痺（馬尾症候群の疑い・緊急）','両側下肢症状']
+    },
+    rules: [
+      { tests:['slr-s1','reflex-achilles'], result:'positive', boost:{ name:'S1神経根症を示唆', pct:'陽性時：神経根性を支持', cause:'SLR陽性（坐骨神経領域の放散再現）とアキレス腱反射の低下がそろう場合、L5/S1レベルのS1神経根障害が示唆される。足底・足外側の感覚と足底屈筋力が髄節と一致するかを確認する。進行性の筋力低下・両側症状・膀胱直腸障害があれば緊急性を考慮し画像評価を優先する。' } }
+    ]
+  },
+  // ----- 総腓骨神経 -----
+  'peroneal': {
+    default: {
+      name: '総腓骨神経麻痺（腓骨頭部での絞扼・下垂足）',
+      conditions: [
+        { name: '腓骨頭部での総腓骨神経麻痺', pct:'約60%', cause:'腓骨頭直下（神経が皮下を走る部位）での圧迫・絞扼。脚組み・長時間のしゃがみ・ギプス/装具圧迫・体重減少が誘因。下垂足・鶏歩、足背〜第1趾間の感覚障害を呈し、足内反（後脛骨筋）は保たれる。' },
+        { name: 'L5神経根症との鑑別', pct:'約25%', cause:'下垂足はL5でも生じる。足内反・股外転（中殿筋）の脱力やSLR陽性があればL5を、これらが保たれ腓骨頭部Tinel陽性なら腓骨神経麻痺を支持する。' },
+        { name: '深腓骨／浅腓骨神経の部分障害', pct:'約10%', cause:'前足根管（深腓骨）や下腿外側（浅腓骨）での部分絞扼。症状が限局する。' },
+        { name: '坐骨神経（腓骨神経成分）障害', pct:'約5%', cause:'坐骨神経近位の障害が腓骨神経成分優位に出ることがある。' }
+      ],
+      management: '圧迫要因（脚組み・しゃがみ・外圧）の除去が最優先。下垂足には短下肢装具（AFO）で背屈を補助し、つまずき/転倒予防・足関節拘縮予防を図る。背屈筋の機能再教育を行う。回復しない・進行する場合や絞扼部の腫瘤が疑われる場合は整形外科で評価する。',
+      redFlags: ['進行性・改善しない下垂足','絞扼部の腫瘤・腫脹']
+    },
+    rules: [
+      { tests:['peroneal-mmt','tinel-fibula'], result:'positive', boost:{ name:'腓骨頭部での総腓骨神経麻痺を示唆', pct:'陽性時：末梢絞扼を支持', cause:'足背屈・外反の脱力に対して足内反（後脛骨筋）が保たれ、かつ腓骨頭部のTinelが陽性の場合、腓骨頭部での総腓骨神経麻痺が強く示唆される。内反・股外転が保たれる点がL5神経根症との決定的な鑑別点となる。圧迫要因の除去とAFOによる機能補助を行い、回復しなければ画像評価を検討する。' } }
+    ]
+  },
+  // ----- 足根管 -----
+  'tarsal': {
+    default: {
+      name: '足根管症候群（内果後方での後脛骨神経絞扼）',
+      conditions: [
+        { name: '足根管症候群', pct:'約55%', cause:'内果後方の屈筋支帯下（足根管）での後脛骨神経絞扼。足底のしびれ・灼熱痛・夜間痛を呈し、足背は保たれる。扁平足・外傷後・ガングリオン・静脈瘤などが誘因。内果後方Tinelが陽性となる。' },
+        { name: 'S1神経根症との鑑別', pct:'約20%', cause:'足底のしびれはS1でも生じる。S1は足外側・踵やアキレス腱反射低下・SLR陽性を伴い、足根管は足底限局・内果後方Tinelで鑑別する。' },
+        { name: '多発神経障害（糖尿病等）の部分症状', pct:'約15%', cause:'両側性・対称性で進行する場合は多発神経障害を疑い全身検索を行う。' },
+        { name: 'モートン病など前足部の局所障害', pct:'約10%', cause:'趾間神経腫（モートン病）など前足部限局の絞扼との鑑別も要する。' }
+      ],
+      management: '足部アライメント改善（扁平足への足底挿板）・誘因の除去・後脛骨神経への局所負荷軽減が基本。夜間痛に対する安静・神経保護を行う。占拠性病変（ガングリオン等）が疑われる場合や保存治療抵抗例は整形外科／足の外科で評価する。両側対称性なら全身性ニューロパチーの検索を行う。',
+      redFlags: ['両側対称・進行性の足底しびれ（全身性ニューロパチーの疑い）','占拠性病変を示唆する腫瘤']
+    },
+    rules: [
+      { tests:['tinel-tarsal'], result:'positive', boost:{ name:'足根管症候群を示唆', pct:'陽性時：末梢絞扼を支持', cause:'内果後方のTinel sign陽性（足底への放散）は、足根管での後脛骨神経絞扼を示唆する。足底に限局し足背が保たれる点・S1領域（足外側/踵・反射低下）と異なる点が鑑別の鍵となる。足部アライメント是正と誘因除去を行い、両側対称性で進行する場合は全身性ニューロパチーの可能性を考慮する。' } }
+    ]
+  },
+  // ----- 外側大腿皮神経 -----
+  'meralgia': {
+    default: {
+      name: '外側大腿皮神経障害（感覚異常性大腿痛・meralgia paresthetica）',
+      conditions: [
+        { name: '外側大腿皮神経の絞扼（鼠径靭帯部）', pct:'約70%', cause:'上前腸骨棘内側下方・鼠径靭帯部での外側大腿皮神経（純粋感覚神経）絞扼。大腿前外側の灼熱痛・しびれ・感覚低下を呈し、運動麻痺・反射異常を伴わない。肥満・妊娠・ベルト/きつい衣服・急な体重変化が誘因。' },
+        { name: 'L2/L3神経根症との鑑別', pct:'約15%', cause:'大腿前面の感覚障害はL2/L3でも生じる。神経根症は大腿四頭筋筋力低下・膝蓋腱反射低下・腰部症状を伴う点で鑑別する。' },
+        { name: '大腿神経障害との鑑別', pct:'約10%', cause:'大腿神経障害は膝伸展低下・膝蓋腱反射低下を伴う。外側大腿皮神経障害は運動正常で鑑別できる。' },
+        { name: '股関節由来の関連痛', pct:'約5%', cause:'股関節病変からの関連痛との鑑別も要する。' }
+      ],
+      management: '誘因の除去が最優先（減量・締め付ける衣服やベルトの是正・姿勢調整）。神経への局所圧迫軽減・愛護的な神経モビライゼーションを行う。多くは保存的に軽快するが、難治性・強い灼熱痛が持続する場合は神経ブロックなどの適応評価のため整形外科／ペインクリニックへ紹介する。',
+      redFlags: ['運動麻痺・反射異常の出現（より近位の障害を示唆）','腹腔内/後腹膜の占拠性病変を疑う随伴症状']
+    },
+    rules: [
+      { tests:['meralgia-sensory','meralgia-motor-check'], result:'positive', boost:{ name:'感覚異常性大腿痛（純粋感覚障害）を支持', pct:'陽性時：末梢感覚神経障害を支持', cause:'大腿前外側に限局する感覚障害があり、かつ大腿四頭筋筋力・膝蓋腱反射が正常な場合、運動成分を持たない外側大腿皮神経の絞扼（感覚異常性大腿痛）が支持される。運動・反射の温存がL2-4神経根症や大腿神経障害との鑑別点であり、誘因除去で多くは軽快する。' } }
+    ]
+  },
+  // ----- デルマトーム型 -----
+  'dermatomal': {
+    default: {
+      name: 'デルマトーム型（神経根性）パターン',
+      conditions: [
+        { name: '神経根症（radiculopathy）', pct:'最有力', cause:'感覚（デルマトーム）・筋力（myotome）・反射が同一髄節で一致し、Spurling/SLRなどの神経根誘発テストで再現される場合、椎間板ヘルニア・椎間孔狭窄・脊柱管狭窄による神経根障害が示唆される。帯状・分節性の分布が特徴。' },
+        { name: '帯状疱疹（後）神経痛', pct:'鑑別要', cause:'単一デルマトームに一致する痛み・感覚異常で、皮疹の有無・既往を確認する。' },
+        { name: '腕/腰仙神経叢障害', pct:'鑑別要', cause:'複数の隣接髄節にまたがる場合は神経叢レベルを考慮する。' }
+      ],
+      management: '罹患髄節を感覚・筋力・反射・誘発テストで特定し、頸椎ならSpurling・腰椎ならSLR/FNSTで再現性を確認する。神経根への負荷を避ける姿勢・運動療法・神経モビライゼーションが基本。進行性の運動麻痺・両側症状・膀胱直腸障害があれば画像評価のため整形外科へ紹介する。',
+      redFlags: ['進行性の筋力低下・筋萎縮','両側性の症状・膀胱直腸障害（脊髄症/馬尾症候群の疑い）']
+    },
+    rules: [
+      { tests:['derm-distribution','derm-myotome','derm-reflex'], result:'positive', boost:{ name:'神経根症（髄節所見の一致）を強く示唆', pct:'3所見一致：神経根性を強く支持', cause:'感覚（デルマトーム）・筋力（myotome）・反射の3所見がいずれも同一髄節で一致する場合、神経根性（radiculopathy）の可能性が高い。罹患髄節の局在が明確であり、誘発テストの再現性と画像所見を併せて評価する。進行性の運動麻痺がある場合は画像評価を優先する。' } }
+    ]
+  },
+  // ----- 単神経型 -----
+  'mononeuropathy': {
+    default: {
+      name: '単神経型（末梢神経性）パターン',
+      conditions: [
+        { name: '末梢神経の絞扼性障害（entrapment）', pct:'最有力', cause:'感覚障害が1本の末梢神経支配域に限局し、絞扼部Tinelが陽性で、その神経の支配筋に選択的筋力低下を認める場合、末梢神経の絞扼が示唆される（手根管・肘部管・腓骨頭部など）。反復動作・外圧・既往骨折が誘因。' },
+        { name: '外傷性単神経障害', pct:'鑑別要', cause:'骨折・切創・圧挫など外傷後の単神経障害。' },
+        { name: '二重絞扼（double crush）', pct:'鑑別要', cause:'近位（神経根）と末梢の絞扼が併存しうる。近位所見も評価する。' },
+        { name: '多発性単神経炎の初期', pct:'鑑別要', cause:'血管炎などで複数の単神経が時間差で障害される（mononeuritis multiplex）場合があり、経過の観察が必要。' }
+      ],
+      management: '絞扼部位の同定（限局した感覚分布・Tinel・選択的筋力低下）を優先する。誘因（反復動作・外圧）の除去・絞扼部への負荷軽減・神経滑走運動が基本。進行性の筋萎縮・運動麻痺がある場合や複数神経が障害される場合は神経伝導検査・専門医評価を行う。',
+      redFlags: ['進行性の筋萎縮・運動麻痺','複数の末梢神経が時間差で障害される（多発性単神経炎の疑い）']
+    },
+    rules: [
+      { tests:['mono-distribution','mono-tinel'], result:'positive', boost:{ name:'末梢神経絞扼（単神経障害）を示唆', pct:'陽性時：末梢絞扼を支持', cause:'感覚障害が単一の末梢神経支配域に一致し、想定絞扼部のTinelが陽性の場合、その部位での末梢神経絞扼が示唆される。神経根性（デルマトーム・髄節所見の一致）との鑑別を行い、選択的な支配筋の筋力低下を確認する。誘因除去と局所負荷軽減を行い、進行例は神経伝導検査を検討する。' } }
+    ]
+  },
+  // ----- 手袋靴下型 -----
+  'polyneuropathy': {
+    default: {
+      name: '手袋靴下型（多発神経性）パターン',
+      conditions: [
+        { name: '糖尿病性多発神経障害', pct:'約40%', cause:'最も頻度が高い。両側対称・遠位優位（手袋靴下型）の感覚障害、アキレス腱反射低下、振動覚低下を呈する。血糖管理・罹病期間が関与する。' },
+        { name: 'その他の代謝性・中毒性（腎不全・アルコール・薬剤・栄養）', pct:'約30%', cause:'腎不全（尿毒症）、アルコール多飲、ビタミンB群欠乏、化学療法など薬剤性で生じる。生活歴・薬剤歴の確認が重要。' },
+        { name: '免疫性・炎症性（CIDP等）', pct:'約15%', cause:'慢性炎症性脱髄性多発根神経炎などで運動・感覚障害が進行する。' },
+        { name: '急性炎症性（Guillain-Barré症候群）', pct:'約15%', cause:'先行感染後に数日〜2週で上行する脱力・反射消失を呈する。呼吸・自律神経障害を伴い緊急対応を要する重要なred flag。' }
+      ],
+      management: '両側対称・遠位優位の分布を確認し、糖尿病・腎不全・アルコール・薬剤・栄養など全身性背景の検索（採血等）を医師と連携して行う。フットケア・転倒予防・感覚低下に伴う外傷/熱傷予防の指導が重要。急速進行・上行性脱力・呼吸/自律神経症状を認める場合はGuillain-Barré症候群を疑い緊急で医療機関へ。',
+      redFlags: ['数日〜2週で上行する急速な脱力・反射消失（GBSの疑い・緊急）','呼吸困難・嚥下障害・著明な血圧変動','感覚低下部位の潰瘍・熱傷・感染']
+    },
+    rules: [
+      { tests:['poly-rapid'], result:'positive', boost:{ name:'Guillain-Barré症候群の疑い（緊急）', pct:'陽性時：緊急評価を推奨', cause:'数日で上行する脱力と腱反射の消失は、先行感染後に発症するGuillain-Barré症候群を示唆する。呼吸筋麻痺・自律神経障害により急速に重篤化しうるため、緊急で医療機関を受診し、神経内科での評価（髄液検査・神経伝導検査）と全身管理が必要である。' } }
+    ]
+  },
+  // ----- 脊髄症 -----
+  'myelopathy': {
+    default: {
+      name: '脊髄症パターン（頸髄症など・上位運動ニューロン障害）',
+      conditions: [
+        { name: '頸椎症性脊髄症', pct:'約55%', cause:'頸椎での脊髄圧迫により手指巧緻運動障害（箸・ボタン操作の困難）、痙性歩行、四肢腱反射亢進、Hoffmann/Babinski陽性を呈する。進行で膀胱直腸障害を伴う。中高年に多い。' },
+        { name: '頸椎椎間板ヘルニア（正中型）・後縦靭帯骨化症（OPLL）', pct:'約25%', cause:'正中での脊髄圧迫。OPLLでは靭帯骨化による進行性圧迫を生じる。' },
+        { name: '胸髄症・脊髄腫瘍・脊髄空洞症', pct:'約10%', cause:'胸髄レベルの圧迫や髄内/髄外病変。レベルに応じた感覚・運動障害を呈する。' },
+        { name: '非圧迫性脊髄症（炎症・血管・変性）', pct:'約10%', cause:'脊髄炎・血流障害・変性疾患など。経過・分布で鑑別する。' }
+      ],
+      management: '脊髄症は機能予後に関わるため、上位運動ニューロン徴候（腱反射亢進・Hoffmann/Babinski・痙性歩行・巧緻障害・膀胱直腸障害）を認めた時点で速やかに整形外科／脊椎外科へ紹介し画像評価（MRI）を行うことが最優先。リハビリは医師の評価後に転倒予防・ADL支援を中心に行い、頸部の過伸展・過屈曲を避ける。',
+      redFlags: ['手指巧緻運動障害・歩行障害の進行','腱反射亢進・Hoffmann/Babinski陽性','膀胱直腸障害（速やかな画像評価・専門医紹介が必要）']
+    },
+    rules: [
+      { tests:['hoffmann','hyperreflexia'], result:'positive', boost:{ name:'脊髄症（上位運動ニューロン障害）を強く示唆', pct:'陽性時：速やかな専門医紹介を推奨', cause:'Hoffmann反射陽性や下肢腱反射亢進・クローヌス・Babinski陽性などの病的反射は、錐体路（上位運動ニューロン）障害を示し、頸椎症性脊髄症などの脊髄圧迫を強く示唆する。巧緻運動障害・痙性歩行・膀胱直腸障害を伴う場合は機能予後に直結するため、緊急性をもってMRI評価と脊椎外科への紹介を行う。' } }
+    ]
+  },
+  // ----- 馬尾 -----
+  'cauda': {
+    default: {
+      name: '馬尾・円錐症候群パターン（緊急）',
+      conditions: [
+        { name: '馬尾症候群（大きな腰椎椎間板ヘルニア等）', pct:'約60%', cause:'L4/5・L5/S1などの大きな正中ヘルニアや腫瘍・血腫による馬尾の圧迫。サドル領域の感覚障害、膀胱直腸障害（尿閉・失禁）、両側下肢の筋力低下・坐骨神経痛を呈する。発症からの時間が予後を左右する緊急疾患。' },
+        { name: '脊髄円錐症候群', pct:'約20%', cause:'脊髄円錐（L1/2レベル）の病変。早期から膀胱直腸障害・サドル麻痺を呈し、上位・下位運動ニューロン徴候が混在しうる。' },
+        { name: '腫瘍・血腫・膿瘍による圧迫', pct:'約15%', cause:'転移性腫瘍・硬膜外血腫/膿瘍などによる急性圧迫。発熱・抗凝固薬・悪性腫瘍歴の有無を確認する。' },
+        { name: '外傷性・医原性', pct:'約5%', cause:'骨折・術後血腫など。' }
+      ],
+      management: '馬尾・円錐症候群は緊急手術の適応となりうる神経学的緊急症である。サドル麻痺・膀胱直腸障害・両側下肢症状のいずれかを認めた時点で、リハビリ的介入よりも緊急の画像評価（MRI）と脊椎外科への即時紹介を最優先する。発症からの時間短縮が機能予後を改善するため、疑った時点でただちに医療機関へ。',
+      redFlags: ['サドル領域（会陰部）の感覚障害','膀胱直腸障害（尿閉・尿便失禁）','両側下肢の筋力低下／急性発症（緊急手術適応を要しうる・ただちに専門医へ）']
+    },
+    rules: [
+      { tests:['saddle','bladder-cauda'], result:'positive', boost:{ name:'馬尾症候群の疑い（神経学的緊急症）', pct:'陽性時：ただちに専門医へ', cause:'サドル領域の感覚障害と膀胱直腸障害がそろう場合、馬尾症候群の可能性が高く、緊急手術の適応となりうる神経学的緊急症である。発症からの時間が機能予後（特に膀胱直腸機能）を左右するため、リハビリ的評価よりも緊急のMRI評価と脊椎外科への即時紹介を最優先する。' } }
+    ]
+  },
+  // ----- 急速進行・全身性 -----
+  'progressive': {
+    default: {
+      name: '急速進行・全身性パターン（GBS・ALS・炎症性等）',
+      conditions: [
+        { name: 'Guillain-Barré症候群（急性炎症性脱髄性多発根神経炎）', pct:'約35%', cause:'先行感染後、数日〜2週で上行する左右対称性の脱力・腱反射消失を呈する。呼吸筋麻痺・自律神経障害を伴うと致命的になりうる緊急疾患。' },
+        { name: '筋萎縮性側索硬化症（ALS）', pct:'約25%', cause:'上位（腱反射亢進・病的反射）と下位（筋萎縮・線維束性収縮）運動ニューロン徴候が混在し、感覚障害を伴わずに進行する。球麻痺（構音・嚥下障害）を伴うことがある。' },
+        { name: '多発性硬化症など中枢脱髄', pct:'約15%', cause:'時間的・空間的に多発する中枢神経症状。視力障害・複視・運動感覚障害が再発寛解する。' },
+        { name: '傍腫瘍性・代謝性・炎症性ニューロパチー', pct:'約25%', cause:'悪性腫瘍・代謝異常・自己免疫を背景に亜急性に進行する。全身検索が必要。' }
+      ],
+      management: '進行速度・上位/下位運動ニューロン徴候の混在・球麻痺・呼吸/自律神経症状を評価し、いずれも神経内科での精査が必要な病態である。急速進行・呼吸/嚥下障害・自律神経症状を認める場合は緊急対応を要する。セラピストは早期に医師へ情報共有し、確定診断前の過負荷を避け、誤嚥/転倒予防・呼吸状態の観察を行う。',
+      redFlags: ['急速に進行・上行する脱力','呼吸困難・嚥下障害（誤嚥/呼吸不全のリスク・緊急）','著明な血圧変動・不整脈（自律神経障害）']
+    },
+    rules: [
+      { tests:['autonomic-resp'], result:'positive', boost:{ name:'重症化リスクの高い病態（緊急）', pct:'陽性時：緊急評価を推奨', cause:'呼吸困難・嚥下障害・著明な血圧変動などの自律神経/呼吸症状を伴う急速進行性の神経症状は、Guillain-Barré症候群の重症型など生命に関わる病態を示唆する。呼吸筋麻痺・誤嚥のリスクが高く、緊急で医療機関を受診し神経内科での評価と全身管理（必要に応じ呼吸管理）を行う必要がある。' } }
+    ]
+  }
+};
+
+// ====== 推奨される対応・アプローチ ======
+const TREATMENTS = {
+  'c5': [
+    { name:'頸椎の安静肢位指導（伸展・患側側屈の回避）', note:'' },
+    { name:'頸部深層屈筋の再教育・肩甲帯アライメント改善', note:'' },
+    { name:'C5神経根への神経モビライゼーション（愛護的に）', note:'' },
+    { name:'三角筋・肘屈曲筋の機能維持', note:'進行性の筋力低下・夜間痛は画像評価のため整形外科へ' }
+  ],
+  'c6': [
+    { name:'頸椎の姿勢調整（椎間孔狭小化を避ける）', note:'' },
+    { name:'頸部深層筋・肩甲帯の再教育', note:'' },
+    { name:'手根管併存例：手関節中間位スプリント・正中神経滑走運動', note:'二重絞扼を念頭に近位/遠位の両方を評価' },
+    { name:'C6神経根への神経モビライゼーション', note:'母指球萎縮・進行性脱力は整形外科／手の外科へ' }
+  ],
+  'c7': [
+    { name:'頸椎の安静肢位・姿勢調整', note:'' },
+    { name:'頸部・肩甲帯の再教育・疼痛管理', note:'' },
+    { name:'C7神経根への神経モビライゼーション', note:'' },
+    { name:'三頭筋・指伸展筋の機能維持', note:'後骨間神経麻痺（感覚正常）との鑑別を継続。進行性脱力は整形外科へ' }
+  ],
+  'c8t1': [
+    { name:'尺骨神経絞扼との鑑別を踏まえた肢位/負荷指導', note:'' },
+    { name:'頸椎姿勢調整・手内在筋の機能維持', note:'' },
+    { name:'神経モビライゼーション（過緊張を避ける）', note:'' },
+    { name:'進行性の手内在筋萎縮・Horner徴候・夜間痛は緊急で画像評価', note:'占拠性病変（Pancoast腫瘍等）を見逃さない' }
+  ],
+  'cts': [
+    { name:'手関節中間位ナイトスプリント（夜間の手根管内圧低減）', note:'' },
+    { name:'正中神経の神経滑走運動・屈筋腱滑走運動', note:'' },
+    { name:'母指球筋の柔軟性改善・前腕回内回外ROM改善', note:'' },
+    { name:'作業姿勢・反復動作の指導', note:'母指球筋萎縮・持続する筋力低下は神経伝導検査・手の外科へ' }
+  ],
+  'cubital': [
+    { name:'肘屈曲位の回避・夜間伸展位装具（肘部管への圧迫軽減）', note:'' },
+    { name:'尺骨神経の神経滑走運動', note:'' },
+    { name:'手内在筋（骨間筋・母指内転筋）の筋力維持・鷲手予防', note:'' },
+    { name:'Guyon管への反復圧迫（自転車・工具）の是正', note:'骨間筋萎縮・Froment陽性は手の外科へ紹介' }
+  ],
+  'radial': [
+    { name:'コックアップスプリントで手関節を機能肢位に保持（拘縮予防）', note:'下垂手・下垂指の二次的拘縮を予防' },
+    { name:'圧迫要因（外圧・肢位）の除去', note:'' },
+    { name:'背屈筋・指伸展筋の機能再教育・腱の滑走維持', note:'' },
+    { name:'神経回復の経過観察', note:'骨折に伴う麻痺・数ヶ月で回復しない例は整形外科／手の外科へ' }
+  ],
+  'tos': [
+    { name:'姿勢改善（頭部前方位・なで肩の是正）', note:'' },
+    { name:'斜角筋・小胸筋の柔軟性改善・肩甲帯挙上筋の強化', note:'' },
+    { name:'誘発肢位（過外転・重量物挙上）の回避指導', note:'' },
+    { name:'神経モビライゼーション', note:'腫脹・色調変化・拍動減弱（血管型）は血管外科／整形外科へ緊急で' }
+  ],
+  'l4': [
+    { name:'腰椎の安静肢位指導（過伸展の調整）', note:'' },
+    { name:'体幹深層筋の再教育・大腿四頭筋の機能維持', note:'' },
+    { name:'L4神経根への神経モビライゼーション', note:'' },
+    { name:'動作指導（膝折れ予防・転倒予防）', note:'進行する膝折れ・膀胱直腸障害は緊急で整形外科へ' }
+  ],
+  'l5': [
+    { name:'腰椎の安静肢位・除圧肢位の活用（狭窄症では前屈位）', note:'' },
+    { name:'体幹深層筋の再教育・中殿筋/母趾背屈筋の機能維持', note:'' },
+    { name:'L5神経根への神経モビライゼーション・運動療法', note:'伸展で増悪しない範囲で実施' },
+    { name:'転倒予防（下垂足傾向への配慮）', note:'進行する下垂足・膀胱直腸障害は緊急で整形外科へ' }
+  ],
+  's1': [
+    { name:'腰椎の安静肢位・除圧肢位の活用', note:'' },
+    { name:'下腿三頭筋・殿筋の機能維持・運動療法', note:'' },
+    { name:'S1神経根への神経モビライゼーション', note:'' },
+    { name:'動作指導・転倒予防', note:'つま先立ち不能・膀胱直腸障害・両側症状は緊急で整形外科へ' }
+  ],
+  'peroneal': [
+    { name:'圧迫要因（脚組み・しゃがみ・外圧）の除去（最優先）', note:'' },
+    { name:'短下肢装具（AFO）で背屈補助・つまずき/転倒予防', note:'足関節拘縮予防を兼ねる' },
+    { name:'背屈筋の機能再教育', note:'' },
+    { name:'回復の経過観察', note:'進行性・改善しない・腫瘤を疑う場合は整形外科で画像評価' }
+  ],
+  'tarsal': [
+    { name:'足部アライメント改善（扁平足への足底挿板）', note:'' },
+    { name:'誘因の除去・後脛骨神経への局所負荷軽減', note:'' },
+    { name:'夜間痛への安静・神経保護', note:'' },
+    { name:'経過観察', note:'占拠性病変疑い・保存抵抗例は整形外科／足の外科へ。両側対称なら全身性検索' }
+  ],
+  'meralgia': [
+    { name:'誘因の除去（減量・締め付ける衣服やベルトの是正・姿勢調整）', note:'最優先' },
+    { name:'神経への局所圧迫軽減・愛護的な神経モビライゼーション', note:'' },
+    { name:'経過観察（多くは保存的に軽快）', note:'難治性・強い灼熱痛は神経ブロック等の適応評価のため整形外科／ペインクリニックへ' }
+  ],
+  'dermatomal': [
+    { name:'罹患髄節の特定（感覚・筋力・反射・誘発テストの統合）', note:'' },
+    { name:'神経根への負荷を避ける姿勢・運動療法', note:'頸椎/腰椎に応じた肢位調整' },
+    { name:'神経モビライゼーション・疼痛管理', note:'' },
+    { name:'動作・生活指導', note:'進行性運動麻痺・両側症状・膀胱直腸障害は画像評価のため整形外科へ' }
+  ],
+  'mononeuropathy': [
+    { name:'絞扼部位の同定（限局分布・Tinel・選択的筋力低下）', note:'' },
+    { name:'誘因（反復動作・外圧）の除去・絞扼部への負荷軽減', note:'' },
+    { name:'神経滑走運動・局所の神経保護', note:'' },
+    { name:'経過観察', note:'進行性筋萎縮・複数神経障害は神経伝導検査・専門医評価へ' }
+  ],
+  'polyneuropathy': [
+    { name:'全身性背景の検索（糖尿病・腎不全・アルコール・薬剤・栄養）を医師と連携', note:'採血等は医師と連携' },
+    { name:'フットケア・感覚低下に伴う外傷/熱傷・潰瘍の予防指導', note:'' },
+    { name:'転倒予防・バランス練習', note:'' },
+    { name:'急速進行・上行性脱力・呼吸/嚥下症状はGBSを疑い緊急受診', note:'生命に関わるため即時対応' }
+  ],
+  'myelopathy': [
+    { name:'上位運動ニューロン徴候を認めた時点で速やかに脊椎外科へ紹介（最優先）', note:'機能予後に直結。MRI評価を' },
+    { name:'医師評価後の転倒予防・ADL支援', note:'' },
+    { name:'頸部の過伸展・過屈曲を避ける肢位指導', note:'' },
+    { name:'巧緻動作・歩行の安全性確保', note:'膀胱直腸障害の出現は緊急サイン' }
+  ],
+  'cauda': [
+    { name:'ただちに緊急の画像評価（MRI）と脊椎外科への即時紹介（最優先）', note:'神経学的緊急症。発症からの時間が予後を左右' },
+    { name:'リハビリ的介入より緊急受診を優先', note:'' },
+    { name:'（医師評価後）膀胱直腸機能・下肢機能への対応', note:'サドル麻痺・膀胱直腸障害を疑った時点でただちに専門医へ' }
+  ],
+  'progressive': [
+    { name:'神経内科での精査につなぐ早期の情報共有（最優先）', note:'進行速度・徴候の混在・球麻痺/呼吸症状を医師へ' },
+    { name:'確定診断前の過負荷を避ける', note:'' },
+    { name:'誤嚥・転倒予防、呼吸状態の観察', note:'' },
+    { name:'急速進行・呼吸/嚥下障害・自律神経症状は緊急受診', note:'生命に関わるため即時対応' }
+  ]
+};
+
+function renderTreatments(subId){
+  const tx = (typeof TREATMENTS!=='undefined') ? TREATMENTS[subId] : null;
+  if(!tx || !tx.length) return '';
+  const items = tx.map(function(it){
+    return '<li><span class="tx-name">'+it.name+'</span>'+(it.note?'<span class="tx-note">'+it.note+'</span>':'')+'</li>';
+  }).join('');
+  return '<div class="result-block tx-block">'
+    + '<div class="result-block-header"><span class="result-block-icon">\uD83D\uDCAA</span> \u63A8\u5968\u3055\u308C\u308B\u5BFE\u5FDC\u30FB\u30A2\u30D7\u30ED\u30FC\u30C1</div>'
+    + '<div class="result-block-body"><ul class="tx-list">'+items+'</ul>'
+    + '<div class="tx-foot">\u203B\u8A55\u4FA1\u6240\u898B\u306B\u5FDC\u3058\u3066\u512A\u5148\u9806\u4F4D\u3092\u5224\u65AD\u3057\u3001\u75DB\u307F\u30FB\u7981\u5FCC\u30FB\u795E\u7D4C\u306E\u904E\u7DCA\u5F35\u306B\u914D\u616E\u3057\u3066\u6BB5\u968E\u7684\u306B\u5B9F\u65BD\u3057\u3066\u304F\u3060\u3055\u3044\u3002</div>'
+    + '</div></div>';
+}
+
+function renderRedFlags(diag){
+  if(!diag || !diag.redFlags || !diag.redFlags.length) return '';
+  const items = diag.redFlags.map(function(f){ return '<li>'+f+'</li>'; }).join('');
+  return '<div class="result-block redflag-block">'
+    + '<div class="result-block-header"><span class="result-block-icon">\uD83D\uDEA8</span> \u898B\u9003\u3057\u3066\u306F\u3044\u3051\u306A\u3044\u5371\u967A\u4FE1\u53F7\uFF08red flags\uFF09</div>'
+    + '<div class="result-block-body"><ul class="redflag-list">'+items+'</ul>'
+    + '<div class="tx-foot">\u4E0A\u8A18\u3092\u8A8D\u3081\u308B\u5834\u5408\u306F\u3001\u30BB\u30E9\u30D4\u30B9\u30C8\u5358\u72EC\u3067\u306E\u5BFE\u5FDC\u3092\u9078\u3070\u305A\u901F\u3084\u304B\u306B\u533B\u5E2B\uFF0F\u5C02\u9580\u533B\u3078\u7D39\u4ECB\u3057\u3066\u304F\u3060\u3055\u3044\u3002</div>'
+    + '</div></div>';
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  region: null,
+  subregion: null,
+  checkedTests: new Set(),
+  testResults: {}
+};
+
+// ============================================================
+// REFERENCE TOGGLE
+// ============================================================
+function toggleRef(){
+  document.getElementById('ref-panel').classList.toggle('open');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goStep(n) {
+  if (n === 2 && !state.region) return;
+  if (n === 3 && !state.subregion) return;
+  if (n === 4 && state.checkedTests.size === 0) return;
+
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+
+  document.querySelectorAll('.step-nav-item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.remove('active', 'done');
+    if (s === n) item.classList.add('active');
+    else if (s < n) item.classList.add('done');
+  });
+}
+
+// ============================================================
+// STEP 1: Region
+// ============================================================
+function selectRegion(regionId) {
+  state.region = regionId;
+  state.subregion = null;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + regionId).classList.add('selected');
+
+  buildSubregions();
+  goStep(2);
+}
+
+// ============================================================
+// STEP 2: Subregion
+// ============================================================
+function buildSubregions() {
+  const list = document.getElementById('subregion-list');
+  list.innerHTML = '';
+  const subs = SUBREGIONS[state.region] || [];
+  subs.forEach(sub => {
+    const el = document.createElement('div');
+    el.className = 'subregion-card';
+    el.id = 'src-' + sub.id;
+    el.innerHTML = `<div class="subregion-label">${sub.label}</div><div class="subregion-desc">${sub.desc}</div>`;
+    el.onclick = () => selectSubregion(sub);
+    list.appendChild(el);
+  });
+}
+
+function selectSubregion(sub) {
+  state.subregion = sub;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.subregion-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('src-' + sub.id)?.classList.add('selected');
+
+  buildTests();
+  updateBreadcrumb();
+  goStep(3);
+}
+
+// ============================================================
+// STEP 3: Tests
+// ============================================================
+function buildTests() {
+  const tests = TESTS[state.subregion.id] || [];
+  const list = document.getElementById('test-list');
+  list.innerHTML = '';
+
+  if (tests.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>この病態の評価項目は準備中です。</p></div>';
+    return;
+  }
+
+  tests.forEach(test => {
+    const el = document.createElement('div');
+    el.className = 'test-card';
+    el.id = 'tc-' + test.id;
+    el.innerHTML = `
+      <div class="test-card-header" onclick="toggleTest('${test.id}')">
+        <div class="test-checkbox" id="chk-${test.id}"></div>
+        <div class="test-info">
+          <div class="test-name">${test.name}</div>
+          <div class="test-purpose">目的：${test.purpose}</div>
+        </div>
+        <span class="test-category-badge ${test.badge}">${getCategoryLabel(test.category)}</span>
+      </div>
+      <div class="test-result-panel">
+        <div class="result-label">評価結果を選択してください：</div>
+        <div class="result-buttons">
+          <button class="result-btn" onclick="setResult('${test.id}','positive',this)">陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','false',this)">偽陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','negative',this)">陰性</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function getCategoryLabel(cat) {
+  const map = { provoc:'誘発テスト', sensory:'感覚評価', motor:'筋力・髄節(MMT)', reflex:'反射', central:'中枢・危険徴候', obs:'観察・歩行' };
+  return map[cat] || cat;
+}
+
+function toggleTest(testId) {
+  const card = document.getElementById('tc-' + testId);
+  if (state.checkedTests.has(testId)) {
+    state.checkedTests.delete(testId);
+    delete state.testResults[testId];
+    card.classList.remove('checked');
+  } else {
+    state.checkedTests.add(testId);
+    card.classList.add('checked');
+  }
+  updateEvalBtn();
+}
+
+function setResult(testId, result, btn) {
+  state.testResults[testId] = result;
+  const panel = btn.closest('.test-result-panel');
+  panel.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active-positive','active-false','active-negative'));
+  const cls = result === 'positive' ? 'active-positive' : result === 'false' ? 'active-false' : 'active-negative';
+  btn.classList.add(cls);
+  updateEvalBtn();
+}
+
+function updateEvalBtn() {
+  const btn = document.getElementById('eval-btn');
+  btn.disabled = state.checkedTests.size === 0;
+}
+
+function updateBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  const bc2 = document.getElementById('breadcrumb2');
+  const reg = REGIONS[state.region];
+  const html = `<span class="crumb">${reg.icon} ${reg.name}</span><span class="sep">›</span><span class="crumb">${state.subregion.label}</span>`;
+  bc.innerHTML = html;
+  bc2.innerHTML = html;
+}
+
+// ============================================================
+// STEP 4: Result
+// ============================================================
+function showResult() {
+  updateBreadcrumb();
+  buildResult();
+  goStep(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildResult() {
+  const content = document.getElementById('result-content');
+  const subId = state.subregion.id;
+  const diagData = DIAGNOSES[subId];
+
+  if (!diagData) {
+    content.innerHTML = '<div class="info-msg">ℹ️ この病態の詳細鑑別データは準備中です。</div>';
+    return;
+  }
+
+  const checkedArr = Array.from(state.checkedTests);
+  const evidenceRows = checkedArr.map(testId => {
+    const tests = TESTS[subId] || [];
+    const t = tests.find(x => x.id === testId);
+    const result = state.testResults[testId] || '未選択';
+    return { name: t ? t.name : testId, result };
+  });
+
+  let mainDiag = diagData.default;
+  let boostedCondition = null;
+  if (diagData.rules) {
+    for (const rule of diagData.rules) {
+      const allMatch = rule.tests.every(tid => state.checkedTests.has(tid) && state.testResults[tid] === rule.result);
+      if (allMatch) {
+        boostedCondition = rule.boost;
+        break;
+      }
+    }
+  }
+
+  const positiveCount = checkedArr.filter(t => state.testResults[t] === 'positive').length;
+  const totalChecked = checkedArr.length;
+  const confidence = positiveCount === 0 ? '評価実施のみ' : positiveCount >= 3 ? '複数陽性あり（局在・精査を考慮）' : '一部陽性あり';
+
+  let html = '';
+
+  html += `
+    <div class="result-header">
+      <div class="result-tag">▶ 鑑別の方向性</div>
+      <h3>${boostedCondition ? boostedCondition.name : mainDiag.name}</h3>
+      <span class="result-confidence">評価数: ${totalChecked}項目 ／ 陽性: ${positiveCount}項目 ／ ${confidence}</span>
+    </div>
+    <div class="result-blocks">
+  `;
+
+  if (boostedCondition) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">⚡</span> 評価パターンによる上位鑑別</div>
+        <div class="result-block-body">
+          <strong>${boostedCondition.name}</strong><br>
+          <strong>考察：</strong>${boostedCondition.cause}
+          <div style="margin-top:10px; font-size:0.82rem; color:#666;">※以下の鑑別条件も合わせて参照してください。</div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">📊</span> 考えられる病態と頻度・根拠</div>
+      <div class="result-block-body">
+  `;
+  mainDiag.conditions.forEach(c => {
+    html += `
+      <div class="cause-item">
+        <div class="cause-pct">${c.pct}</div>
+        <div class="cause-text">
+          <div class="cause-name">${c.name}</div>
+          <div class="cause-detail">考察：${c.cause}</div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div></div>`;
+
+  if (evidenceRows.length > 0) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">📋</span> 今回の評価結果一覧</div>
+        <div class="result-block-body" style="padding:0;">
+          <table class="evidence-table">
+            <tr><th>評価項目</th><th>結果</th></tr>
+    `;
+    evidenceRows.forEach(row => {
+      const cls = row.result === 'positive' ? 'ev-pos' : row.result === 'false' ? 'ev-false' : row.result === 'negative' ? 'ev-neg' : '';
+      const label = row.result === 'positive' ? '陽性' : row.result === 'false' ? '偽陽性' : row.result === 'negative' ? '陰性' : row.result;
+      html += `<tr><td>${row.name}</td><td class="${cls}">${label}</td></tr>`;
+    });
+    html += `</table></div></div>`;
+  }
+
+  html += `
+    ${renderTreatments(subId)}
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">🏥</span> 対応・評価の方向性（理学療法的視点）</div>
+      <div class="result-block-body">${mainDiag.management}</div>
+    </div>
+    ${renderRedFlags(mainDiag)}
+  `;
+
+  html += `
+    <div class="caution-box">
+      <span class="caution-icon">⚠️</span>
+      <div><strong>注意事項：</strong>本ツールはセラピストの臨床推論を構造化した学習・思考支援ツールであり、医療診断の代替ではありません。神経症状は中枢性・全身性・占拠性病変など重篤な原因を含みます。進行する筋力低下・筋萎縮、膀胱直腸障害、サドル麻痺、急速進行、安静時/夜間痛、両側症状などの危険信号（red flags）を認める場合は、速やかに医師へご紹介ください。</div>
+    </div>
+  `;
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetAll() {
+  state = { region: null, subregion: null, checkedTests: new Set(), testResults: {} };
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('subregion-list').innerHTML = '';
+  document.getElementById('test-list').innerHTML = '';
+  document.getElementById('result-content').innerHTML = '';
+  document.getElementById('eval-btn').disabled = true;
+  goStep(1);
+}
+</script>
+</body>
+</html>

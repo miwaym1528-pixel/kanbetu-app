@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健やか式症状鑑別 手指特化Ver.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap');
+
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2563a8;
+    --accent: #e85d26;
+    --accent2: #2ecc96;
+    --accent3: #f0a500;
+    --step1: #2563a8;
+    --step2: #d63636;
+    --step3: #2eaa6e;
+    --step4: #7c3aed;
+    --bg: #f4f6fa;
+    --bg-card: #ffffff;
+    --text: #1a202c;
+    --text-sub: #4a5568;
+    --border: #e2e8f0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 24px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(26,58,92,0.25);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .header-icon { font-size: 36px; }
+  .header-text h1 { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em; }
+  .header-text p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+
+  /* ===== MAIN ===== */
+  .app-main { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ===== STEP INDICATOR ===== */
+  .step-nav {
+    display: flex;
+    gap: 0;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .step-nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #a0aec0;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .step-nav-item.active {
+    color: white;
+  }
+  .step-nav-item[data-step="1"].active { background: var(--step1); border-bottom-color: var(--step1); }
+  .step-nav-item[data-step="2"].active { background: var(--step2); border-bottom-color: var(--step2); }
+  .step-nav-item[data-step="3"].active { background: var(--step3); border-bottom-color: var(--step3); }
+  .step-nav-item[data-step="4"].active { background: var(--step4); border-bottom-color: var(--step4); }
+  .step-nav-item.done { color: var(--text-sub); background: #f0f4ff; border-bottom-color: #c3d0e8; }
+  .step-num { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+
+  /* ===== SECTIONS ===== */
+  .step-section { display: none; animation: fadeIn 0.35s ease; }
+  .step-section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 900;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .step-badge.s1 { background: var(--step1); }
+  .step-badge.s2 { background: var(--step2); }
+  .step-badge.s3 { background: var(--step3); }
+  .step-badge.s4 { background: var(--step4); }
+
+  .section-title h2 { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+  .section-subtitle { font-size: 0.83rem; color: var(--text-sub); margin-top: 2px; }
+
+  /* ===== REGION CARDS (STEP 1) ===== */
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .region-card {
+    background: var(--bg-card);
+    border: 2.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 12px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .region-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+  .region-card.selected { border-color: var(--primary-light); background: #eef3ff; box-shadow: 0 0 0 3px rgba(37,99,168,0.18); }
+  .region-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+  .region-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+
+  /* ===== SUBREGION GRID (STEP 2) ===== */
+  .subregion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .subregion-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .subregion-card:hover { border-color: var(--step2); background: #fff5f5; }
+  .subregion-card.selected { border-color: var(--step2); background: #fff5f5; box-shadow: 0 0 0 3px rgba(214,54,54,0.12); }
+  .subregion-label { font-weight: 700; font-size: 0.9rem; color: var(--step2); margin-bottom: 4px; }
+  .subregion-desc { font-size: 0.78rem; color: var(--text-sub); }
+
+  /* ===== BACK BUTTON ===== */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 99px;
+    background: white;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 20px;
+  }
+  .back-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
+
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.83rem;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .breadcrumb .crumb { font-weight: 600; color: var(--primary); }
+  .breadcrumb .sep { color: #cbd5e0; }
+
+  /* ===== TEST CARDS (STEP 3) ===== */
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .test-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .test-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .test-card.checked .test-checkbox { background: var(--step3); border-color: var(--step3); }
+  .test-card.checked .test-checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: 700; }
+  .test-info { flex: 1; }
+  .test-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+  .test-purpose { font-size: 0.78rem; color: var(--text-sub); margin-top: 3px; }
+  .test-category-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .badge-ortho { background: #e0f0ff; color: #1a5fa8; }
+  .badge-palpation { background: #fff0e0; color: #a85a00; }
+  .badge-neurological { background: #f0e8ff; color: #6830b0; }
+  .badge-rom { background: #e8fff0; color: #0a8040; }
+  .badge-mmt { background: #fff0f5; color: #b0286a; }
+  .badge-posture { background: #f5f5e8; color: #6b5a00; }
+
+  /* Result selector */
+  .test-result-panel {
+    display: none;
+    padding: 0 16px 14px 52px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .test-card.checked .test-result-panel { display: flex; }
+  .result-label { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); }
+  .result-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .result-btn {
+    padding: 6px 16px;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.18s;
+    color: var(--text-sub);
+  }
+  .result-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .result-btn.active-positive { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+  .result-btn.active-false { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+  .result-btn.active-negative { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+
+  /* ===== EVALUATE BUTTON ===== */
+  .evaluate-btn-wrap { margin-top: 24px; text-align: center; }
+  .evaluate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    transition: all 0.22s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .evaluate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.4); }
+  .evaluate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== RESULT SECTION (STEP 4) ===== */
+  .result-header {
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.25);
+  }
+  .result-header .result-tag { font-size: 0.8rem; opacity: 0.85; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .result-header h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+  .result-header .result-confidence {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .result-blocks { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-block {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .result-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f8f9fc;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+  }
+  .result-block-icon { font-size: 1.2rem; }
+  .result-block-body { padding: 16px; font-size: 0.88rem; line-height: 1.9; color: var(--text); }
+  .result-block-body strong { color: var(--primary); }
+
+  .cause-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cause-item:last-child { border-bottom: none; }
+  .cause-pct {
+    font-size: 1.0rem;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .cause-text { flex: 1; }
+  .cause-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
+  .cause-detail { font-size: 0.82rem; color: var(--text-sub); }
+
+  /* Evidence table */
+  .evidence-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .evidence-table th { background: #f0f4ff; color: var(--primary); padding: 8px 12px; text-align: left; font-weight: 700; }
+  .evidence-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+  .evidence-table tr:last-child td { border-bottom: none; }
+  .ev-pos { color: #b91c1c; font-weight: 700; }
+  .ev-false { color: #854d0e; font-weight: 700; }
+  .ev-neg { color: #15803d; font-weight: 700; }
+
+  /* Caution box */
+  .caution-box {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.83rem;
+    color: #78350f;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .caution-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* New eval button */
+  .new-eval-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: white;
+    border: 2.5px solid var(--primary-light);
+    border-radius: 99px;
+    color: var(--primary-light);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 24px;
+  }
+  .new-eval-btn:hover { background: var(--primary-light); color: white; }
+
+  /* No selection message */
+  .info-msg {
+    background: #eef3ff;
+    border: 1.5px solid #c3d0e8;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 0.88rem;
+    color: var(--primary);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-sub);
+  }
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+  @media (max-width: 600px) {
+    .app-header { padding: 16px 16px 14px; }
+    .header-text h1 { font-size: 1.2rem; }
+    .app-main { padding: 20px 12px 60px; }
+    .region-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .step-nav-item { font-size: 0.68rem; padding: 10px 4px; }
+  }
+
+  .tx-block .result-block-header { background: linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
+  .tx-list { list-style:none; margin:0; padding:0; }
+  .tx-list li { position:relative; padding:9px 0 9px 24px; border-bottom:1px solid #eef2f4; line-height:1.7; font-size:0.9rem; }
+  .tx-list li:last-child { border-bottom:none; }
+  .tx-list li::before { content:''; position:absolute; left:5px; top:16px; width:9px; height:9px; border-radius:50%; background:#0f766e; }
+  .tx-name { font-weight:700; color:#1f2d3a; }
+  .tx-note { display:block; font-size:0.8rem; color:#9a6b00; margin-top:3px; }
+  .tx-foot { margin-top:12px; font-size:0.8rem; color:#8a97a0; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <span class="header-icon">🩺</span>
+    <div class="header-text">
+      <h1>健やか式症状鑑別　手指特化 Ver.</h1>
+      <p>母指・手指の関節／しびれ・感覚障害／腱・腱鞘の痛みの鑑別を支援する臨床推論ツール｜セラピストの評価戦略を構造化</p>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- Step Navigation -->
+  <nav class="step-nav">
+    <div class="step-nav-item active" data-step="1" onclick="goStep(1)">
+      <span class="step-num">①</span>部位選択
+    </div>
+    <div class="step-nav-item" data-step="2" onclick="goStep(2)">
+      <span class="step-num">②</span>痛みの部位
+    </div>
+    <div class="step-nav-item" data-step="3" onclick="goStep(3)">
+      <span class="step-num">③</span>評価入力
+    </div>
+    <div class="step-nav-item" data-step="4" onclick="goStep(4)">
+      <span class="step-num">④</span>鑑別結果
+    </div>
+  </nav>
+
+  <!-- ===== STEP 1: Region Selection ===== -->
+  <section class="step-section active" id="step-1">
+    <div class="section-title">
+      <span class="step-badge s1">1</span>
+      <div>
+        <h2>部位を選択してください</h2>
+        <p class="section-subtitle">痛みやしびれが生じている部位はどこですか？</p>
+      </div>
+    </div>
+    <div class="region-grid">
+      <div class="region-card" onclick="selectRegion('thumb')" id="rc-thumb">
+        <span class="region-icon">👍</span>
+        <div class="region-name">母指</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">CM・MP・IP関節</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('finger')" id="rc-finger">
+        <span class="region-icon">✋</span>
+        <div class="region-name">示指〜小指</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">MP・PIP・DIP関節</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('numb')" id="rc-numb">
+        <span class="region-icon">🖐️</span>
+        <div class="region-name">しびれ・感覚障害</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">正中・尺骨・固有指神経</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('tendon')" id="rc-tendon">
+        <span class="region-icon">✊</span>
+        <div class="region-name">腱・腱鞘</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">ばね指・屈筋腱・伸筋腱</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STEP 2: Subregion ===== -->
+  <section class="step-section" id="step-2">
+    <button class="back-btn" onclick="goStep(1)">← 部位選択へ戻る</button>
+    <div class="section-title">
+      <span class="step-badge s2">2</span>
+      <div>
+        <h2>痛みの部位を選択してください</h2>
+        <p class="section-subtitle">どの方向・部位に痛みがありますか？</p>
+      </div>
+    </div>
+    <div class="subregion-grid" id="subregion-list"></div>
+  </section>
+
+  <!-- ===== STEP 3: Evaluation ===== -->
+  <section class="step-section" id="step-3">
+    <button class="back-btn" onclick="goStep(2)">← 痛みの部位へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="section-title">
+      <span class="step-badge s3">3</span>
+      <div>
+        <h2>評価項目を選択・入力してください</h2>
+        <p class="section-subtitle">実施した評価にチェックを入れ、結果（陽性／偽陽性／陰性）を選択してください。複数選択可。</p>
+      </div>
+    </div>
+    <div class="test-list" id="test-list"></div>
+    <div class="evaluate-btn-wrap">
+      <button class="evaluate-btn" onclick="showResult()" id="eval-btn" disabled>
+        🔍 評価結果を表示する
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 4: Result ===== -->
+  <section class="step-section" id="step-4">
+    <button class="back-btn" onclick="goStep(3)">← 評価入力へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb2"></div>
+    <div class="section-title">
+      <span class="step-badge s4">4</span>
+      <div>
+        <h2>鑑別結果</h2>
+        <p class="section-subtitle">評価結果に基づく鑑別診断と原因考察</p>
+      </div>
+    </div>
+    <div id="result-content"></div>
+    <div style="text-align:center">
+      <button class="new-eval-btn" onclick="resetAll()">🔄 新しい評価を開始する</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// DATA DEFINITIONS
+// ============================================================
+
+const REGIONS = {
+  thumb:  { name: '母指', icon: '👍' },
+  finger: { name: '示指〜小指', icon: '✋' },
+  numb:   { name: 'しびれ・感覚障害', icon: '🖐️' },
+  tendon: { name: '腱・腱鞘', icon: '✊' }
+};
+
+const SUBREGIONS = {
+  thumb: [
+    { id:'thumb-cm', label:'母指CM関節の痛み', desc:'第1手根中手関節・基部／つまみ動作痛' },
+    { id:'thumb-mp', label:'母指MP関節の痛み・不安定', desc:'尺側側副靭帯・掌側板（スキーヤー母指）' },
+    { id:'thumb-ip', label:'母指IP関節の痛み・伸展不能', desc:'IP関節症・長母指伸筋腱（EPL）障害' }
+  ],
+  finger: [
+    { id:'finger-mp', label:'MP関節の痛み・変形', desc:'中手指節関節・矢状索・尺側偏位' },
+    { id:'finger-pip', label:'PIP関節の痛み・腫脹', desc:'突き指・側副靭帯・ボタン穴・ブシャール結節' },
+    { id:'finger-dip', label:'DIP関節の痛み・変形', desc:'槌指・ヘバーデン結節・粘液嚢腫' }
+  ],
+  numb: [
+    { id:'numb-median', label:'母指〜環指橈側のしびれ', desc:'正中神経領域（手根管・円回内筋）' },
+    { id:'numb-ulnar', label:'環指尺側〜小指のしびれ', desc:'尺骨神経領域（肘部管・Guyon管）' },
+    { id:'numb-digital', label:'1指のみ・限局性のしびれ', desc:'固有指神経の絞扼・圧迫' }
+  ],
+  tendon: [
+    { id:'tendon-flexor', label:'屈曲時の引っかかり・弾発', desc:'ばね指・屈筋腱（FDP/FDS）損傷' },
+    { id:'tendon-extensor', label:'伸展できない・伸筋腱の障害', desc:'槌指・中央索・伸筋腱皮下断裂' }
+  ]
+};
+
+// TESTS database
+const TESTS = {
+  'thumb-cm': [
+    { id:'grind-test', name:'Grind test（軸圧迫＋回旋）', category:'ortho', purpose:'母指中手骨に軸圧と回旋を加え、CM関節の疼痛・軋轢音を確認する。CM関節症の誘発テスト', badge:'badge-ortho' },
+    { id:'cm-palpation', name:'母指CM関節（第1中手骨基部）の圧痛触診', category:'palpation', purpose:'解剖学的嗅ぎタバコ入れ近位・第1中手骨基部の圧痛を直接触診で確認する', badge:'badge-palpation' },
+    { id:'square-deformity', name:'Square hand（角張り変形）の視診', category:'posture', purpose:'CM関節背側亜脱臼による第1中手骨基部の突出（shoulder sign）を確認し、CM関節症の進行を評価', badge:'badge-posture' },
+    { id:'adductor-tight', name:'母指内転筋の短縮評価（第1指間開大）', category:'rom', purpose:'母指内転筋の短縮は第1中手骨の内転変位を増強しCM関節圧縮を高める。第1指間（web space）の開大制限を確認', badge:'badge-rom' },
+    { id:'apl-mmt', name:'長母指外転筋（APL）の筋力評価', category:'mmt', purpose:'母指橈側外転の筋力低下はCM関節の動的安定性低下に関与する', badge:'badge-mmt' },
+    { id:'pinch-eval', name:'つまみ動作（pinch）・対立運動の評価', category:'rom', purpose:'つまみ動作時の疼痛・代償（IP過屈曲）・対立可動域を確認する', badge:'badge-rom' }
+  ],
+  'thumb-mp': [
+    { id:'ucl-valgus', name:'MP関節尺側側副靭帯ストレステスト（外反）', category:'ortho', purpose:'MP屈曲位・伸展位で橈側偏位（外反）ストレスを加え動揺性（健側比＞15°・絶対35°）を確認。UCL損傷の評価', badge:'badge-ortho' },
+    { id:'ucl-palpation', name:'MP関節尺側の圧痛・結節触診', category:'palpation', purpose:'尺側側副靭帯付着部（基節骨基部尺側）の圧痛・腫脹を確認。可動性ある結節触知はStener損傷を示唆', badge:'badge-palpation' },
+    { id:'pinch-strength', name:'つまみ力（key pinch）の評価', category:'mmt', purpose:'UCL不全ではつまみ力・安定性が低下する。健側比で評価', badge:'badge-mmt' },
+    { id:'mp-rom-thumb', name:'母指MP関節ROM（屈曲・伸展）', category:'rom', purpose:'MP関節の可動域制限・疼痛パターン・過伸展を確認', badge:'badge-rom' },
+    { id:'volar-plate-mp', name:'MP関節過伸展ストレス（掌側板）', category:'ortho', purpose:'過伸展ストレスで掌側板損傷による掌側痛・過伸展不安定を確認', badge:'badge-ortho' }
+  ],
+  'thumb-ip': [
+    { id:'ip-palpation', name:'母指IP関節の圧痛・腫脹触診', category:'palpation', purpose:'IP関節背側・側方の圧痛と骨性肥大を確認', badge:'badge-palpation' },
+    { id:'ip-rom', name:'母指IP関節ROM（屈曲・伸展）', category:'rom', purpose:'屈曲伸展制限・軋轢音・伸展ラグを確認', badge:'badge-rom' },
+    { id:'epl-function-ip', name:'長母指伸筋（EPL）機能テスト（retropulsion）', category:'mmt', purpose:'手掌を机につけ母指を持ち上げる（lift-off）。挙上不能はEPL皮下断裂を示唆（陽性＝挙上不能）', badge:'badge-mmt' },
+    { id:'fpl-function', name:'長母指屈筋（FPL）機能テスト', category:'mmt', purpose:'IP関節の自動屈曲を確認。屈曲不能はFPL損傷を示唆（陽性＝屈曲不能）', badge:'badge-mmt' }
+  ],
+  'finger-mp': [
+    { id:'mp-palpation', name:'MP関節の圧痛・滑膜腫脹触診', category:'palpation', purpose:'MP関節背側・掌側の滑膜腫脹・圧痛を確認', badge:'badge-palpation' },
+    { id:'mp-rom', name:'MP関節ROM（屈曲・伸展）', category:'rom', purpose:'可動域制限・伸展ラグを確認', badge:'badge-rom' },
+    { id:'ulnar-drift', name:'手指尺側偏位の視診', category:'posture', purpose:'手指の尺側偏位はMP関節滑膜炎（関節リウマチ）を示唆する重要所見（陽性＝偏位あり）', badge:'badge-posture' },
+    { id:'sagittal-band', name:'矢状索損傷テスト（伸筋腱脱臼）', category:'ortho', purpose:'MP屈伸時に総指伸筋腱が尺側へ脱臼するか確認。中指好発。屈曲時の弾発で陽性', badge:'badge-ortho' },
+    { id:'mp-collateral', name:'MP関節側副靭帯ストレステスト', category:'ortho', purpose:'側方動揺性で側副靭帯損傷を評価', badge:'badge-ortho' },
+    { id:'grip-strength', name:'握力の評価', category:'mmt', purpose:'握力低下の程度と疼痛・代償を確認', badge:'badge-mmt' }
+  ],
+  'finger-pip': [
+    { id:'pip-palpation', name:'PIP関節の圧痛・腫脹触診', category:'palpation', purpose:'PIP関節背側・側方の圧痛と腫脹を確認', badge:'badge-palpation' },
+    { id:'pip-rom', name:'PIP関節ROM（屈曲・伸展）', category:'rom', purpose:'伸展制限・屈曲拘縮・過伸展（swan neck傾向）を確認', badge:'badge-rom' },
+    { id:'collateral-stress-pip', name:'PIP側副靭帯ストレステスト', category:'ortho', purpose:'側方動揺性で側副靭帯損傷（突き指）を評価（陽性＝動揺性あり）', badge:'badge-ortho' },
+    { id:'volar-plate-pip', name:'掌側板損傷テスト（過伸展ストレス）', category:'ortho', purpose:'PIP過伸展で掌側板損傷・過伸展不安定を確認', badge:'badge-ortho' },
+    { id:'elson-test', name:'Elson test（中央索損傷）', category:'ortho', purpose:'PIP90°屈曲位で伸展抵抗をかけDIPの状態を確認。DIPが硬く伸展する場合は中央索損傷＝ボタン穴変形（陽性）', badge:'badge-ortho' },
+    { id:'bouchard', name:'ブシャール結節の視診・触診', category:'posture', purpose:'PIP関節の骨性肥大はPIP変形性関節症を示唆', badge:'badge-posture' }
+  ],
+  'finger-dip': [
+    { id:'dip-palpation', name:'DIP関節の圧痛・腫脹触診', category:'palpation', purpose:'DIP関節背側の圧痛・骨性肥大を確認', badge:'badge-palpation' },
+    { id:'dip-rom', name:'DIP関節ROM（屈曲・伸展）', category:'rom', purpose:'伸展ラグ・屈曲制限を確認', badge:'badge-rom' },
+    { id:'mallet-drop', name:'槌指（mallet finger）の視診', category:'ortho', purpose:'DIPが屈曲位で自動伸展不能（extension lag）なら終止伸筋腱損傷を示唆（陽性＝伸展不能）', badge:'badge-ortho' },
+    { id:'heberden', name:'ヘバーデン結節の視診・触診', category:'posture', purpose:'DIP関節の骨性肥大（結節）はDIP変形性関節症を示唆', badge:'badge-posture' },
+    { id:'mucous-cyst', name:'粘液嚢腫（mucous cyst）の視診', category:'palpation', purpose:'DIP背側・爪基部の半透明腫瘤を確認。爪変形を伴うことがある', badge:'badge-palpation' }
+  ],
+  'numb-median': [
+    { id:'phalen', name:'Phalen test', category:'ortho', purpose:'手関節最大掌屈位を60秒保持し正中神経領域のしびれ増悪を確認。手根管内圧上昇による圧迫の評価', badge:'badge-ortho' },
+    { id:'tinel-carpal', name:'Tinel sign（手根管部）', category:'ortho', purpose:'手関節掌側（手根管）を叩打し末梢への放散痛・しびれで陽性', badge:'badge-ortho' },
+    { id:'durkan', name:'手根管圧迫テスト（Durkan test）', category:'ortho', purpose:'手根管を母指で30秒圧迫し症状誘発。感度・特異度が比較的高い', badge:'badge-ortho' },
+    { id:'median-sensory', name:'正中神経領域の感覚評価', category:'neurological', purpose:'母指〜環指橈側の感覚低下・2点識別覚を確認', badge:'badge-neurological' },
+    { id:'thenar-mmt', name:'母指球筋（短母指外転筋）MMT・萎縮', category:'mmt', purpose:'短母指外転筋の筋力低下・母指球萎縮は重症手根管症候群（軸索障害）を示唆', badge:'badge-mmt' }
+  ],
+  'numb-ulnar': [
+    { id:'tinel-cubital', name:'Tinel sign（肘部管）', category:'ortho', purpose:'肘内側（尺骨神経溝）の叩打で前腕尺側〜小指への放散痛を確認。肘部管症候群の評価', badge:'badge-ortho' },
+    { id:'tinel-guyon', name:'Tinel sign（Guyon管）', category:'ortho', purpose:'手関節尺側掌側（Guyon管）の叩打で症状誘発。Guyon管症候群の評価', badge:'badge-ortho' },
+    { id:'froment', name:'Froment徴候', category:'neurological', purpose:'母指と示指で紙を挟ませると母指IPが屈曲（長母指屈筋で代償）。母指内転筋（尺骨神経深枝）麻痺を示唆（陽性＝IP屈曲）', badge:'badge-neurological' },
+    { id:'ulnar-sensory', name:'尺骨神経領域の感覚評価（背側枝含む）', category:'neurological', purpose:'環指尺側・小指の感覚低下を確認。手背枝領域の温存はGuyon管より近位の絞扼を示唆', badge:'badge-neurological' },
+    { id:'interossei-mmt', name:'骨間筋MMT・鷲手変形', category:'mmt', purpose:'指の開排（外転）筋力低下・鷲手（claw hand）を確認', badge:'badge-mmt' },
+    { id:'elbow-flexion-test', name:'肘屈曲テスト', category:'ortho', purpose:'肘最大屈曲位を3分保持し尺側のしびれ増悪を確認。肘部管症候群の誘発', badge:'badge-ortho' }
+  ],
+  'numb-digital': [
+    { id:'digital-tinel', name:'固有指神経のTinel sign', category:'ortho', purpose:'しびれのある指の基部・側面を叩打し限局性の放散痛を確認', badge:'badge-ortho' },
+    { id:'localized-sensory', name:'限局性感覚評価（1指単位）', category:'neurological', purpose:'1本の指の片側（橈側／尺側）に限局する感覚障害を確認。固有指神経障害を示唆', badge:'badge-neurological' },
+    { id:'compression-history', name:'反復圧迫・絞扼の問診', category:'palpation', purpose:'ボウリング・工具把持・指輪など慢性圧迫要因を確認', badge:'badge-palpation' },
+    { id:'cold-sensitivity', name:'寒冷過敏・拍動痛の確認', category:'neurological', purpose:'拍動性激痛・著明な寒冷過敏はグロームス腫瘍など腫瘍性病変を示唆（陽性＝該当あり・red flag）', badge:'badge-neurological' }
+  ],
+  'tendon-flexor': [
+    { id:'a1-palpation', name:'A1プーリー（MP掌側）の圧痛・結節触診', category:'palpation', purpose:'MP掌側の圧痛と屈筋腱の肥厚結節（nodule）を確認。ばね指の好発部位', badge:'badge-palpation' },
+    { id:'trigger-catch', name:'弾発現象（引っかかり）の確認', category:'ortho', purpose:'自動屈伸で引っかかり・弾発（trigger）・ロッキングを確認。狭窄性腱鞘炎の特徴所見（陽性＝弾発あり）', badge:'badge-ortho' },
+    { id:'fds-test', name:'浅指屈筋（FDS）機能テスト', category:'mmt', purpose:'他指を伸展位で固定し対象指のPIPのみ屈曲させる。屈曲不能はFDS損傷を示唆（陽性＝屈曲不能）', badge:'badge-mmt' },
+    { id:'fdp-test', name:'深指屈筋（FDP）機能テスト', category:'mmt', purpose:'PIPを固定しDIPの自動屈曲を確認。屈曲不能はFDP損傷（jersey finger）を示唆（陽性＝屈曲不能）', badge:'badge-mmt' },
+    { id:'locking-grade', name:'弾発の程度（Green分類）', category:'rom', purpose:'疼痛のみ〜他動でも伸展不能（ロッキング）まで重症度を評価', badge:'badge-rom' }
+  ],
+  'tendon-extensor': [
+    { id:'extension-lag', name:'各関節の伸展ラグの確認', category:'rom', purpose:'DIP・PIP・MPの自動伸展制限（lag）を関節ごとに確認し損傷zoneを推定', badge:'badge-rom' },
+    { id:'mallet-drop-ext', name:'槌指（DIP伸展不能）の視診', category:'ortho', purpose:'DIP屈曲位・自動伸展不能で終止伸筋腱（zone I）損傷を確認（陽性＝伸展不能）', badge:'badge-ortho' },
+    { id:'central-slip-ext', name:'中央索テスト（Elson test）', category:'ortho', purpose:'PIP伸展不能＋DIP硬直で中央索（zone III）損傷＝ボタン穴変形を確認（陽性）', badge:'badge-ortho' },
+    { id:'epl-rupture', name:'長母指伸筋（EPL）皮下断裂の評価', category:'mmt', purpose:'retropulsion（lift-off）不能で陽性。橈骨遠位端骨折後・関節リウマチで好発（red flag）', badge:'badge-mmt' },
+    { id:'extensor-palpation', name:'伸筋腱の連続性・圧痛触診', category:'palpation', purpose:'手背〜指背の伸筋腱の連続性・圧痛・腱脱臼を確認', badge:'badge-palpation' }
+  ]
+};
+
+// DIAGNOSES database
+const DIAGNOSES = {
+  'thumb-cm': {
+    default: {
+      name: '母指CM関節の痛み（CM関節症・基部障害）',
+      conditions: [
+        { name: '母指CM関節症（変形性関節症）', pct: '約60%', cause: '第1手根中手関節（鞍関節）の軟骨変性。母指内転筋の短縮による第1中手骨の内転・回内変位と長母指外転筋の筋力低下が関節への圧縮ストレスを増大させ変性を進行させる。中年以降の女性・手作業の多い人に好発し、つまみ動作や瓶の蓋開けで疼痛が増悪する。進行するとshoulder sign（基部背側突出）を呈する。' },
+        { name: 'de Quervain腱鞘炎の関連・併存', pct: '約20%', cause: '第1腱区画（長母指外転筋・短母指伸筋）の腱鞘炎が橈側手関節〜母指基部痛として現れ、CM関節症と鑑別を要する。Finkelstein testで鑑別するが、両者が併存することもある。' },
+        { name: '第1中手骨基部の不安定性（前斜走靭帯弛緩）', pct: '約10%', cause: '前斜走靭帯（beak ligament）の弛緩によりCM関節掌側の安定性が低下する。亜脱臼傾向がつまみ動作時の疼痛を生む。Bennett骨折既往例でも生じる。' },
+        { name: '母指内転筋短縮による機能的要因', pct: '多くの例に併存', cause: '母指内転筋の短縮は第1中手骨を内転位に固定し、CM関節への圧縮・剪断ストレスを慢性化させる。第1指間（web space）の開大制限として評価できる機能的背景因子。' }
+      ],
+      management: '母指内転筋ストレッチ・長母指外転筋の筋力強化・CM関節の動的安定化が基本戦略。急性炎症期は対立装具（thumb spica）で安静を図る。変形高度例・亜脱臼例は装具療法と整形外科への紹介を検討する。'
+    },
+    rules: [
+      { tests: ['grind-test'], result: 'positive', boost: { name: '母指CM関節症（軸圧迫陽性）', pct: '陽性時：CM関節症を強く示唆', cause: 'Grind test陽性（軸圧＋回旋での疼痛・軋轢音）はCM関節の軟骨変性を強く示唆する。母指内転筋短縮による第1中手骨の内転変位がCM関節面への圧縮ストレスを慢性的に増大させていることが背景にあると考えられる。X線（亜脱臼・関節裂隙狭小化）での確認が推奨される。' } }
+    ]
+  },
+  'thumb-mp': {
+    default: {
+      name: '母指MP関節の痛み・不安定（尺側側副靭帯損傷・MP関節症）',
+      conditions: [
+        { name: '尺側側副靭帯（UCL）損傷（スキーヤー母指・ゲームキーパー母指）', pct: '約50%', cause: '母指MP関節への急性外反（橈側偏位）ストレスでUCLが損傷する。スキーのストック把持での転倒が典型例で、慢性反復例はゲームキーパー母指と呼ばれる。つまみ動作時の不安定感・脱力が特徴。' },
+        { name: 'Stener損傷（UCL断端の内転筋腱膜への嵌入）', pct: '約15%', cause: '完全断裂したUCL近位断端が母指内転筋腱膜の上方に転位し、自然治癒が阻害される病態。MP尺側に可動性のある結節を触知する。保存治療では治癒せず手術適応となるため見逃さないことが重要。' },
+        { name: 'MP関節掌側板損傷', pct: '約15%', cause: '過伸展ストレスによる掌側板損傷。MP掌側の疼痛と過伸展不安定を呈する。' },
+        { name: '母指MP関節症', pct: '約20%', cause: 'MP関節の変形性関節症。CM関節症に続発することが多い。' }
+      ],
+      management: 'UCL部分損傷は母指スピカ装具で4〜6週固定し靭帯治癒を促す。つまみ動作・対立筋機能の段階的回復訓練を行う。完全断裂・Stener損傷疑い（動揺性大・結節触知）は手術適応評価のため整形外科へ紹介する。'
+    },
+    rules: [
+      { tests: ['ucl-valgus'], result: 'positive', boost: { name: 'UCL損傷（外反不安定性）', pct: '陽性時：UCL損傷を示唆', cause: '外反ストレステスト陽性（健側比で著明な動揺性）は尺側側副靭帯の機能不全を示す。MP屈曲位で35°以上・健側比15°以上の開大は完全断裂を示唆し、Stener損傷の可能性も考慮した整形外科的評価（必要に応じ画像）が必要と考えられる。' } }
+    ]
+  },
+  'thumb-ip': {
+    default: {
+      name: '母指IP関節の痛み・伸展不能（IP関節症・EPL障害）',
+      conditions: [
+        { name: '母指IP関節症（変形性関節症）', pct: '約40%', cause: 'IP関節の軟骨変性。CM関節症や手作業負荷に伴うことが多い。背側の骨性肥大・屈伸時痛が特徴。' },
+        { name: '長母指伸筋腱（EPL）皮下断裂', pct: '約30%', cause: '橈骨遠位端骨折後（Lister結節部での摩擦・血行障害）や関節リウマチで好発する。母指IPの自動伸展（retropulsion）が不能になる。骨折既往・RA背景の確認が重要なred flag。' },
+        { name: '長母指屈筋腱（FPL）損傷', pct: '約15%', cause: '鋭的外傷や慢性摩擦（手根管底・有頭骨部）でのFPL断裂。IP自動屈曲不能となる。RA（Mannerfelt症候群）でも生じる。' },
+        { name: '母指IP関節側副靭帯損傷（突き指）', pct: '約15%', cause: '側方ストレスによる側副靭帯損傷。側方不安定・疼痛を呈する。' }
+      ],
+      management: 'IP関節症は装具・疼痛管理・関節保護指導が基本。自動伸展・屈曲が不能（EPL/FPL断裂疑い）な場合は腱移行・再建の適応評価のため整形外科へ紹介する。関節リウマチ背景例は多関節評価とリウマチ科連携を行う。'
+    },
+    rules: [
+      { tests: ['epl-function-ip'], result: 'positive', boost: { name: '長母指伸筋腱（EPL）皮下断裂', pct: '陽性時：EPL断裂を強く示唆', cause: 'retropulsion（lift-off）で母指の机からの挙上が不能な場合、長母指伸筋腱の皮下断裂が強く示唆される。橈骨遠位端骨折後はLister結節部での腱の摩擦と血行障害が、関節リウマチでは滑膜炎による腱の脆弱化が断裂の原因となる。腱移行術（示指固有伸筋腱移行）の適応評価のため整形外科紹介が必要。' } }
+    ]
+  },
+  'finger-mp': {
+    default: {
+      name: 'MP関節の痛み・変形（滑膜炎・矢状索損傷・側副靭帯損傷）',
+      conditions: [
+        { name: 'MP関節滑膜炎・関節リウマチ（尺側偏位）', pct: '約35%', cause: 'MP関節の慢性滑膜炎により側副靭帯・矢状索・伸筋腱の支持機構が破綻し、手指の尺側偏位・掌側亜脱臼が生じる。朝のこわばり・多関節対称性罹患はリウマチを示唆する重要なred flag。' },
+        { name: '矢状索損傷（伸筋腱脱臼）', pct: '約20%', cause: 'MP関節背側の矢状索損傷により総指伸筋腱がMP屈曲時に尺側へ脱臼する（橈側矢状索損傷時）。中指に好発し、屈曲時の弾発・伸展開始困難が特徴。' },
+        { name: 'MP関節側副靭帯損傷', pct: '約20%', cause: '側方ストレスによる側副靭帯損傷。側方不安定・疼痛を呈する。' },
+        { name: '変形性MP関節症', pct: '約25%', cause: 'MP関節の変形性変化。示指・中指に多い。' }
+      ],
+      management: '滑膜炎・尺側偏位はリウマチ精査と関節保護・装具療法・伸筋腱再教育が基本。矢状索損傷は急性期にMP伸展位装具で保存治療、整復不能・慢性例は手術検討。側副靭帯損傷は装具固定を行う。'
+    },
+    rules: [
+      { tests: ['ulnar-drift'], result: 'positive', boost: { name: 'MP関節滑膜炎（関節リウマチ疑い）', pct: '陽性時：リウマチ精査を推奨', cause: '手指の尺側偏位はMP関節の慢性滑膜炎により支持機構（側副靭帯・矢状索・伸筋腱）が破綻したことを示唆する。朝のこわばり・多関節対称性罹患を伴う場合は関節リウマチの可能性が高く、リウマチ科での精査（抗CCP抗体・画像）と早期治療が予後を左右するため紹介が必要。' } },
+      { tests: ['sagittal-band'], result: 'positive', boost: { name: '矢状索損傷（伸筋腱脱臼）', pct: '陽性時：矢状索損傷を示唆', cause: 'MP屈伸時に総指伸筋腱が尺側へ脱臼し弾発を呈する所見は矢状索損傷を示唆する。橈側矢状索の損傷で腱が尺側に滑り込み、MP伸展開始が困難となる。受傷早期はMP伸展位装具での保存治療が有効である。' } }
+    ]
+  },
+  'finger-pip': {
+    default: {
+      name: 'PIP関節の痛み・腫脹（突き指・側副靭帯・ボタン穴・ブシャール結節）',
+      conditions: [
+        { name: 'PIP側副靭帯損傷・捻挫（突き指）', pct: '約35%', cause: '側方ストレスによる側副靭帯損傷。スポーツでの突き指が典型で、側方不安定・腫脹・疼痛を呈する。' },
+        { name: '掌側板損傷（PIP過伸展損傷）', pct: '約20%', cause: 'PIP過伸展による掌側板損傷。剥離骨折を伴うことがあり、放置するとswan neck変形や屈曲拘縮の原因となる。' },
+        { name: 'ボタン穴変形（中央索損傷）', pct: '約15%', cause: '伸筋腱中央索（zone III）の損傷でPIP伸展力が失われ、側索の掌側化によりPIP屈曲・DIP過伸展（boutonnière）を呈する。受傷直後は変形が明らかでないため見逃しやすい。' },
+        { name: 'ブシャール結節（PIP変形性関節症）', pct: '約20%', cause: 'PIP関節の変形性関節症による骨性肥大。ヘバーデン結節を伴うことが多い。' },
+        { name: 'PIP関節リウマチ・乾癬性関節炎', pct: '約10%', cause: '多関節・対称性・朝のこわばりを伴う炎症性関節炎。red flag。' }
+      ],
+      management: '突き指（側副靭帯・掌側板損傷）は腫脹管理後、buddy tapingや伸展ブロック装具で早期可動域訓練を行い拘縮を予防する。中央索損傷（ボタン穴）はPIP伸展位固定（DIPは自由）が基本で、見逃すと変形が固定化する。炎症性関節炎が疑われる場合はリウマチ科紹介。'
+    },
+    rules: [
+      { tests: ['elson-test'], result: 'positive', boost: { name: '中央索損傷（ボタン穴変形）', pct: '陽性時：中央索損傷を示唆', cause: 'Elson test陽性（PIP90°屈曲位での伸展抵抗時にDIPが硬く伸展する）は中央索損傷を示唆する。中央索が断裂すると側索が掌側へ滑り込みPIP伸展力が失われ、放置すると典型的なボタン穴変形へ進行する。受傷早期のPIP伸展位固定が変形予防に重要。' } }
+    ]
+  },
+  'finger-dip': {
+    default: {
+      name: 'DIP関節の痛み・変形（槌指・ヘバーデン結節・粘液嚢腫）',
+      conditions: [
+        { name: '槌指（mallet finger）', pct: '約40%', cause: 'DIPに屈曲力が加わり終止伸筋腱が損傷（腱性）または末節骨背側の剥離骨折（骨性）を生じる。DIP伸展不能（drop）が特徴で、ボールでの突き指で好発する。' },
+        { name: 'ヘバーデン結節（DIP変形性関節症）', pct: '約35%', cause: 'DIP関節の変形性関節症による骨性肥大。中年以降の女性に好発し、しばしば多指に生じる。' },
+        { name: '粘液嚢腫（mucous cyst）', pct: '約10%', cause: 'DIP関節由来のガングリオンで爪基部背側に生じる。爪変形や自壊・感染のリスクがある。' },
+        { name: 'DIP関節リウマチ・乾癬性関節炎', pct: '約15%', cause: 'DIP罹患は乾癬性関節炎を示唆することがある（爪病変の確認が重要）。red flag。' }
+      ],
+      management: '槌指は腱性ならDIP伸展位装具を6〜8週間（夜間含め継続）装着し腱治癒を促す（PIPは自由）。骨片が大きい・掌側亜脱臼を伴う骨性槌指は手術検討。ヘバーデン結節は疼痛管理・関節保護・装具。粘液嚢腫で爪変形・感染兆候があれば手の外科へ紹介。'
+    },
+    rules: [
+      { tests: ['mallet-drop'], result: 'positive', boost: { name: '槌指（終止伸筋腱損傷）', pct: '陽性時：槌指を示唆', cause: 'DIP関節が屈曲位で自動伸展できない（extension lag）所見は終止伸筋腱（zone I）損傷＝槌指を示す。腱性損傷ではDIP伸展位での持続的装具固定が、骨片が大きい・掌側亜脱臼を伴う骨性槌指では手術適応の評価が必要となるため、X線での骨折確認を行うことが望ましい。' } }
+    ]
+  },
+  'numb-median': {
+    default: {
+      name: '正中神経領域のしびれ（手根管症候群・近位絞扼・神経根症）',
+      conditions: [
+        { name: '手根管症候群（手関節での正中神経絞扼）', pct: '約60%', cause: '手根管内圧上昇による正中神経絞扼が最多。手関節掌屈/背屈最終域での内圧上昇に加え、妊娠・更年期・反復手作業・透析が誘因となる。1〜3指・4指橈側のしびれ、夜間〜早朝の増悪が特徴で、進行すると母指球筋萎縮を呈する。' },
+        { name: '円回内筋症候群（前腕近位での正中神経絞扼）', pct: '約15%', cause: '円回内筋二頭間・浅指屈筋アーチでの正中神経絞扼。前腕掌側痛を伴い、手根管症候群と異なり手掌枝領域（母指球部）の感覚障害を呈する。前腕回内反復で増悪。' },
+        { name: '頸椎神経根症（C6/C7）・二重絞扼', pct: '約20%', cause: '頸椎神経根レベルと末梢の絞扼が重複する二重絞扼（double crush）。デルマトーム分布と頸部運動での誘発が鑑別の手がかりとなる。' },
+        { name: '前骨間神経麻痺（純粋運動麻痺）', pct: '約5%', cause: '正中神経運動枝（前骨間神経）の絞扼。感覚障害を伴わず、母指・示指でのOKサイン（tear drop sign）ができないのが特徴。' }
+      ],
+      management: '手根管症候群は手関節中間位ナイトスプリント・手関節ROM/腱滑走運動・母指球筋柔軟性・前腕回内回外改善が基本。母指球筋萎縮・持続する筋力低下など重症例は神経伝導検査と手の外科へ紹介。頸部由来の重複例は頸部アプローチも併用する。'
+    },
+    rules: [
+      { tests: ['phalen','tinel-carpal'], result: 'positive', boost: { name: '手根管症候群（正中神経絞扼）確定的疑い', pct: '両テスト陽性で診断精度向上', cause: 'Phalen testとTinel sign（手根管部）がともに陽性の場合、手根管症候群の可能性が高い。手関節掌屈最終域での手根管内圧上昇と正中神経への直接圧迫がしびれ・疼痛を誘発している。母指球筋の萎縮を認める場合は軸索障害が進行しているため、神経伝導検査と手の外科での評価を優先する。' } }
+    ]
+  },
+  'numb-ulnar': {
+    default: {
+      name: '尺骨神経領域のしびれ（肘部管症候群・Guyon管症候群・神経根症）',
+      conditions: [
+        { name: '肘部管症候群（肘での尺骨神経絞扼）', pct: '約50%', cause: '肘部管（内側上顆後方）での尺骨神経絞扼。肘屈曲位での牽引・絞扼増大が関与する。環指尺側・小指のしびれ、進行で骨間筋萎縮・鷲手変形・Froment徴候を呈する。野球・肘酷使・変形性肘関節症が背景となる。' },
+        { name: 'Guyon管症候群（手関節での尺骨神経絞扼）', pct: '約25%', cause: '豆状骨・有鈎骨鈎間のGuyon管での絞扼。絞扼部位により運動枝優位・感覚枝優位に分かれる。手背枝領域の感覚が保たれる点で肘部管症候群と鑑別できる。サイクリスト・反復圧迫が誘因。' },
+        { name: '頸椎神経根症（C8/Th1）', pct: '約20%', cause: '頸椎下位神経根レベルの絞扼。前腕尺側まで含む感覚障害分布と頸部運動での誘発が鑑別の手がかりとなる。' },
+        { name: '胸郭出口症候群（下神経幹型）', pct: '約5%', cause: '腕神経叢下神経幹（C8/Th1）の絞扼で尺側のしびれ・手内在筋筋力低下を呈する。' }
+      ],
+      management: '絞扼部位の特定（しびれ分布・Tinel・誘発テスト・手背枝の感覚）を優先する。肘部管症候群は肘屈曲位の回避・夜間伸展位装具・神経滑走運動が基本。骨間筋萎縮・Froment陽性など運動麻痺進行例は神経伝導検査と手の外科へ紹介する。'
+    },
+    rules: [
+      { tests: ['froment'], result: 'positive', boost: { name: '尺骨神経麻痺（深枝・母指内転筋）', pct: '陽性時：運動麻痺進行を示唆', cause: 'Froment徴候陽性（紙つまみ時に母指IPが屈曲し長母指屈筋で代償する）は母指内転筋（尺骨神経深枝支配）の筋力低下を示す。尺骨神経の運動麻痺が進行している所見であり、肘部管・Guyon管いずれの絞扼かを感覚分布（手背枝の温存）とTinel部位で鑑別し、進行例は神経伝導検査と手の外科評価が必要。' } }
+    ]
+  },
+  'numb-digital': {
+    default: {
+      name: '限局性・1指のみのしびれ（固有指神経障害）',
+      conditions: [
+        { name: '固有指神経の絞扼・圧迫（digital neuritis）', pct: '約55%', cause: '1本の指の片側（橈側または尺側）に限局する感覚障害。MP掌側の靭帯性裂孔・骨棘・ガングリオンによる絞扼や、工具把持・指輪などの慢性外圧が原因となる。' },
+        { name: 'ボウラー母指（母指尺側指神経の反復圧迫）', pct: '約20%', cause: 'ボウリングのボール把持で母指尺側の固有指神経が反復圧迫され、しびれと有痛性神経腫を生じる。把持様式の見直しが必要。' },
+        { name: '腫瘍性・血管性病変（グロームス腫瘍等）', pct: '約15%', cause: 'グロームス腫瘍（爪下の拍動性激痛・著明な寒冷過敏）など。見逃さないことが重要なred flag。' },
+        { name: '全身性末梢神経障害の部分症状', pct: '約10%', cause: '糖尿病など多発神経障害の初期に限局性に見えることがある。分布の経過観察が必要。' }
+      ],
+      management: '圧迫要因（工具・指輪・把持様式）の除去と局所の神経保護が基本。限局性で改善しない場合・有痛性神経腫を触知する場合は手の外科へ。拍動性激痛・寒冷過敏が著明な場合はグロームス腫瘍などを疑い画像評価・専門医紹介を行う。'
+    },
+    rules: [
+      { tests: ['cold-sensitivity'], result: 'positive', boost: { name: '腫瘍性病変の疑い（グロームス腫瘍等）', pct: '陽性時：専門医評価を推奨', cause: '拍動性の激痛と著明な寒冷過敏は爪下グロームス腫瘍などの腫瘍性病変を示唆する所見であり、限局性しびれの鑑別として見逃さないことが重要。MRI等の画像評価と手の外科・専門医への紹介を検討する。' } }
+    ]
+  },
+  'tendon-flexor': {
+    default: {
+      name: '屈曲時の引っかかり・弾発（ばね指・屈筋腱損傷）',
+      conditions: [
+        { name: 'ばね指（狭窄性腱鞘炎・A1プーリー部）', pct: '約55%', cause: 'A1プーリー（MP掌側）部で屈筋腱の肥厚結節と腱鞘の狭窄が生じ、屈伸時に引っかかり・弾発（trigger）を呈する。母指・中指・環指に好発し、糖尿病・更年期・反復把持が誘因。進行するとロッキング（伸展不能）に至る。' },
+        { name: '屈筋腱損傷・断裂（FDP/FDS）', pct: '約15%', cause: '鋭的外傷による屈筋腱断裂。自動屈曲不能（FDS：PIP、FDP：DIP）で評価する。zone II損傷（縫合困難な領域）は予後に注意を要する。' },
+        { name: 'jersey finger（FDP付着部剥離）', pct: '約10%', cause: '屈曲中の指が強制伸展されFDPが末節骨付着部から剥離する（環指に好発）。DIP自動屈曲不能となり、早期手術が必要。' },
+        { name: '多発性腱鞘炎（関節リウマチ・糖尿病背景）', pct: '約20%', cause: '複数指の腱鞘炎・ばね指は関節リウマチ・糖尿病の関与を示唆する。背景疾患の評価が必要なred flag。' }
+      ],
+      management: 'ばね指は局所安静・腱鞘炎の鎮静化・腱滑走運動が基本で、夜間の伸展装具も有用。保存治療抵抗例・ロッキング例はステロイド注射や手術（A1プーリー切離）のため整形外科へ。屈筋腱断裂・jersey fingerは早期手術適応のため速やかに手の外科へ紹介する。'
+    },
+    rules: [
+      { tests: ['trigger-catch'], result: 'positive', boost: { name: 'ばね指（狭窄性腱鞘炎）', pct: '陽性時：ばね指を強く示唆', cause: '自動屈伸での引っかかり・弾発現象が陽性の場合、A1プーリー部での狭窄性腱鞘炎（ばね指）が強く示唆される。屈筋腱の肥厚結節がA1プーリーを通過する際に抵抗が生じることが弾発の機序であり、複数指に及ぶ場合は糖尿病・関節リウマチなど全身背景の評価も行う。' } }
+    ]
+  },
+  'tendon-extensor': {
+    default: {
+      name: '伸展できない・伸筋腱の障害（槌指・中央索・伸筋腱皮下断裂）',
+      conditions: [
+        { name: '槌指（zone I・終止伸筋腱損傷）', pct: '約35%', cause: 'DIP伸展不能（drop）。腱性・骨性がある。DIP関節の項も参照。' },
+        { name: 'ボタン穴変形（zone III・中央索損傷）', pct: '約20%', cause: 'PIP伸展不能＋DIP過伸展。受傷早期は変形が明らかでなく見逃しやすい。' },
+        { name: '伸筋腱皮下断裂（EPL・総指伸筋）', pct: '約25%', cause: '橈骨遠位端骨折後（EPL：Lister結節部）や関節リウマチの手関節滑膜炎による尺側伸筋腱の断裂（小指・環指から進行＝caput ulnae症候群）。背景疾患の確認が重要なred flag。' },
+        { name: '矢状索損傷（伸筋腱脱臼）', pct: '約20%', cause: 'MP背側の矢状索損傷で総指伸筋腱が脱臼し、MP伸展開始困難・屈曲時の弾発を呈する。中指に好発。' }
+      ],
+      management: '損傷zoneと関節ごとの伸展ラグから障害腱を特定する。zone I（槌指）はDIP伸展位装具、zone III（中央索）はPIP伸展位装具が基本。皮下断裂（EPL・総指伸筋）や関節リウマチ背景の多発断裂は腱移行・再建の適応評価のため手の外科へ紹介する。'
+    },
+    rules: [
+      { tests: ['epl-rupture'], result: 'positive', boost: { name: '長母指伸筋腱（EPL）皮下断裂', pct: '陽性時：EPL断裂を示唆', cause: 'retropulsion（lift-off）不能はEPL皮下断裂を示唆する。橈骨遠位端骨折（保存・手術いずれも）後のLister結節部での腱の摩擦・血行障害、あるいは関節リウマチの滑膜炎による腱の脆弱化が原因となる。腱縫合は困難なことが多く示指固有伸筋腱移行が選択されるため、手の外科への紹介が必要。' } }
+    ]
+  }
+};
+
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  region: null,
+  subregion: null,
+  checkedTests: new Set(),
+  testResults: {} // testId -> 'positive'/'false'/'negative'
+};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goStep(n) {
+  // Validate navigation
+  if (n === 2 && !state.region) return;
+  if (n === 3 && !state.subregion) return;
+  if (n === 4 && state.checkedTests.size === 0) return;
+
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+
+  document.querySelectorAll('.step-nav-item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.remove('active', 'done');
+    if (s === n) item.classList.add('active');
+    else if (s < n) item.classList.add('done');
+  });
+}
+
+// ============================================================
+// STEP 1: Region
+// ============================================================
+function selectRegion(regionId) {
+  state.region = regionId;
+  state.subregion = null;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + regionId).classList.add('selected');
+
+  // Build subregions
+  buildSubregions();
+  goStep(2);
+}
+
+// ============================================================
+// STEP 2: Subregion
+// ============================================================
+function buildSubregions() {
+  const list = document.getElementById('subregion-list');
+  list.innerHTML = '';
+  const subs = SUBREGIONS[state.region] || [];
+  subs.forEach(sub => {
+    const el = document.createElement('div');
+    el.className = 'subregion-card';
+    el.id = 'src-' + sub.id;
+    el.innerHTML = `<div class="subregion-label">${sub.label}</div><div class="subregion-desc">${sub.desc}</div>`;
+    el.onclick = () => selectSubregion(sub);
+    list.appendChild(el);
+  });
+}
+
+function selectSubregion(sub) {
+  state.subregion = sub;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.subregion-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('src-' + sub.id)?.classList.add('selected');
+
+  buildTests();
+  updateBreadcrumb();
+  goStep(3);
+}
+
+// ============================================================
+// STEP 3: Tests
+// ============================================================
+function buildTests() {
+  const tests = TESTS[state.subregion.id] || [];
+  const list = document.getElementById('test-list');
+  list.innerHTML = '';
+
+  if (tests.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>この部位の評価項目は準備中です。</p></div>';
+    return;
+  }
+
+  tests.forEach(test => {
+    const el = document.createElement('div');
+    el.className = 'test-card';
+    el.id = 'tc-' + test.id;
+    el.innerHTML = `
+      <div class="test-card-header" onclick="toggleTest('${test.id}')">
+        <div class="test-checkbox" id="chk-${test.id}"></div>
+        <div class="test-info">
+          <div class="test-name">${test.name}</div>
+          <div class="test-purpose">目的：${test.purpose}</div>
+        </div>
+        <span class="test-category-badge ${test.badge}">${getCategoryLabel(test.category)}</span>
+      </div>
+      <div class="test-result-panel">
+        <div class="result-label">評価結果を選択してください：</div>
+        <div class="result-buttons">
+          <button class="result-btn" onclick="setResult('${test.id}','positive',this)">陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','false',this)">偽陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','negative',this)">陰性</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function getCategoryLabel(cat) {
+  const map = { ortho:'整形外科テスト', palpation:'圧痛・触診', neurological:'神経学的評価', rom:'ROM', mmt:'MMT', posture:'姿勢・アライメント' };
+  return map[cat] || cat;
+}
+
+function toggleTest(testId) {
+  const card = document.getElementById('tc-' + testId);
+  if (state.checkedTests.has(testId)) {
+    state.checkedTests.delete(testId);
+    delete state.testResults[testId];
+    card.classList.remove('checked');
+  } else {
+    state.checkedTests.add(testId);
+    card.classList.add('checked');
+  }
+  updateEvalBtn();
+}
+
+function setResult(testId, result, btn) {
+  state.testResults[testId] = result;
+  const panel = btn.closest('.test-result-panel');
+  panel.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active-positive','active-false','active-negative'));
+  const cls = result === 'positive' ? 'active-positive' : result === 'false' ? 'active-false' : 'active-negative';
+  btn.classList.add(cls);
+  updateEvalBtn();
+}
+
+function updateEvalBtn() {
+  const btn = document.getElementById('eval-btn');
+  btn.disabled = state.checkedTests.size === 0;
+}
+
+function updateBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  const bc2 = document.getElementById('breadcrumb2');
+  const reg = REGIONS[state.region];
+  const html = `<span class="crumb">${reg.icon} ${reg.name}</span><span class="sep">›</span><span class="crumb">${state.subregion.label}</span>`;
+  bc.innerHTML = html;
+  bc2.innerHTML = html;
+}
+
+// ============================================================
+// STEP 4: Result
+// ============================================================
+function showResult() {
+  updateBreadcrumb();
+  buildResult();
+  goStep(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== 推奨治療法データ（追加） ======
+const TREATMENTS = {
+  'thumb-cm': [
+    { name:'母指内転筋のストレッチ（第1指間の開大）', note:'' },
+    { name:'長母指外転筋（APL）の筋力強化', note:'' },
+    { name:'CM関節の動的安定化訓練（対立筋・第1背側骨間筋）', note:'' },
+    { name:'対立装具（thumb spica）による関節保護・つまみ動作指導', note:'変形高度・亜脱臼例は整形外科へ' }
+  ],
+  'thumb-mp': [
+    { name:'母指スピカ装具によるUCLの安静・治癒促進（部分損傷）', note:'' },
+    { name:'つまみ力・対立運動の段階的筋力強化', note:'' },
+    { name:'MP関節の動的安定化（短母指外転筋・母指内転筋のバランス）', note:'' },
+    { name:'関節保護・つまみ動作の指導', note:'動揺性著明・Stener損傷疑いは手術評価のため整形外科へ' }
+  ],
+  'thumb-ip': [
+    { name:'IP関節の関節保護・装具による安静（IP関節症）', note:'' },
+    { name:'母指の巧緻動作・対立運動訓練', note:'' },
+    { name:'周囲腱（FPL・EPL）の腱滑走運動', note:'自動伸展・屈曲不能（EPL/FPL断裂疑い）は整形外科へ紹介' }
+  ],
+  'finger-mp': [
+    { name:'関節保護指導・MP伸展位スプリント（滑膜炎・尺側偏位）', note:'' },
+    { name:'伸筋腱の再教育・矢状索の保護（MP伸展位装具）', note:'' },
+    { name:'手内在筋（虫様筋・骨間筋）のバランス訓練', note:'' },
+    { name:'握力・把持動作の段階的強化', note:'尺側偏位・朝のこわばり・多関節罹患はリウマチ科で精査' }
+  ],
+  'finger-pip': [
+    { name:'buddy taping・伸展ブロック装具での早期可動域訓練（突き指）', note:'' },
+    { name:'PIP伸展位固定（中央索損傷／ボタン穴：DIPは自由）', note:'中央索損傷は見逃すと変形が固定化' },
+    { name:'浮腫管理・PIP屈曲拘縮の予防', note:'' },
+    { name:'関節保護指導（ブシャール結節）', note:'多関節・対称性の炎症はリウマチ科へ' }
+  ],
+  'finger-dip': [
+    { name:'DIP伸展位装具の継続装着（槌指：腱性で6〜8週・夜間含む）', note:'骨性槌指・掌側亜脱臼は手術検討' },
+    { name:'DIP関節の関節保護・疼痛管理（ヘバーデン結節）', note:'' },
+    { name:'浮腫・爪変形のケア（粘液嚢腫）', note:'感染兆候・自壊は手の外科へ' }
+  ],
+  'numb-median': [
+    { name:'手関節中間位ナイトスプリント（夜間の手根管内圧低減）', note:'' },
+    { name:'正中神経の神経滑走運動・屈筋腱滑走運動', note:'' },
+    { name:'母指球筋の柔軟性改善・前腕回内回外ROM改善', note:'' },
+    { name:'作業姿勢・反復動作の指導', note:'母指球筋萎縮・持続する筋力低下は神経伝導検査・手の外科へ' }
+  ],
+  'numb-ulnar': [
+    { name:'肘屈曲位の回避・肘部管への圧迫軽減（夜間伸展位装具）', note:'' },
+    { name:'尺骨神経の神経滑走運動', note:'' },
+    { name:'手内在筋（骨間筋・母指内転筋）の筋力維持・鷲手予防', note:'' },
+    { name:'Guyon管への反復圧迫（自転車・工具）の是正', note:'骨間筋萎縮・Froment陽性は手の外科へ紹介' }
+  ],
+  'numb-digital': [
+    { name:'圧迫要因（工具・指輪・把持様式）の除去・指導', note:'' },
+    { name:'固有指神経への局所負荷軽減・知覚再教育', note:'' },
+    { name:'経過観察と感覚障害分布の記録', note:'有痛性神経腫・拍動性激痛・寒冷過敏は手の外科／専門医へ' }
+  ],
+  'tendon-flexor': [
+    { name:'A1プーリー部の局所安静・腱滑走運動（ばね指）', note:'' },
+    { name:'夜間伸展装具による弾発・ロッキングの軽減', note:'' },
+    { name:'把持動作・反復負荷の是正、全身背景（糖尿病・RA）の評価', note:'' },
+    { name:'保存抵抗・ロッキング例は注射・手術を検討', note:'屈筋腱断裂・jersey fingerは早期手術のため手の外科へ' }
+  ],
+  'tendon-extensor': [
+    { name:'損傷zoneに応じた伸展位装具（zone I：DIP／zone III：PIP）', note:'' },
+    { name:'伸筋腱の腱滑走運動・伸展ラグの改善', note:'' },
+    { name:'矢状索損傷はMP伸展位装具で保存治療', note:'' },
+    { name:'関節保護・巧緻動作訓練', note:'EPL・総指伸筋の皮下断裂・RA背景の多発断裂は手の外科へ紹介' }
+  ]
+};
+
+function renderTreatments(subId){
+  const tx = (typeof TREATMENTS!=='undefined') ? TREATMENTS[subId] : null;
+  if(!tx || !tx.length) return '';
+  const items = tx.map(function(it){
+    return '<li><span class="tx-name">'+it.name+'</span>'+(it.note?'<span class="tx-note">'+it.note+'</span>':'')+'</li>';
+  }).join('');
+  return '<div class="result-block tx-block">'
+    + '<div class="result-block-header"><span class="result-block-icon">\uD83D\uDCAA</span> \u63A8\u5968\u3055\u308C\u308B\u6CBB\u7642\u6CD5</div>'
+    + '<div class="result-block-body"><ul class="tx-list">'+items+'</ul>'
+    + '<div class="tx-foot">\u203B\u8A55\u4FA1\u6240\u898B\u306B\u5FDC\u3058\u3066\u512A\u5148\u9806\u4F4D\u3092\u5224\u65AD\u3057\u3001\u75DB\u307F\u30FB\u7981\u5FCC\u306B\u914D\u616E\u3057\u3066\u6BB5\u968E\u7684\u306B\u5B9F\u65BD\u3057\u3066\u304F\u3060\u3055\u3044\u3002</div>'
+    + '</div></div>';
+}
+
+function buildResult() {
+  const content = document.getElementById('result-content');
+  const subId = state.subregion.id;
+  const diagData = DIAGNOSES[subId];
+
+  if (!diagData) {
+    content.innerHTML = '<div class="info-msg">ℹ️ この部位の詳細鑑別データは準備中です。</div>';
+    return;
+  }
+
+  // Collect evidence
+  const checkedArr = Array.from(state.checkedTests);
+  const evidenceRows = checkedArr.map(testId => {
+    const tests = TESTS[subId] || [];
+    const t = tests.find(x => x.id === testId);
+    const result = state.testResults[testId] || '未選択';
+    return { name: t ? t.name : testId, result };
+  });
+
+  // Apply rules
+  let mainDiag = diagData.default;
+  let boostedCondition = null;
+  if (diagData.rules) {
+    for (const rule of diagData.rules) {
+      const allMatch = rule.tests.every(tid => state.checkedTests.has(tid) && state.testResults[tid] === rule.result);
+      if (allMatch) {
+        boostedCondition = rule.boost;
+        break;
+      }
+    }
+  }
+
+  // Count positives
+  const positiveCount = checkedArr.filter(t => state.testResults[t] === 'positive').length;
+  const totalChecked = checkedArr.length;
+  const confidence = positiveCount === 0 ? '評価実施のみ' : positiveCount >= 3 ? '複数陽性あり（精密検査考慮）' : '一部陽性あり';
+
+  // Build HTML
+  let html = '';
+
+  // Header
+  html += `
+    <div class="result-header">
+      <div class="result-tag">▶ 鑑別診断</div>
+      <h3>${boostedCondition ? boostedCondition.name : mainDiag.name}</h3>
+      <span class="result-confidence">評価数: ${totalChecked}項目 ／ 陽性: ${positiveCount}項目 ／ ${confidence}</span>
+    </div>
+    <div class="result-blocks">
+  `;
+
+  // Boosted condition box
+  if (boostedCondition) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">⚡</span> 評価パターンによる上位鑑別</div>
+        <div class="result-block-body">
+          <strong>${boostedCondition.name}</strong><br>
+          <strong>原因の考察：</strong>${boostedCondition.cause}
+          <div style="margin-top:10px; font-size:0.82rem; color:#666;">※以下の鑑別条件も合わせて参照してください。</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Conditions (causes)
+  html += `
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">📊</span> 考えられる原因と発生頻度・根拠</div>
+      <div class="result-block-body">
+  `;
+  mainDiag.conditions.forEach(c => {
+    html += `
+      <div class="cause-item">
+        <div class="cause-pct">${c.pct}</div>
+        <div class="cause-text">
+          <div class="cause-name">${c.name}</div>
+          <div class="cause-detail">原因：${c.cause}</div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div></div>`;
+
+  // Evidence table
+  if (evidenceRows.length > 0) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">📋</span> 今回の評価結果一覧</div>
+        <div class="result-block-body" style="padding:0;">
+          <table class="evidence-table">
+            <tr><th>評価項目</th><th>結果</th></tr>
+    `;
+    evidenceRows.forEach(row => {
+      const cls = row.result === '陽性' || row.result === 'positive' ? 'ev-pos' : row.result === '偽陽性' || row.result === 'false' ? 'ev-false' : row.result === '陰性' || row.result === 'negative' ? 'ev-neg' : '';
+      const label = row.result === 'positive' ? '陽性' : row.result === 'false' ? '偽陽性' : row.result === 'negative' ? '陰性' : row.result;
+      html += `<tr><td>${row.name}</td><td class="${cls}">${label}</td></tr>`;
+    });
+    html += `</table></div></div>`;
+  }
+
+  // Management
+  html += `
+    ${renderTreatments(subId)}
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">🏥</span> 治療・評価の方向性（理学療法的視点）</div>
+      <div class="result-block-body">${mainDiag.management}</div>
+    </div>
+  `;
+
+  // Caution
+  html += `
+    <div class="caution-box">
+      <span class="caution-icon">⚠️</span>
+      <div><strong>注意事項：</strong>本ツールはセラピストの臨床推論を構造化した学習・思考支援ツールであり、医療診断の代替ではありません。神経症状の悪化・腫脹・発熱・安静時痛など危険信号（red flags）を認める場合は速やかに医師へご紹介ください。</div>
+    </div>
+  `;
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetAll() {
+  state = { region: null, subregion: null, checkedTests: new Set(), testResults: {} };
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('subregion-list').innerHTML = '';
+  document.getElementById('test-list').innerHTML = '';
+  document.getElementById('result-content').innerHTML = '';
+  document.getElementById('eval-btn').disabled = true;
+  goStep(1);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健やか式症状鑑別 下半身Ver.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap');
+
+  :root {
+    --primary: #1a4a2e;
+    --primary-light: #2e7d52;
+    --accent: #e85d26;
+    --step1: #2e7d52;
+    --step2: #c0392b;
+    --step3: #1a6fa8;
+    --step4: #7c3aed;
+    --bg: #f2f6f3;
+    --bg-card: #ffffff;
+    --text: #1a202c;
+    --text-sub: #4a5568;
+    --border: #d1e0d6;
+    --shadow: 0 4px 20px rgba(0,0,0,0.07);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.13);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 24px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(26,74,46,0.28);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .header-icon { font-size: 36px; }
+  .header-text h1 { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em; }
+  .header-text p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+
+  .app-main { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  .step-nav {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .step-nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #a0aec0;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .step-nav-item.active { color: white; }
+  .step-nav-item[data-step="1"].active { background: var(--step1); border-bottom-color: var(--step1); }
+  .step-nav-item[data-step="2"].active { background: var(--step2); border-bottom-color: var(--step2); }
+  .step-nav-item[data-step="3"].active { background: var(--step3); border-bottom-color: var(--step3); }
+  .step-nav-item[data-step="4"].active { background: var(--step4); border-bottom-color: var(--step4); }
+  .step-nav-item.done { color: var(--text-sub); background: #eef5ef; border-bottom-color: #aac8b2; }
+  .step-num { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+
+  .step-section { display: none; animation: fadeIn 0.35s ease; }
+  .step-section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 900;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .step-badge.s1 { background: var(--step1); }
+  .step-badge.s2 { background: var(--step2); }
+  .step-badge.s3 { background: var(--step3); }
+  .step-badge.s4 { background: var(--step4); }
+  .section-title h2 { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+  .section-subtitle { font-size: 0.83rem; color: var(--text-sub); margin-top: 2px; }
+
+  .region-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .region-card {
+    background: var(--bg-card);
+    border: 2.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 12px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .region-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+  .region-card.selected { border-color: var(--primary-light); background: #edf5ef; box-shadow: 0 0 0 3px rgba(46,125,82,0.18); }
+  .region-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+  .region-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+  .region-desc { font-size: 0.75rem; color: #718096; margin-top: 4px; }
+
+  .subregion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .subregion-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .subregion-card:hover { border-color: var(--step2); background: #fff5f5; }
+  .subregion-card.selected { border-color: var(--step2); background: #fff5f5; box-shadow: 0 0 0 3px rgba(192,57,43,0.12); }
+  .subregion-label { font-weight: 700; font-size: 0.9rem; color: var(--step2); margin-bottom: 4px; }
+  .subregion-desc { font-size: 0.78rem; color: var(--text-sub); }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 99px;
+    background: white;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 20px;
+  }
+  .back-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.83rem;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .breadcrumb .crumb { font-weight: 600; color: var(--primary); }
+  .breadcrumb .sep { color: #cbd5e0; }
+
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .test-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .test-checkbox {
+    width: 22px; height: 22px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .test-card.checked .test-checkbox { background: var(--step3); border-color: var(--step3); }
+  .test-card.checked .test-checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: 700; }
+  .test-info { flex: 1; }
+  .test-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+  .test-purpose { font-size: 0.78rem; color: var(--text-sub); margin-top: 3px; }
+  .test-category-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; flex-shrink: 0; }
+  .badge-ortho { background: #e0f0ff; color: #1a5fa8; }
+  .badge-palpation { background: #fff0e0; color: #a85a00; }
+  .badge-neurological { background: #f0e8ff; color: #6830b0; }
+  .badge-rom { background: #e8fff0; color: #0a8040; }
+  .badge-mmt { background: #fff0f5; color: #b0286a; }
+  .badge-posture { background: #f5f5e8; color: #6b5a00; }
+
+  .test-result-panel {
+    display: none;
+    padding: 0 16px 14px 52px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .test-card.checked .test-result-panel { display: flex; }
+  .result-label { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); }
+  .result-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .result-btn {
+    padding: 6px 16px;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.18s;
+    color: var(--text-sub);
+  }
+  .result-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .result-btn.active-positive { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+  .result-btn.active-false { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+  .result-btn.active-negative { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+
+  .evaluate-btn-wrap { margin-top: 24px; text-align: center; }
+  .evaluate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    transition: all 0.22s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .evaluate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.4); }
+  .evaluate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .result-header {
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.25);
+  }
+  .result-header .result-tag { font-size: 0.8rem; opacity: 0.85; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .result-header h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+  .result-header .result-confidence {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .result-blocks { display: flex; flex-direction: column; gap: 16px; }
+  .result-block {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .result-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f5faf6;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+  }
+  .result-block-icon { font-size: 1.2rem; }
+  .result-block-body { padding: 16px; font-size: 0.88rem; line-height: 1.9; color: var(--text); }
+
+  .cause-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cause-item:last-child { border-bottom: none; }
+  .cause-pct {
+    font-size: 1.0rem;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .cause-text { flex: 1; }
+  .cause-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
+  .cause-detail { font-size: 0.82rem; color: var(--text-sub); }
+
+  .evidence-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .evidence-table th { background: #edf5ef; color: var(--primary); padding: 8px 12px; text-align: left; font-weight: 700; }
+  .evidence-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+  .evidence-table tr:last-child td { border-bottom: none; }
+  .ev-pos { color: #b91c1c; font-weight: 700; }
+  .ev-false { color: #854d0e; font-weight: 700; }
+  .ev-neg { color: #15803d; font-weight: 700; }
+
+  .caution-box {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.83rem;
+    color: #78350f;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .caution-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  .new-eval-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: white;
+    border: 2.5px solid var(--primary-light);
+    border-radius: 99px;
+    color: var(--primary-light);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 24px;
+  }
+  .new-eval-btn:hover { background: var(--primary-light); color: white; }
+
+  @media (max-width: 600px) {
+    .app-header { padding: 16px 16px 14px; }
+    .header-text h1 { font-size: 1.2rem; }
+    .app-main { padding: 20px 12px 60px; }
+    .region-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .step-nav-item { font-size: 0.68rem; padding: 10px 4px; }
+  }
+
+  .tx-block .result-block-header { background: linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
+  .tx-list { list-style:none; margin:0; padding:0; }
+  .tx-list li { position:relative; padding:9px 0 9px 24px; border-bottom:1px solid #eef2f4; line-height:1.7; font-size:0.9rem; }
+  .tx-list li:last-child { border-bottom:none; }
+  .tx-list li::before { content:''; position:absolute; left:5px; top:16px; width:9px; height:9px; border-radius:50%; background:#0f766e; }
+  .tx-name { font-weight:700; color:#1f2d3a; }
+  .tx-note { display:block; font-size:0.8rem; color:#9a6b00; margin-top:3px; }
+  .tx-foot { margin-top:12px; font-size:0.8rem; color:#8a97a0; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <span class="header-icon">🦵</span>
+    <div class="header-text">
+      <h1>健やか式症状鑑別　下半身 Ver.</h1>
+      <p>股関節・腰部・膝関節・足関節の痛み評価支援ツール｜工藤慎太郎「運動機能障害のなぜ？がわかる評価戦略」準拠</p>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <nav class="step-nav">
+    <div class="step-nav-item active" data-step="1" onclick="goStep(1)"><span class="step-num">①</span>部位選択</div>
+    <div class="step-nav-item" data-step="2" onclick="goStep(2)"><span class="step-num">②</span>痛みの部位</div>
+    <div class="step-nav-item" data-step="3" onclick="goStep(3)"><span class="step-num">③</span>評価入力</div>
+    <div class="step-nav-item" data-step="4" onclick="goStep(4)"><span class="step-num">④</span>鑑別結果</div>
+  </nav>
+
+  <!-- STEP 1 -->
+  <section class="step-section active" id="step-1">
+    <div class="section-title">
+      <span class="step-badge s1">1</span>
+      <div>
+        <h2>部位を選択してください</h2>
+        <p class="section-subtitle">痛みやしびれが生じている部位はどこですか？</p>
+      </div>
+    </div>
+    <div class="region-grid">
+      <div class="region-card" onclick="selectRegion('hip')" id="rc-hip">
+        <span class="region-icon">🦴</span>
+        <div class="region-name">股関節</div>
+        <div class="region-desc">鼠径部・大転子周囲</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('lumbar')" id="rc-lumbar">
+        <span class="region-icon">🔵</span>
+        <div class="region-name">腰部</div>
+        <div class="region-desc">腰椎・仙腸関節</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('knee')" id="rc-knee">
+        <span class="region-icon">🦿</span>
+        <div class="region-name">膝関節</div>
+        <div class="region-desc">膝内側・外側・前方</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('ankle')" id="rc-ankle">
+        <span class="region-icon">🦶</span>
+        <div class="region-name">足関節・足部</div>
+        <div class="region-desc">足首・足底</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step-section" id="step-2">
+    <button class="back-btn" onclick="goStep(1)">← 部位選択へ戻る</button>
+    <div class="section-title">
+      <span class="step-badge s2">2</span>
+      <div>
+        <h2>痛みの部位を選択してください</h2>
+        <p class="section-subtitle">どの方向・部位に痛みがありますか？</p>
+      </div>
+    </div>
+    <div class="subregion-grid" id="subregion-list"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step-section" id="step-3">
+    <button class="back-btn" onclick="goStep(2)">← 痛みの部位へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="section-title">
+      <span class="step-badge s3">3</span>
+      <div>
+        <h2>評価項目を選択・入力してください</h2>
+        <p class="section-subtitle">実施した評価にチェックを入れ、結果（陽性／偽陽性／陰性）を選択してください。複数選択可。</p>
+      </div>
+    </div>
+    <div class="test-list" id="test-list"></div>
+    <div class="evaluate-btn-wrap">
+      <button class="evaluate-btn" onclick="showResult()" id="eval-btn" disabled>🔍 評価結果を表示する</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step-section" id="step-4">
+    <button class="back-btn" onclick="goStep(3)">← 評価入力へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb2"></div>
+    <div class="section-title">
+      <span class="step-badge s4">4</span>
+      <div>
+        <h2>鑑別結果</h2>
+        <p class="section-subtitle">評価結果に基づく鑑別診断と原因考察</p>
+      </div>
+    </div>
+    <div id="result-content"></div>
+    <div style="text-align:center">
+      <button class="new-eval-btn" onclick="resetAll()">🔄 新しい評価を開始する</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const REGIONS = {
+  hip: { name: '股関節', icon: '🦴' },
+  lumbar: { name: '腰部', icon: '🔵' },
+  knee: { name: '膝関節', icon: '🦿' },
+  ankle: { name: '足関節・足部', icon: '🦶' }
+};
+
+const SUBREGIONS = {
+  hip: [
+    { id: 'hip-anterior', label: '股関節前面の痛み', desc: '鼠径部・大腿前面の疼痛' },
+    { id: 'hip-lateral', label: '股関節外側の痛み', desc: '大転子周囲・腸脛靭帯領域' }
+  ],
+  lumbar: [
+    { id: 'lumbar-pain', label: '腰部・仙腸関節の痛み', desc: '腰椎椎間関節・椎間板・仙腸関節・固有背筋' }
+  ],
+  knee: [
+    { id: 'knee-medial', label: '膝内側の痛み', desc: '内側側副靭帯・鵞足・半膜様筋・内側半月板' },
+    { id: 'knee-lateral', label: '膝外側の痛み', desc: '後外側支持機構・大腿二頭筋・腸脛靭帯' },
+    { id: 'knee-anterior', label: '膝前面の痛み', desc: '脛骨粗面・膝蓋靭帯・膝蓋下脂肪体・膝蓋大腿関節' }
+  ],
+  ankle: [
+    { id: 'ankle-posterior', label: '足関節後方の痛み', desc: 'アキレス腱・後脛骨筋腱・腓骨筋腱・三角骨' },
+    { id: 'ankle-anterior', label: '足関節前方の痛み', desc: '距腿関節前方関節包・伸筋腱・前距腓靭帯' },
+    { id: 'ankle-plantar', label: '足底の痛み', desc: '足底腱膜・踵骨下脂肪体・脛骨神経' }
+  ]
+};
+
+const TESTS = {
+  'hip-anterior': [
+    { id:'thomas', name:'Thomas test（腸腰筋・大腿直筋短縮テスト）', category:'ortho', purpose:'背臥位で反対側股関節最大屈曲→検査側大腿面がベッド面まで下降しなければ陽性。腸腰筋の短縮による股関節伸展制限を評価', badge:'badge-ortho' },
+    { id:'ely', name:'Ely test（大腿直筋短縮テスト）', category:'ortho', purpose:'腹臥位で膝関節他動的屈曲。殿部の浮き上がりがあれば陽性。大腿直筋の短縮による膝屈曲制限（股関節との二関節筋特性）を評価', badge:'badge-ortho' },
+    { id:'faber', name:'FABER test（Patrick test）（股関節・仙腸関節評価）', category:'ortho', purpose:'背臥位で股関節屈曲・外転・外旋位（figure-4肢位）。鼠径部痛または殿部痛で陽性。FAI・関節唇損傷・仙腸関節障害の鑑別に使用', badge:'badge-ortho' },
+    { id:'fadir', name:'FADIR test（Impingement test）（大腿骨寛骨臼インピンジメント）', category:'ortho', purpose:'背臥位で股関節屈曲・内転・内旋（Quadrant検査）。鼠径部・股関節前方の疼痛誘発でFAI・関節唇損傷を評価', badge:'badge-ortho' },
+    { id:'quadrant', name:'クアドラント検査（関節唇疼痛誘発）', category:'ortho', purpose:'股関節屈曲・内転・内旋位で前方の圧縮ストレスを加え疼痛誘発。FAI（CAM type・pincer type）の評価に使用', badge:'badge-ortho' },
+    { id:'hip-flexor-palpation', name:'腸腰筋の圧痛触診（スカルパ三角）', category:'palpation', purpose:'鼠径靭帯下方のスカルパ三角中央部での腸腰筋の圧痛確認。腸腰筋炎・腸恥滑液包炎との鑑別に重要', badge:'badge-palpation' },
+    { id:'adductor-palpation', name:'股関節内転筋群（長内転筋・恥骨筋・薄筋）の圧痛触診', category:'palpation', purpose:'恥骨結合・恥骨下枝への付着部圧痛確認。背臥位で股関節外転位・膝屈曲位で長内転筋を触診', badge:'badge-palpation' },
+    { id:'femoral-nerve-stretch', name:'大腿神経伸張テスト（大腿神経絞扼評価）', category:'ortho', purpose:'腹臥位での膝関節他動的屈曲→股関節伸展。大腿前面への放散痛誘発でL2〜L4神経根障害・大腿神経絞扼を評価', badge:'badge-ortho' },
+    { id:'hip-ext-rom', name:'股関節伸展ROM計測（Thomas test応用）', category:'rom', purpose:'股関節伸展可動域制限の確認。腸腰筋短縮・関節包前方の拘縮評価。正常値15〜30°', badge:'badge-rom' },
+    { id:'hip-dynamic-stability', name:'股関節動的安定性評価（単脚立位での骨盤側方傾斜）', category:'posture', purpose:'中殿筋・小殿筋・深層外旋六筋の機能評価。大腿骨頭の寛骨臼への引き付け（求心位保持）能力の確認', badge:'badge-posture' },
+    { id:'hip-abductor-mmt', name:'股関節外転筋群MMT（中殿筋・小殿筋）', category:'mmt', purpose:'中殿筋・小殿筋の筋力低下確認。筋力低下は骨盤前額面上での制御不全→内転増大→股関節内側への圧縮増大に関与', badge:'badge-mmt' }
+  ],
+  'hip-lateral': [
+    { id:'ober', name:'Ober test（腸脛靭帯・大腿筋膜張筋伸張性テスト）', category:'ortho', purpose:'側臥位で膝関節90°屈曲・股関節伸展・外転位から重力落下。内転制限があれば陽性。腸脛靭帯・大腿筋膜張筋の伸張性低下を評価', badge:'badge-ortho' },
+    { id:'trendelenburg', name:'Trendelenburg sign（中殿筋・小殿筋筋力評価）', category:'ortho', purpose:'片脚立位での骨盤の側方傾斜評価。支持側の骨盤が下制すれば陽性（Trendelenburg陽性）。中殿筋・小殿筋の機能不全を示す', badge:'badge-ortho' },
+    { id:'gluteus-medius-palpation', name:'中殿筋・小殿筋の圧痛触診（大転子外側面）', category:'palpation', purpose:'大転子外側面（中殿筋停止部）・大転子前面（小殿筋停止部）の圧痛確認。大転子滑液包炎との鑑別に重要', badge:'badge-palpation' },
+    { id:'tfl-palpation', name:'大腿筋膜張筋の圧痛触診', category:'palpation', purpose:'上前腸骨棘外側から大転子前方にかけての大腿筋膜張筋の圧痛確認。腸脛靭帯との連続性を評価', badge:'badge-palpation' },
+    { id:'greater-trochanter-palpation', name:'大転子滑液包の圧痛触診', category:'palpation', purpose:'大転子外側での圧痛確認。大転子滑液包炎の評価。腸脛靭帯走行上の圧痛との鑑別が重要', badge:'badge-palpation' },
+    { id:'hip-internal-rotation', name:'股関節内旋ROM（外旋筋短縮評価）', category:'rom', purpose:'股関節外旋筋群（深層外旋六筋）の短縮による内旋制限の確認。外旋筋短縮は大腿骨外旋変位→腸脛靭帯への摩擦ストレス増大に関与', badge:'badge-rom' },
+    { id:'hip-abductor-mmt-lat', name:'股関節外転筋群MMT（中殿筋）', category:'mmt', purpose:'中殿筋の筋力低下確認。中殿筋は外転筋総断面積の約60%を占める最大の外転筋。筋力低下は大転子周囲への力学的負荷を増大させる', badge:'badge-mmt' },
+    { id:'knee-valgus-single-leg', name:'片脚スクワットでの膝外反・内転評価', category:'posture', purpose:'股関節外転筋・外旋筋の機能低下により膝外反・下腿外旋が生じるか確認。殿筋群の機能不全を動作として評価', badge:'badge-posture' }
+  ],
+  'lumbar-pain': [
+    { id:'lumbar-ext-rot', name:'腰椎伸展・回旋運動テスト（椎間関節疼痛誘発）', category:'ortho', purpose:'直立位での腰椎伸展＋回旋で椎間関節への圧縮・剪断ストレスを加え疼痛誘発。腰部椎間関節症の評価', badge:'badge-ortho' },
+    { id:'lasegue', name:'Laségue sign（SLR test）（腰椎椎間板ヘルニア・神経根症）', category:'ortho', purpose:'背臥位で股関節屈曲・膝完全伸展挙上。70〜90°以下での大腿後面〜膝窩の坐骨神経症状で陽性。L5・S1神経根圧迫を評価', badge:'badge-ortho' },
+    { id:'bragard', name:'Bragard test（SLR変法）', category:'ortho', purpose:'Laségue signで症状出現後、さらに5°角度を下げ足関節背屈追加。坐骨神経症状悪化でヘルニアを強く示唆する', badge:'badge-ortho' },
+    { id:'pelvic-rock', name:'Pelvic rock test（仙腸関節疼痛誘発）', category:'ortho', purpose:'側臥位での腸骨への垂直圧迫（剪断ストレス）。仙腸関節部への疼痛誘発で仙腸関節障害を評価', badge:'badge-ortho' },
+    { id:'multifidus-palpation', name:'多裂筋・固有背筋の圧痛触診', category:'palpation', purpose:'棘突起間・椎間関節部での圧痛・筋硬度確認。多裂筋は腰椎の節間安定化に最重要なインナーマッスル。筋スパズムも評価', badge:'badge-palpation' },
+    { id:'thoracolumbar-fascia', name:'胸腰筋膜・腸骨稜の圧痛触診', category:'palpation', purpose:'胸腰筋膜（腸骨稜〜棘突起間）の圧痛・緊張確認。腹横筋・内腹斜筋との連結を介した仙腸関節安定化機能の評価', badge:'badge-palpation' },
+    { id:'sij-palpation', name:'仙腸関節・PSIS（上後腸骨棘）の圧痛触診', category:'palpation', purpose:'PSISおよびその内側・下方の仙腸関節部の圧痛確認。仙腸関節障害の主要評価所見', badge:'badge-palpation' },
+    { id:'lumbar-rom', name:'腰椎屈曲/伸展ROM計測（フィンガーフロアテスト含む）', category:'rom', purpose:'腰椎可動域の確認。腸腰筋短縮・固有背筋短縮・椎間板変性に伴う可動域制限を評価', badge:'badge-rom' },
+    { id:'thomas-lumbar', name:'Thomas test（腸腰筋短縮・骨盤前傾評価）', category:'ortho', purpose:'腸腰筋の短縮が骨盤前傾増大→腰椎前弯増強→椎間関節への圧縮ストレス増大に関与するか評価', badge:'badge-ortho' },
+    { id:'hip-ext-mmt', name:'股関節伸展筋群（大殿筋）MMT', category:'mmt', purpose:'大殿筋の筋力低下確認。大殿筋弱化→骨盤前傾増大→腰椎前弯増強→椎間関節圧縮増大という連鎖を評価', badge:'badge-mmt' },
+    { id:'abdominal-mmt', name:'体幹屈筋群（腹横筋・腹斜筋）の機能評価', category:'mmt', purpose:'体幹深部筋（腹横筋・内腹斜筋）の機能確認。弱化は胸腰筋膜・仙腸関節の安定性低下に直結。ドローイン・アブドミナルホロウイングで評価', badge:'badge-mmt' },
+    { id:'lumbar-alignment', name:'腰椎アライメント評価（骨盤前後傾・腰椎前弯角）', category:'posture', purpose:'骨盤前傾・マルアライメントの確認。過度の前弯は椎間関節圧縮↑、後弯は椎間板後方伸張↑。静的・動的アライメント両方を評価', badge:'badge-posture' },
+    { id:'hip-flex-flexibility', name:'股関節屈筋群の柔軟性評価（Thomas test応用）', category:'rom', purpose:'腸腰筋・大腿直筋の短縮確認。短縮は骨盤前傾増大→腰椎前弯増強→椎間関節への慢性的圧縮ストレス増大に関与', badge:'badge-rom' }
+  ],
+  'knee-medial': [
+    { id:'valgus-stress', name:'外反ストレステスト（内側側副靭帯評価）', category:'ortho', purpose:'膝関節外反負荷で内側側副靭帯（MCL）の張力感消失・関節裂隙の開大を確認。軽度屈曲位（5〜25°）で実施。MCL制動力は屈曲5°で57.4%、25°で78.2%', badge:'badge-ortho' },
+    { id:'dial-test', name:'ダイアルテスト（tibial external rotation test）（MCL・PCL評価）', category:'ortho', purpose:'背臥位または腹臥位で膝屈曲30°・90°での下腿外旋角度の左右差を確認。MCL損傷による前内側回旋不安定性の評価', badge:'badge-ortho' },
+    { id:'mcl-palpation', name:'内側側副靭帯（MCL）の圧痛触診', category:'palpation', purpose:'大腿骨内側上顆から脛骨後縁・斜膝窩靭帯近位部のMCL走行を触診。大腿骨付着部・脛骨付着部それぞれの圧痛確認', badge:'badge-palpation' },
+    { id:'pesanserine-palpation', name:'鵞足部（縫工筋・薄筋・半腱様筋付着部）の圧痛触診', category:'palpation', purpose:'脛骨内側面への鵞足付着部の圧痛確認。鵞足炎（鵞足部痛）は3筋の共通付着部の炎症。各筋の筋腹も触診し原因筋を特定', badge:'badge-palpation' },
+    { id:'trigger-discrimination', name:'トリガー筋鑑別テスト（鵞足炎の原因筋特定）', category:'ortho', purpose:'薄筋（股関節外転・膝屈曲）・半腱様筋（股関節内転・膝屈曲）・縫工筋（側臥位・股関節内旋・膝屈曲）の各肢位で膝関節伸展して疼痛誘発筋を鑑別。薄筋単独が約68%と最多', badge:'badge-ortho' },
+    { id:'semimembranosus-palpation', name:'半膜様筋・腓腹筋内側頭の圧痛触診', category:'palpation', purpose:'膝窩内側での半膜様筋の圧痛確認。膝窩内側の疼痛・膝伸展制限への関与を評価。DTTT（半膜様筋リラクセーション前後の疼痛変化）と組み合わせて評価', badge:'badge-palpation' },
+    { id:'medial-meniscus-palpation', name:'内側半月板の圧痛触診（関節裂隙内側）', category:'palpation', purpose:'膝関節内側裂隙での圧痛確認。MCL圧痛との鑑別のため大腿骨付着部・脛骨付着部双方を確認。半月板損傷の評価', badge:'badge-palpation' },
+    { id:'mcmurray', name:'McMurray test（内側半月板損傷評価）', category:'ortho', purpose:'背臥位での膝関節最大屈曲から外旋・伸展。クリック音や内側関節裂隙への疼痛で内側半月板損傷を示唆', badge:'badge-ortho' },
+    { id:'varus-stress', name:'内反ストレステスト（外側側副靭帯評価）', category:'ortho', purpose:'膝関節内反負荷で外側側副靭帯（LCL）・後外側支持機構の評価。内反不安定性確認', badge:'badge-ortho' },
+    { id:'knee-rom-medial', name:'膝関節屈曲/伸展ROM計測', category:'rom', purpose:'屈曲最終域での内側上顆近傍の疼痛（MCL巻き込み現象）、伸展制限（半膜様筋・腓腹筋の過緊張）を評価', badge:'badge-rom' },
+    { id:'hip-abductor-mmt-knee', name:'股関節外転筋群（大殿筋・中殿筋）MMT', category:'mmt', purpose:'殿筋群の筋力低下確認。お尻の筋力低下→膝の内側変異（knee-in）→鵞足部への圧縮・剪断ストレス増大→鵞足炎発症の連鎖評価', badge:'badge-mmt' },
+    { id:'tibia-rotation', name:'下腿回旋異常評価（下腿外旋）', category:'posture', purpose:'下腿の過外旋の確認。大腿二頭筋・腸脛靭帯の過緊張や後外側支持機構の機能低下が下腿外旋を引き起こし鵞足への剪断ストレスを増大させる', badge:'badge-posture' }
+  ],
+  'knee-lateral': [
+    { id:'varus-stress-lat', name:'内反ストレステスト（後外側支持機構・LCL評価）', category:'ortho', purpose:'膝関節内反負荷で外側側副靭帯（LCL）・後外側支持機構（PLS）の機能評価。内反不安定性の確認（軽度屈曲位で実施）', badge:'badge-ortho' },
+    { id:'ober-knee', name:'Ober test（腸脛靭帯・大腿筋膜張筋の伸張性評価）', category:'ortho', purpose:'側臥位で腸脛靭帯の伸張性を評価。腸脛靭帯の過緊張は膝外側への摩擦・圧縮ストレスを増大させ膝外側痛（腸脛靭帯炎）を引き起こす', badge:'badge-ortho' },
+    { id:'lcl-popliteus-palpation', name:'外側側副靭帯（LCL）・膝窩筋腱の圧痛触診', category:'palpation', purpose:'大腿骨外側上顆から腓骨頭へのLCL走行を触診。膝窩筋腱の大腿骨外側上顆前下方への付着部圧痛も確認', badge:'badge-palpation' },
+    { id:'biceps-femoris-palpation', name:'大腿二頭筋の圧痛触診（腓骨頭付着部）', category:'palpation', purpose:'腓骨頭付着部および大腿後外側の大腿二頭筋の圧痛確認。大腿二頭筋の過緊張は下腿外旋を促進させ外側支持機構への摩擦ストレスを増大させる', badge:'badge-palpation' },
+    { id:'itband-palpation', name:'腸脛靭帯の圧痛触診（大腿骨外側上顆付近）', category:'palpation', purpose:'腸脛靭帯と大腿骨外側上顆の摩擦部位の圧痛確認。腸脛靭帯炎（ランナー膝）の主要評価所見。股関節内転での緊張増大も確認', badge:'badge-palpation' },
+    { id:'noble-compression', name:'Noble compression test（腸脛靭帯炎評価）', category:'ortho', purpose:'背臥位で膝屈曲30°（外側上顆上方2cmを圧迫しながら伸展）。外側上顆近傍での疼痛再現で腸脛靭帯炎を評価', badge:'badge-ortho' },
+    { id:'tibia-rotation-lat', name:'下腿回旋異常評価（下腿過外旋）', category:'posture', purpose:'下腿の過外旋確認。後外側支持機構の機能低下・大腿二頭筋の過緊張が下腿外旋を誘発し外側組織への伸張ストレスを増大させる', badge:'badge-posture' },
+    { id:'knee-varus-instability', name:'膝関節内反不安定性評価（歩行動作観察含む）', category:'posture', purpose:'荷重位での膝内反不安定性の確認。外側広筋の過緊張・大腿二頭筋の過緊張が内反不安定性に関与', badge:'badge-posture' },
+    { id:'hip-abductor-mmt-lat', name:'股関節外転筋・外旋筋MMT', category:'mmt', purpose:'中殿筋・深層外旋六筋の筋力低下確認。外転・外旋筋力低下→下肢内旋増大→下腿外旋代償→膝外側への伸張ストレス増大', badge:'badge-mmt' }
+  ],
+  'knee-anterior': [
+    { id:'patellar-compression', name:'Patella compression test（膝蓋大腿関節評価）', category:'ortho', purpose:'背臥位で膝蓋骨を内側または外側に誘導しながら圧迫。誘導方向への疼痛で膝蓋大腿関節の内側・外側どちらの圧縮ストレスが問題か判断', badge:'badge-ortho' },
+    { id:'patellar-tilt', name:'Patellar tilt test（膝蓋骨外側傾斜評価）', category:'ortho', purpose:'膝蓋骨外側縁を挙上するテスト。外側広筋の過緊張・外側支持帯拘縮による膝蓋骨外側傾斜の評価。内側広筋活動遅延（膝蓋大腿関節炎）との関連評価', badge:'badge-ortho' },
+    { id:'tibial-tuberosity-palpation', name:'脛骨粗面の圧痛触診（大腿四頭筋停止部評価）', category:'palpation', purpose:'脛骨粗面（大腿四頭筋の最終停止部）の圧痛確認。オスグッド病（骨化核・骨端核への牽引ストレス）の評価', badge:'badge-palpation' },
+    { id:'patellar-tendon-palpation', name:'膝蓋靭帯・膝蓋支帯の圧痛触診', category:'palpation', purpose:'膝蓋骨下極から脛骨粗面の膝蓋靭帯走行の圧痛確認。ジャンパー膝（膝蓋腱炎）の評価。膝蓋支帯（内側・外側）の緊張評価も実施', badge:'badge-palpation' },
+    { id:'hoffa-fat-pad-palpation', name:'膝蓋下脂肪体の圧痛触診（Hoffa sign）', category:'palpation', purpose:'膝蓋骨下極両側での膝蓋下脂肪体の圧痛確認。大腿四頭筋の筋力低下・伸張性低下により脂肪体への圧縮ストレスが増大し炎症が生じる', badge:'badge-palpation' },
+    { id:'quad-mmt', name:'大腿四頭筋MMT（特に内側広筋・外側広筋の左右バランス）', category:'mmt', purpose:'内側広筋・外側広筋の収縮バランス評価。外側広筋優位の場合、膝蓋骨の外側変位→外側関節面への圧縮集中が生じる（膝蓋大腿関節症）', badge:'badge-mmt' },
+    { id:'quad-flexibility', name:'大腿四頭筋の伸張性評価（膝屈曲ROM）', category:'rom', purpose:'大腿四頭筋（特に大腿直筋）の伸張性低下確認。伸張性低下は膝蓋骨の下方への動きを制限し膝蓋大腿関節への圧縮ストレスを増大させる', badge:'badge-rom' },
+    { id:'ankle-dorsiflexion-rom', name:'足関節背屈ROM計測（膝前面痛との関連評価）', category:'rom', purpose:'足関節背屈制限の確認。背屈制限があると踏み込み動作で下腿前傾不足→後方重心→膝蓋大腿関節への圧縮ストレス増大に関与', badge:'badge-rom' },
+    { id:'knee-flexion-contracture', name:'Flexion contracture sign（膝屈曲拘縮評価）', category:'ortho', purpose:'背臥位での下肢脱力時、股関節外旋が出現すれば膝関節伸展制限が生じている可能性。膝蓋骨の可動性低下・膝窩部軟部組織の拘縮を評価', badge:'badge-ortho' },
+    { id:'single-leg-squat', name:'単脚スクワット評価（膝外反・足部過回内）', category:'posture', purpose:'片脚スクワットでの膝外反・足部の過回内確認。股関節外転・外旋筋力低下→膝外反→膝蓋骨外側変位→膝蓋大腿関節圧縮ストレス増大を評価', badge:'badge-posture' }
+  ],
+  'ankle-posterior': [
+    { id:'thompson', name:'Thompson squeeze test（アキレス腱断裂評価）', category:'ortho', purpose:'腹臥位での下腿三頭筋把持。足関節底屈がなければ陽性（アキレス腱完全断裂）。腱炎・腱付着部障害では陽性になることは少ない', badge:'badge-ortho' },
+    { id:'achilles-palpation', name:'アキレス腱の圧痛触診（腱体部・付着部の鑑別）', category:'palpation', purpose:'腱体部（踵骨から2〜6cm近位）と踵骨付着部（踵骨後方2/3）での圧痛を鑑別。腱体部障害は中年・過使用が多く、付着部障害は炎症・変性が主', badge:'badge-palpation' },
+    { id:'posterior-tib-palpation', name:'後脛骨筋腱の圧痛触診（内果後方・舟状骨付着部）', category:'palpation', purpose:'内果後方での後脛骨筋腱の圧痛確認。足部アライメント異常（扁平足）・回内足との関連を評価', badge:'badge-palpation' },
+    { id:'peroneal-palpation', name:'長・短腓骨筋腱の圧痛触診（外果後方）', category:'palpation', purpose:'外果後方の腓骨筋腱走行の圧痛確認。足関節内反捻挫後の腓骨筋腱損傷・腱鞘炎の評価', badge:'badge-palpation' },
+    { id:'kager-fat-pad-palpation', name:'Kager\'s fat padの圧痛触診（アキレス腱前方）', category:'palpation', purpose:'アキレス腱前方の脂肪体（Kager\'s fat pad）の圧痛確認。アキレス腱炎との鑑別に重要。アキレス腱後面と踵骨後方の間に存在', badge:'badge-palpation' },
+    { id:'triangular-bone', name:'三角骨テスト（後方インピンジメント評価）', category:'ortho', purpose:'足関節最大底屈強制での後方痛誘発。三角骨・長母指屈筋腱の後方インピンジメントを評価。バレエダンサー・サッカー選手に多い', badge:'badge-ortho' },
+    { id:'ankle-plantar-rom', name:'足関節背屈ROM計測（下腿三頭筋伸張性評価）', category:'rom', purpose:'足関節背屈可動域の確認。腓腹筋・ヒラメ筋の伸張性低下（特に腓腹筋は膝伸展位で背屈制限が顕著）。正常値背屈0〜20°', badge:'badge-rom' },
+    { id:'calf-mmt', name:'下腿三頭筋MMT（踵上げテスト）', category:'mmt', purpose:'腓腹筋・ヒラメ筋の筋力評価。単脚踵上げ回数・高さで評価。アキレス腱障害例では筋力低下が著明な場合がある', badge:'badge-mmt' }
+  ],
+  'ankle-anterior': [
+    { id:'anterior-drawer', name:'前方引き出しテスト（前距腓靭帯評価）', category:'ortho', purpose:'足関節底屈位での距骨前方移動テスト。前距腓靭帯損傷による前方不安定性の評価。距骨の前方移動量増大またはend feel欠如で陽性', badge:'badge-ortho' },
+    { id:'talar-tilt', name:'内反ストレステスト（踵腓靭帯評価）', category:'ortho', purpose:'足関節内反強制による前距腓靭帯・踵腓靭帯の評価。内反可動性増大またはend feel欠如で陽性。急性期には疼痛増強のため実施しない', badge:'badge-ortho' },
+    { id:'atfl-palpation', name:'前距腓靭帯（ATFL）の圧痛触診（外果前下方）', category:'palpation', purpose:'外果前下方から距骨頸部外側への前距腓靭帯の圧痛確認。足関節内反捻挫で最も損傷頻度が高い靭帯', badge:'badge-palpation' },
+    { id:'anterior-joint-palpation', name:'距腿関節前方関節包・伸筋腱の圧痛触診', category:'palpation', purpose:'足関節前方での関節包・前脛腓靭帯・伸筋腱の圧痛確認。前方インピンジメント（骨棘・軟部組織）の評価', badge:'badge-palpation' },
+    { id:'tarsal-sinus-palpation', name:'足根洞（sinus tarsi）の圧痛触診', category:'palpation', purpose:'足関節前外側・距骨と踵骨の間の足根洞部での圧痛確認。骨間距踵靭帯損傷による足根洞症候群の評価（慢性足関節不安定症に合併多い）', badge:'badge-palpation' },
+    { id:'ankle-dorsiflexion', name:'足関節背屈ROM計測（前方インピンジメント評価）', category:'rom', purpose:'背屈可動域制限の確認。足関節背屈制限は前方インピンジメント・距骨後方滑りの障害・下腿三頭筋拘縮などが原因', badge:'badge-rom' },
+    { id:'navicular-drop', name:'Navicular drop test（足部アライメント評価）', category:'posture', purpose:'距骨下関節中間位と自然立位での舟状骨高さの差を計測。10mm以上で扁平足傾向。足部回内が足関節不安定性を増悪させるか評価', badge:'badge-posture' },
+    { id:'peroneus-mmt', name:'腓骨筋群MMT（足関節外反・腓骨筋機能評価）', category:'mmt', purpose:'長腓骨筋・短腓骨筋の筋力低下確認。腓骨筋の筋力低下は慢性足関節不安定症（CAI）を促進させる動的安定化機能の低下を示す', badge:'badge-mmt' }
+  ],
+  'ankle-plantar': [
+    { id:'windlass', name:'Windlass test（足底腱膜伸張テスト）', category:'ortho', purpose:'背臥位または座位で母趾を最大伸展させ足底腱膜に伸張ストレスを加え疼痛誘発。荷重下でも実施。足底腱膜炎の評価に使用', badge:'badge-ortho' },
+    { id:'plantar-fascia-palpation', name:'足底腱膜の圧痛触診（踵骨内側結節付着部）', category:'palpation', purpose:'踵骨内側結節（足底腱膜起始部）の圧痛確認。足底腱膜炎の最も特徴的な所見。起床時の第一歩での疼痛増悪も確認', badge:'badge-palpation' },
+    { id:'heel-fat-pad-palpation', name:'踵骨下脂肪体（heel pad）の圧痛触診', category:'palpation', purpose:'踵骨直下の脂肪体の圧痛確認。足底腱膜炎との鑑別。踵着地時の衝撃吸収機能を担う脂肪体の変性・炎症の評価', badge:'badge-palpation' },
+    { id:'tibial-nerve', name:'脛骨神経Tinel sign（足根管症候群評価）', category:'neurological', purpose:'内果後方〜足底への脛骨神経上でのTinel sign確認。足根管症候群（脛骨神経絞扼）による足底のしびれ・灼熱感の評価', badge:'badge-neurological' },
+    { id:'ankle-dorsiflexion-plantar', name:'足関節背屈ROM計測（下腿三頭筋伸張性・足底腱膜張力評価）', category:'rom', purpose:'背屈制限の確認。背屈制限は足底腱膜への伸張ストレスを増大させる主要因。腓腹筋・ヒラメ筋の伸張性評価と組み合わせ評価', badge:'badge-rom' },
+    { id:'arch-height', name:'アーチ高率・Navicular drop test（足部アライメント評価）', category:'posture', purpose:'内側縦アーチ高さの評価。扁平足（回内足）では足底腱膜が慢性的な伸張ストレスを受け炎症が生じやすい。Navicular drop 10mm以上で扁平足傾向', badge:'badge-posture' },
+    { id:'calf-mmt-plantar', name:'下腿三頭筋MMT（踵上げテスト）', category:'mmt', purpose:'腓腹筋・ヒラメ筋の筋力低下確認。筋力低下は足関節底屈モーメント不足→代償的に足底腱膜の緊張増大→足底腱膜への伸張ストレス増大に関与', badge:'badge-mmt' },
+    { id:'hip-knee-ext-mmt', name:'股関節・膝関節伸展筋群MMT', category:'mmt', purpose:'股関節・膝関節伸展筋の筋力低下確認。ランニング・ジャンプ時の支持モーメント不足→足関節底屈モーメント増大→足底腱膜への伸張ストレス増大という連鎖を評価', badge:'badge-mmt' }
+  ]
+};
+
+// DIAGNOSES
+const DIAGNOSES = {
+  'hip-anterior': {
+    default: {
+      name: '股関節前面の痛み（腸腰筋炎・FAI・関節唇損傷・大腿神経絞扼）',
+      conditions: [
+        { name: '腸腰筋炎・腸恥滑液包炎', pct: '約33%', cause: '腸腰筋の繰り返す屈曲・伸展運動により、腸恥滑液包（腸腰筋腱と関節包前面の間の滑液包）に摩擦ストレスが加わり炎症が生じる。腸腰筋の伸張性低下・弱化が発症を促進させる。鼠径靭帯下方のスカルパ三角中央部に疼痛・圧痛が特徴的。固有背筋内側群の機能低下→骨盤後傾増大による腸腰筋への持続的伸張ストレスが慢性化の要因と考えられる。' },
+        { name: '大腿骨寛骨臼インピンジメント（FAI）・関節唇損傷', pct: '約25%', cause: 'FAIはCAM typeとpincer typeに分類され、大腿骨頭・寛骨臼の骨形態異常により関節唇・関節軟骨に過剰な機械的ストレスが加わり損傷が生じる。特に股関節深屈曲・内転・内旋（FADIR）で前上方の関節唇に挟み込みが生じる。FADIR test・クアドラント検査陽性が特徴的。股関節の動的安定性低下（深層外旋六筋・腸腰筋の機能不全）が骨への接触を増大させると考えられる。' },
+        { name: '股関節内転筋群の炎症・付着部障害（グロインペイン症候群）', pct: '約15%', cause: '長内転筋・恥骨筋などの繰り返す遠心性収縮により恥骨への付着部に炎症・微細断裂が生じる。股関節内転筋群の伸張性低下・弱化と、股関節伸展筋群・腹筋群の機能低下が発症に関与する。サッカー選手など股関節の多方向への急激な動作を繰り返すスポーツで多発。' },
+        { name: '大腿神経絞扼・腰椎疾患関連の大腿前面痛', pct: '約7%', cause: '腸腰筋スパズムまたは腸腰筋の伸張性低下により鼠径靭帯付近の筋裂孔での大腿神経絞扼が生じる。また腰椎椎間板ヘルニア（L2〜L4）による神経根症として大腿前面への放散痛が生じることがある。固有背筋内側群の機能低下による動作中の骨盤後傾が腸腰筋への伸張ストレスを増大させ絞扼を悪化させると考えられる。' },
+        { name: '大腿直筋腱炎・AIIS（下前腸骨棘）付着部炎', pct: '約8%', cause: '大腿直筋は股関節屈曲・膝伸展を兼ねる二関節筋であり、キック動作やスプリント動作での反復した遠心性収縮によりAIIS付着部に牽引ストレスが蓄積し腱炎が生じる。Ely testで大腿直筋の短縮が確認される例で発症リスクが高い。股関節屈曲位での抵抗運動時に鼠径部やや外側の疼痛が誘発される点が腸腰筋炎との鑑別点となる。' },
+        { name: '股関節前方関節包炎・滑膜炎（軽度変形性股関節症を含む）', pct: '約7%', cause: '関節唇損傷やFAIによる反復した機械的ストレスが慢性化すると、前方関節包・滑膜の炎症や早期の軟骨変性を伴うことがある。荷重時痛に加え安静時・夜間痛を伴う場合は変性の進行を疑う。FADIR・クアドラント検査陽性に加え、股関節伸展ROMの制限を伴うことが多い。' },
+        { name: '恥骨結合炎（osteitis pubis）・骨盤アライメント不良に伴う恥骨部ストレス', pct: '約5%', cause: '股関節内転筋群と腹直筋は恥骨結合を介して力学的につながっており、そのバランスが崩れると恥骨結合への剪断ストレスが増大し炎症が生じる。中殿筋・深層外旋六筋の機能低下による骨盤の動的不安定性も恥骨結合への非対称的ストレスを助長すると考えられる。内転筋の圧痛と恥骨結合部の圧痛の両方を確認し、グロインペイン症候群（内転筋単独の付着部障害）との鑑別を行うことが重要。' }
+      ],
+      management: '腸腰筋の伸張性改善・大殿筋・中殿筋・深層外旋六筋の筋力強化・股関節動的安定性改善が基本。FAI・関節唇損傷が疑われる場合はMRIによる画像確認を優先。日常動作での股関節最大屈曲姿勢（低い椅子・深いしゃがみ）を一時的に制限することが有効。'
+    },
+    rules: [
+      { tests: ['fadir', 'faber'], result: 'positive', boost: { name: 'FAI（大腿骨寛骨臼インピンジメント）・関節唇損傷', pct: '両テスト陽性で確率上昇', cause: 'FADIR test（股関節屈曲・内転・内旋）とFABER test（股関節屈曲・外転・外旋）が共に陽性の場合、FAI（特にCAM type・pincer type）または関節唇損傷の可能性が高い。股関節の動的安定化機構（腸腰筋・深層外旋六筋）の機能低下により大腿骨頭の求心位保持が不十分となり、骨形態異常部位への過剰な機械的ストレスが集中していると考えられる。MRIによる画像評価と整形外科への紹介を検討する。' } }
+    ]
+  },
+  'hip-lateral': {
+    default: {
+      name: '股関節外側の痛み（大転子滑液包炎・腸脛靭帯症候群・中殿筋腱障害）',
+      conditions: [
+        { name: '大転子滑液包炎・中殿筋腱炎', pct: '約35%', cause: '大転子外側面における中殿筋停止部および大転子滑液包への繰り返す摩擦・圧縮ストレスにより炎症が生じる。中殿筋の筋力低下→骨盤前額面上での制御不全→腸脛靭帯の張力増大→大転子外側への摩擦ストレス増大が悪循環を形成する。Trendelenburg sign陽性が中殿筋機能不全の特徴的所見。' },
+        { name: '大腿筋膜張筋・腸脛靭帯の伸張性低下（Ober testによる評価）', pct: '約24%', cause: '大腿筋膜張筋の伸張性低下・過緊張が腸脛靭帯を介して大転子・膝外側への摩擦ストレスを増大させる。中殿筋・小殿筋の筋力低下により大腿筋膜張筋が代償的に過活動し伸張性低下を招くと考えられる。Ober test陽性が特徴的。' },
+        { name: '深層外旋六筋の機能低下（梨状筋症候群含む）', pct: '約13%', cause: '梨状筋を含む深層外旋六筋の機能低下または過緊張により大腿骨の外旋変位が生じ、腸脛靭帯・大腿二頭筋への伸張ストレスが増大する。また梨状筋の過緊張は坐骨神経を圧迫し大腿外側への放散痛を引き起こす場合がある。' },
+        { name: '中殿筋腱炎（滑液包炎を伴わない腱実質単独の病変）', pct: '約9%', cause: '中殿筋腱の停止部において、滑液包の炎症を伴わず腱実質そのものに変性・微細断裂が生じる病態。大転子滑液包炎と症状が類似するが、圧痛部位がより限局的で、抵抗運動時痛が強く出る点が鑑別のポイントとなる。中殿筋の筋力低下・過用が背景に存在する。' },
+        { name: '深層外旋六筋炎・梨状筋腱付着部炎（坐骨神経症状を伴わない軽症型）', pct: '約8%', cause: '梨状筋をはじめとする深層外旋六筋腱の大転子付着部への反復ストレスにより炎症が生じる。梨状筋症候群のような坐骨神経絞扼症状を伴わず、股関節内旋可動域の制限と股関節深部の疼痛のみを呈する軽症型として鑑別する必要がある。' },
+        { name: '大腿筋膜張筋炎（TFL単独の過使用性炎症）', pct: '約6%', cause: '大腿筋膜張筋自体の過使用により筋腹に炎症が生じる病態。腸脛靭帯やその遠位部（膝外側）ではなく、上前腸骨棘直下のTFL筋腹に限局した圧痛を呈する点でOber test陽性の腸脛靭帯症候群と鑑別する。' },
+        { name: '中殿筋・小殿筋の筋力低下による動的不安定性', pct: '多くの例に機能的要因として存在', cause: '中殿筋は外転筋総断面積の約60%を占め骨盤の前額面上での制御に最も重要な筋である。中殿筋の筋力低下は骨盤の側方傾斜（Trendelenburg現象）を引き起こし、体重心の外側移動により股関節外側への圧縮・伸張ストレスが増大する。片脚立位・歩行時の骨盤安定化機能低下が発症の根本原因と考えられる。' }
+      ],
+      management: '中殿筋・小殿筋・深層外旋六筋の筋力強化・大腿筋膜張筋・腸脛靭帯のストレッチ（Ober test陽性例を優先）・骨盤前額面上の安定化訓練が基本。Trendelenburg sign陽性例は片脚立位・歩行での骨盤側方制御訓練を中心に進める。'
+    },
+    rules: [
+      { tests: ['trendelenburg'], result: 'positive', boost: { name: '中殿筋・小殿筋の機能不全（Trendelenburg陽性）', pct: '陽性時：殿筋機能不全を明確に示唆', cause: 'Trendelenburg sign陽性は中殿筋・小殿筋の機能不全を直接示す所見。支持側骨盤の下制は股関節外転筋力（特に中殿筋）の低下を意味する。中殿筋の弱化→骨盤前額面上での制御不全→大転子外側への力学的負荷増大→大転子滑液包炎・腸脛靭帯過緊張が生じると考えられる。殿筋強化と骨盤安定化訓練を優先すべき状態である。' } }
+    ]
+  },
+  'lumbar-pain': {
+    default: {
+      name: '腰部・仙腸関節の痛み（椎間関節症・椎間板障害・仙腸関節障害）',
+      conditions: [
+        { name: '腰部椎間関節症・椎間関節性腰痛', pct: '約32%', cause: '腰椎の伸展・回旋運動時に椎間関節面に圧縮＋剪断ストレスが加わり疼痛が生じる。腸腰筋の短縮による骨盤前傾増大・腰椎前弯増強が椎間関節への圧縮ストレスを慢性化させる。体幹屈筋群（腹横筋・腹斜筋）の筋力低下による体幹安定化機能の低下も椎間関節への負荷増大に関与する。大殿筋の弱化→骨盤前傾→腰椎前弯増強という連鎖も重要な発症機序と考えられる。' },
+        { name: '腰部椎間板障害（椎間板ヘルニア・椎間板性腰痛）', pct: '約24%', cause: '腰椎屈曲・回旋複合動作での椎間板後方への伸張ストレス増大が線維輪の断裂・髄核の後方突出を引き起こす。多裂筋（特に腰部）の筋力低下による腰椎前弯減少（後弯位）が椎間板後部への圧縮を増大させることが主因。Laségue sign・Bragard test陽性が神経根症状の指標。下肢への放散痛・しびれを伴う場合は整形外科への紹介を優先する。' },
+        { name: '仙腸関節障害（force closure機能低下）', pct: '約12%', cause: '仙腸関節への剪断ストレス増大により疼痛が生じる。固有背筋（腸骨後面への付着）の筋力低下と体幹屈筋群（腹横筋・内腹斜筋：胸腰筋膜を介した仙腸関節圧迫力）の弱化がforce closure機能を破綻させる。また骨盤後傾（カウンターニューテーション）が仙腸関節への剪断ストレスを増大させると考えられる。Pelvic rock test陽性が特徴的所見。' },
+        { name: '多裂筋・固有背筋の機能低下（筋性腰痛）', pct: '約12%', cause: '多裂筋は腰椎の節間安定化に最も重要な内在筋であり、その機能低下は腰椎の不安定性を招く。特に急性腰痛後の多裂筋萎縮は再発リスクを高める。深層多裂筋（椎体間安定化）と浅層多裂筋（腰椎伸展）の機能評価が重要。マルアライメント（骨盤の非対称性・脊柱側弯など）が多裂筋の左右非対称な機能低下を引き起こすことも多い。' },
+        { name: '腰部筋膜性疼痛症候群（胸腰筋膜由来のトリガーポイント）', pct: '約8%', cause: '胸腰筋膜・多裂筋周囲に形成されたトリガーポイントにより関連痛パターンとして腰部の鈍痛・こわばりが生じる。長時間の同一姿勢や体幹深部筋の持久力低下により筋膜の緊張が慢性化しやすい。椎間関節症・椎間板障害と異なり神経学的所見を伴わず、圧痛点への刺激で症状が再現される点が特徴。' },
+        { name: '椎体分離症・すべり症（若年層・スポーツ選手考慮）', pct: '約6%', cause: '腰椎の反復した伸展・回旋動作により椎弓峡部にストレスが集中し疲労骨折（分離症）が生じ、進行すると椎体すべり症に至る。体操・野球など体幹伸展・回旋を繰り返す競技の若年選手に好発する。多裂筋の機能低下による節間安定性の低下がすべりの進行因子となりうる。' },
+        { name: '股関節由来の代償性腰痛（腸腰筋短縮・股関節可動域制限の二次的腰痛）', pct: '約6%', cause: '股関節屈筋群（腸腰筋・大腿直筋）の短縮や股関節伸展可動域の制限があると、歩行・立位動作で骨盤前傾が代償的に増強し腰椎への負担が増大する。股関節そのものには症状がなくても、可動域制限を放置すると腰部への二次的な機械的ストレスが慢性化する点に注意が必要。' }
+      ],
+      management: '多裂筋・体幹深部筋（ドローイン・アブドミナルホロウイング）の機能回復・腸腰筋柔軟性改善・骨盤アライメント矯正が基本戦略。Laségue sign陽性・神経根症状が著明な場合は医師への紹介を優先。急性期は痛みを増悪させない範囲での軽度活動が推奨（絶対安静は避ける）。'
+    },
+    rules: [
+      { tests: ['lasegue', 'bragard'], result: 'positive', boost: { name: '腰椎椎間板ヘルニア（神経根症状）', pct: '両テスト陽性でヘルニア疑い↑', cause: 'Laségue signとBragard testが共に陽性の場合、腰椎椎間板ヘルニアによる神経根絞扼の可能性が高まる。多裂筋の筋力低下による腰椎後弯が椎間板後部への圧縮ストレスを増大させ、髄核の後方突出が神経根を絞扼していると考えられる。下肢症状（しびれ・筋力低下）が著明な場合は整形外科・神経外科への紹介を優先する。' } },
+      { tests: ['pelvic-rock'], result: 'positive', boost: { name: '仙腸関節障害（force closure機能低下）', pct: '陽性時：仙腸関節障害を示唆', cause: 'Pelvic rock test陽性は仙腸関節由来の疼痛を示唆する。固有背筋・腹横筋・内腹斜筋のforce closure機能が低下し仙腸関節の動的安定化が破綻していることが根本原因と考えられる。骨盤後傾アライメントの改善・多関節協調訓練が有効。'} }
+    ]
+  },
+  'knee-medial': {
+    default: {
+      name: '膝内側の痛み（鵞足炎・内側側副靭帯損傷・内側半月板障害）',
+      conditions: [
+        { name: '鵞足炎（縫工筋・薄筋・半腱様筋の付着部炎症）', pct: '約35%', cause: 'お尻の筋力低下（大殿筋・中殿筋の弱化）により膝の内側変異（knee-in：膝外反）が生じることで、鵞足付着部に繰り返す圧縮・剪断ストレスが加わり炎症が発生する。また下腿の過外旋（大腿二頭筋・腸脛靭帯の過緊張による）が鵞足構成筋に伸張ストレスを加え付着部障害を促進させる。トリガー筋鑑別テストでは薄筋単独が約68%、縫工筋と薄筋の合併が16%と報告されており薄筋が最多の原因筋と考えられている。' },
+        { name: '内側側副靭帯（MCL）損傷・慢性炎症', pct: '約20%', cause: 'MCLは膝外反を制動し屈曲5°での外反制動の57.4%、25°での78.2%を担う重要な靭帯である。外反ストレステスト陽性・ダイアルテスト陽性が特徴。殿筋群の機能低下→膝外反増大（メディアルコラプス）→MCLへの慢性的な伸張ストレス増大が発症・悪化の主因と考えられる。MCL自体は静的安定化機構であるため、鵞足構成筋・半腱様筋・腓腹筋内側頭の強化による動的安定化が治療の鍵となる。' },
+        { name: '半膜様筋・腓腹筋内側頭の過緊張', pct: '約12%', cause: '半膜様筋の過緊張が膝窩内側の疼痛・膝伸展制限を引き起こす。半腱様筋の収縮不全が大腿二頭筋の緊張を充進させ下腿外旋が強まることで、半膜様筋の伸張ストレスが増大する。DTTTで半膜様筋リラクセーション後の症状変化を確認することが評価・治療両面で重要。' },
+        { name: '内側半月板損傷', pct: '約12%', cause: '内側半月板への繰り返す圧縮・剪断ストレス（特に屈曲最終域での外旋強制）により損傷が生じる。下腿回旋異常（過外旋）・MCL機能不全による前内側回旋不安定性が半月板への過剰ストレスを招くと考えられる。McMurray test・内側関節裂隙圧痛が評価の指標。' },
+        { name: '変形性膝関節症（内側コンパートメント）', pct: '約8%', cause: '内反膝（O脚）アライメントにより内側コンパートメントへの荷重ストレスが慢性的に集中し軟骨変性・骨棘形成が進行する。中高年に多く、荷重時痛・動作開始時のこわばりが特徴。殿筋群の機能低下による動的な内反制御不全が進行を助長し、膝関節伸展可動域の減少・crepitus（軋轢音）を伴うことが多い。' },
+        { name: '内側半月板嚢腫（半月板損傷の慢性化に伴う滑液貯留）', pct: '約7%', cause: '内側半月板損傷が慢性化すると損傷部から滑液が漏出・貯留し関節裂隙に嚢腫を形成することがある。単純な半月板損傷と比べ関節裂隙部に触知可能な腫瘤感を伴う点が特徴で、McMurray testでの疼痛誘発に加え触診での嚢胞様の膨隆を確認する。' },
+        { name: '複合靭帯損傷疑い（MCL＋後外側支持機構合併）', pct: '約6%', cause: '強い外反・回旋ストレスが加わった外傷例ではMCL単独ではなく後外側支持機構（LCL・膝窩筋腱）を含む複合損傷に至ることがある。内反ストレステスト・ダイアルテストでの回旋不安定性が単純なMCL損傷より大きい場合はこの複合損傷を疑い、整形外科への紹介を優先する。' }
+      ],
+      management: '殿筋群（大殿筋・中殿筋）の筋力強化・膝外反を改善する下肢アライメント訓練・鵞足構成筋の伸張性改善が基本。トリガー筋鑑別テストで薄筋・縫工筋・半腱様筋のどれが主因かを特定してから介入することが重要。MCL損傷例は段階的負荷訓練と動的安定化訓練を優先する。'
+    },
+    rules: [
+      { tests: ['trigger-discrimination'], result: 'positive', boost: { name: '鵞足炎（原因筋特定済み）', pct: 'テスト陽性で原因筋が特定', cause: 'トリガー筋鑑別テスト陽性は鵞足炎の原因筋（薄筋・半腱様筋・縫工筋）の特定に成功したことを示す。鵞足炎の最多原因筋は薄筋単独（約68%）であり、次いで縫工筋と薄筋の合併（16%）が多い。お尻の筋力低下（大殿筋・中殿筋の弱化）による膝の内側変異と、下腿の過外旋（大腿二頭筋・腸脛靭帯の過緊張による）が鵞足付着部への反復ストレスを引き起こしていることが主因と考えられる。特定された原因筋のストレッチと殿筋強化を組み合わせたアプローチが有効。' } }
+    ]
+  },
+  'knee-lateral': {
+    default: {
+      name: '膝外側の痛み（腸脛靭帯炎・後外側支持機構障害・大腿二頭筋障害）',
+      conditions: [
+        { name: '腸脛靭帯炎（IT band syndrome・ランナー膝）', pct: '約36%', cause: '腸脛靭帯が大腿骨外側上顆と繰り返す摩擦を起こし脂肪体への圧縮ストレスによる炎症が生じる。Ober test陽性（腸脛靭帯・大腿筋膜張筋の伸張性低下）が特徴。股関節外転筋・外旋筋の筋力低下→大腿筋膜張筋の代償的過活動→腸脛靭帯の過緊張→膝外側への摩擦ストレス増大という連鎖が発症メカニズムと考えられる。膝屈曲30°付近（Impingement zone）での疼痛が特徴的。' },
+        { name: '後外側支持機構（PLS）障害・外側側副靭帯損傷', pct: '約20%', cause: '後外側支持機構（外側側副靭帯・膝窩筋腱・膝窩腓骨靭帯・後外側関節包）への伸張ストレスにより疼痛・不安定性が生じる。下腿の過外旋（大腿二頭筋・後外側支持機構機能低下）が特徴的。内反ストレステスト陽性・ダイアルテスト陽性が評価指標。' },
+        { name: '大腿二頭筋腱炎・腓骨頭付着部障害', pct: '約16%', cause: '大腿二頭筋腱の腓骨頭付着部への繰り返す牽引・摩擦ストレスにより炎症が生じる。大腿二頭筋の過緊張が下腿外旋を促進し後外側支持機構への伸張ストレスを増大させる。膝窩外側から腓骨頭にかけての圧痛が特徴的。' },
+        { name: '膝関節内反不安定性・外側広筋過緊張', pct: '約8%', cause: '外側広筋の過緊張は膝蓋骨を外上方に引き上げ外側関節面への圧縮ストレスを増大させる。また膝関節内反不安定性（LCL機能不全）が外側組織への伸張ストレスを反復させ慢性炎症を引き起こす可能性がある。' },
+        { name: '膝窩筋腱炎（popliteus tendinitis）', pct: '約7%', cause: '膝窩筋腱（大腿骨外側上顆前下方付着部）への下り坂歩行・下腿外旋位での反復ストレスにより炎症が生じる。LCL損傷や下腿の過外旋との合併が多く、膝窩筋腱の圧痛と下腿回旋異常の両方が確認される場合に疑う。' },
+        { name: '外側半月板損傷', pct: '約7%', cause: '下腿の過回旋を伴う荷重位での屈伸動作の反復により外側半月板後節に圧縮・剪断ストレスが集中し損傷が生じる。後外側支持機構の機能低下による回旋不安定性が半月板への過剰ストレスを助長すると考えられ、内反不安定性を伴う例で疑いが強まる。' },
+        { name: '腓骨頭部滑液包炎（大腿二頭筋腱下滑液包炎）', pct: '約6%', cause: '大腿二頭筋腱と腓骨頭の間に存在する滑液包への摩擦ストレスにより炎症が生じる。腱炎そのものと症状が類似するが、圧痛範囲がより限局し腓骨頭直上に腫脹を触知することがある点で鑑別する。' }
+      ],
+      management: '腸脛靭帯・大腿筋膜張筋のストレッチ・股関節外転筋・外旋筋の筋力強化・下腿回旋異常の改善が基本。Noble compression test陽性例は膝屈曲30°付近での負荷を一時的に軽減するランニング距離・傾斜の管理が必要。PLS障害が疑われる場合は整形外科への紹介を検討する。'
+    },
+    rules: []
+  },
+  'knee-anterior': {
+    default: {
+      name: '膝前面の痛み（膝蓋大腿関節症・腱炎・脂肪体炎・オスグッド病）',
+      conditions: [
+        { name: '膝蓋大腿関節症・膝蓋骨外側変位（膝蓋大腿関節炎）', pct: '約32%', cause: '内側広筋の筋力低下（特に活動開始の遅延）により外側広筋との収縮バランスが崩れ、膝蓋骨が外側に変位する。これにより膝蓋大腿関節外側面への圧縮ストレスが集中し疼痛が生じる。また足関節背屈制限→後方重心→膝蓋大腿関節への圧縮増大、股関節外転・外旋筋力低下→膝外反→膝蓋骨の外側変位という連鎖も発症に関与する。' },
+        { name: 'ジャンパー膝（膝蓋腱炎）・脛骨粗面付着部障害（オスグッド病）', pct: '約20%', cause: '大腿四頭筋の繰り返す遠心性収縮ストレスにより膝蓋腱・脛骨粗面付着部に炎症・変性が生じる。大腿四頭筋の伸張性低下が付着部への牽引ストレスを増大させる主因。オスグッド病は成長期（apophyseal stage：11〜14歳）に骨化核への牽引ストレスが集中して発症し、腸腰筋短縮・大腿直筋短縮が発症を促進させると考えられる。' },
+        { name: '膝蓋下脂肪体炎（Hoffa病）', pct: '約16%', cause: '膝蓋骨下極両側の膝蓋下脂肪体への圧縮ストレスにより炎症が生じる。大腿四頭筋の筋力低下・伸張性低下が脂肪体への圧縮を増大させる主要因。また膝蓋下脂肪体の拘縮が生じると膝関節の伸展が阻害され、さらに大腿四頭筋への負担が増大するという悪循環が形成される。' },
+        { name: '大腿四頭筋腱炎（膝蓋骨上極付着部障害）', pct: '約12%', cause: '大腿四頭筋腱の膝蓋骨上極付着部への反復した伸張ストレスにより炎症・変性が生じる。病態はジャンパー膝（膝蓋腱炎）と類似するが、圧痛の首座が膝蓋骨上極にある点で鑑別する。ジャンプ動作を繰り返す中高年アスリートに比較的多い。' },
+        { name: '滑膜ひだ障害（内側膝蓋滑膜ひだ症候群）', pct: '約10%', cause: '内側膝蓋滑膜ひだが大腿骨内側顆と膝蓋骨の間で反復して挟み込まれ炎症・肥厚が生じる。膝屈伸の反復動作で悪化し、膝蓋骨内側縁でのクリック感・引っかかり感を伴うことがある。膝蓋大腿関節症と症状が類似するため触診での圧痛部位・可動域内での引っかかりの有無で鑑別する。' },
+        { name: '膝蓋骨疲労骨折・二分膝蓋骨障害（若年層考慮）', pct: '約6%', cause: '二分膝蓋骨（骨癒合不全）を有する例では外側広筋の牽引ストレスが二分部に集中し疼痛が生じる。オスグッド病と同様に成長期に多く、大腿四頭筋の過緊張・伸張性低下が誘因となる。症状が長引く場合はX線評価による確認が推奨される。' },
+        { name: '足関節背屈制限・骨盤後傾による後方重心への影響', pct: 'ほぼ全例に機能的要因として関与', cause: '足関節背屈制限は踏み込み動作・着地動作において下腿前傾不足→後方重心→膝蓋大腿関節への圧縮ストレス増大を招く。また骨盤後傾が生じると体幹後方重心→膝蓋大腿関節への圧縮増大という連鎖が起こる。これらは大腿四頭筋への慢性的な過負荷の原因となる。' }
+      ],
+      management: '内側広筋の選択的強化・外側広筋・腸脛靭帯のストレッチ・足関節背屈ROM改善・股関節外転筋力強化が基本。Patella compression test陽性の方向（内側か外側か）で介入方向を決定する。オスグッド病例は成長期の運動負荷管理と大腿四頭筋・腸腰筋のストレッチが優先。'
+    },
+    rules: []
+  },
+  'ankle-posterior': {
+    default: {
+      name: '足関節後方の痛み（アキレス腱障害・後脛骨筋腱炎・腓骨筋腱炎）',
+      conditions: [
+        { name: 'アキレス腱障害（腱体部炎・付着部障害）', pct: '約44%', cause: '下腿三頭筋（腓腹筋・ヒラメ筋）の繰り返す遠心性収縮ストレスによりアキレス腱に微細損傷が蓄積する。腱体部障害は踵骨から2〜6cm近位、付着部障害は踵骨後方2/3に損傷が集中する。足関節背屈制限（下腿三頭筋の伸張性低下）が腱への牽引ストレスを増大させる主因と考えられる。足部アライメント異常（回内足）による腱への回旋ストレス増大も関与する。' },
+        { name: '後脛骨筋腱炎・後脛骨筋腱機能不全', pct: '約16%', cause: '内果後方での後脛骨筋腱への繰り返す摩擦・牽引ストレスにより炎症が生じる。回内足（扁平足）では後脛骨筋に対する負荷が増大し腱の炎症・変性が進行する。足部アライメント異常（扁平足）の評価が重要であり、navicular drop test・アーチ高率の計測が評価指標となる。' },
+        { name: '長・短腓骨筋腱炎・腱脱臼', pct: '約12%', cause: '外果後方での腓骨筋腱への繰り返す摩擦ストレスにより炎症が生じる。足関節内反捻挫後の腓骨筋腱損傷・腱鞘炎も多い。慢性足関節不安定症では腓骨筋腱への力学的負荷が増大する。' },
+        { name: '三角骨障害・後方インピンジメント症候群', pct: '約8%', cause: '足関節最大底屈強制時に三角骨（距骨後突起の過剰骨）または長母指屈筋腱が後方で挟み込まれ疼痛が生じる。バレエダンサー・サッカー選手のようにつま先立ち姿勢を繰り返す競技者に多発。' },
+        { name: 'Kager脂肪体炎（アキレス腱前方インピンジメント）', pct: '約8%', cause: 'Kager\'s fat pad（アキレス腱と踵骨後面の間の脂肪体）が反復した圧迫・摩擦ストレスを受け炎症が生じる。つま先立ち動作の反復や後方インピンジメントとの合併が多く、アキレス腱炎とは圧痛部位（腱前方）で鑑別する。' },
+        { name: '腓腹筋腱移行部損傷（下腿三頭筋筋腱移行部の障害）', pct: '約6%', cause: '腓腹筋とアキレス腱の筋腱移行部（腱体部よりやや近位）への遠心性収縮ストレスの蓄積により微細損傷・炎症が生じる。ダッシュ・ジャンプ動作での急激な負荷が誘因となることが多く、腱体部障害よりやや近位に圧痛が限局する点で鑑別する。' },
+        { name: '距骨後突起部の障害（疲労骨折・滑膜炎を含む）', pct: '約6%', cause: '距骨後突起への繰り返す衝突ストレスにより疲労骨折や滑膜炎が生じる。三角骨障害と類似の受傷機転だが骨性の器質的破綻を伴う点で鑑別が必要であり、症状が遷延する場合は画像評価を優先する。' }
+      ],
+      management: '下腿三頭筋の伸張性改善・遠心性筋力強化・足部アライメント改善（回内足例は足底挿板）が基本。Thompson test陽性例は腱断裂を考慮し整形外科への紹介を優先。アキレス腱炎急性期は安静と炎症管理。'
+    },
+    rules: [
+      { tests: ['thompson'], result: 'positive', boost: { name: 'アキレス腱完全断裂', pct: '陽性時：完全断裂を強く示唆', cause: 'Thompson squeeze testで足関節が底屈しない場合、アキレス腱の完全断裂が強く示唆される。腱炎・腱付着部障害では通常Thompson testは陽性にならないため、陽性所見は腱の連続性消失を示す重要な所見である。早急に整形外科への紹介が必要。' } }
+    ]
+  },
+  'ankle-anterior': {
+    default: {
+      name: '足関節前方の痛み（前距腓靭帯損傷・前方インピンジメント・慢性足関節不安定症）',
+      conditions: [
+        { name: '前距腓靭帯（ATFL）損傷・慢性足関節不安定症（CAI）', pct: '約44%', cause: '足関節内反捻挫により前距腓靭帯（最脆弱な外側側副靭帯）が損傷し、40〜70%が慢性的な足関節不安定症（CAI）に移行すると報告されている。慢性期には固有感覚の障害により動的安定化（腓骨筋群の保護反射）が低下する。前方引き出しテスト陽性・外果前下方圧痛が特徴的所見。足根洞部圧痛（骨間距踵靭帯損傷）がCAIに合併することが多い。' },
+        { name: '距腿関節前方インピンジメント（骨棘・軟部組織）', pct: '約20%', cause: '足関節背屈時に距腿関節前方での骨棘または肥厚した前方関節包・前脛腓靭帯遠位部が挟み込まれ疼痛が生じる。足部アライメント異常（回内足）・足関節背屈制限が前方への距骨の後方滑りを障害し前方インピンジメントを悪化させると考えられる。' },
+        { name: '足根洞症候群（骨間距踵靭帯損傷）', pct: '約12%', cause: '足根洞（距骨と踵骨の間のスペース）内の骨間距踵靭帯損傷による足関節不安定性・痛みが生じる。慢性足関節不安定症に合併することが多く、足根洞部の圧痛が特徴。足部アライメント異常（回内足）が発症を促進させると考えられる。' },
+        { name: '踵腓靭帯（CFL）単独損傷', pct: '約10%', cause: '内反捻挫の中でもより強い内反力が加わった際に踵腓靭帯（CFL）単独または優位に損傷することがある。ATFL損傷に比べ距骨下関節の不安定性を伴いやすく、内反ストレステスト陽性かつ前方引き出しテストが陰性〜軽度の場合にCFL優位の損傷を疑う。' },
+        { name: '前脛腓靭帯損傷（高位足関節捻挫：syndesmosis injury）', pct: '約8%', cause: '外旋・背屈強制により前脛腓靭帯（syndesmosis）が損傷し脛骨・腓骨間の離開が生じる。外旋ストレスでの疼痛誘発が特徴で、通常の外側靭帯損傷より治癒期間が長期化しやすいため見落としに注意が必要。' },
+        { name: '距骨滑車軟骨損傷（骨軟骨損傷：OLT）', pct: '約6%', cause: '繰り返す足関節内反捻挫により距骨滑車の軟骨・軟骨下骨に圧縮・剪断ストレスが蓄積し骨軟骨損傷（OLT）が生じる。足関節前方の深部痛・可動域内でのクリック感を伴うことがあり、保存療法で改善しない場合はMRI評価が推奨される。' },
+        { name: '腓骨筋群の機能低下（動的安定化機能不全）', pct: 'CAI例にほぼ全例関与', cause: '腓骨筋群（長腓骨筋・短腓骨筋）は足関節の動的安定化に最も重要な筋群であり、内反捻挫を繰り返すことで腓骨筋MMTの低下が生じる。腓骨筋力低下→保護反射遅延→再捻挫リスク増大という悪循環が形成される。' }
+      ],
+      management: '腓骨筋群の筋力強化・固有感覚訓練（バランストレーニング）・足部アライメント改善が基本。前方引き出しテスト陽性・CAI例は段階的な機能回復訓練と再捻挫予防（テーピング・装具）が必要。骨棘による前方インピンジメントが疑われる場合はX線評価のため整形外科への紹介を検討。'
+    },
+    rules: [
+      { tests: ['anterior-drawer', 'talar-tilt'], result: 'positive', boost: { name: '慢性足関節不安定症（前距腓靭帯＋踵腓靭帯損傷）', pct: '両テスト陽性で複合靭帯損傷示唆', cause: '前方引き出しテストと内反ストレステストが共に陽性の場合、前距腓靭帯（ATFL）と踵腓靭帯（CFL）の複合損傷による慢性足関節不安定症（CAI）が強く示唆される。固有感覚障害による腓骨筋保護反射の遅延が動的安定化を低下させ慢性化していると考えられる。腓骨筋強化・固有感覚訓練を優先的に実施し、再捻挫予防のためのテーピング・装具の使用を検討する。' } }
+    ]
+  },
+  'ankle-plantar': {
+    default: {
+      name: '足底の痛み（足底腱膜炎・踵骨下脂肪体炎・足根管症候群）',
+      conditions: [
+        { name: '足底腱膜炎', pct: '約52%', cause: '足底腱膜の踵骨内側結節付着部への繰り返す伸張ストレスにより炎症・微細断裂が生じる。主な発症原因として、①股関節・膝関節伸展筋の筋力低下（ランニング・ジャンプ時の支持モーメント不足→足関節底屈モーメント増大→足底腱膜張力増大）、②下腿三頭筋の筋力低下（代償的な足底腱膜緊張増大）、③足関節背屈制限（アーチ低下→足底腱膜伸張増大）、④足部アライメント異常（扁平足による内側縦アーチ低下→足底腱膜への慢性伸張）の4つが考えられる。起床時の第一歩での踵部痛が特徴的症状。' },
+        { name: '踵骨下脂肪体変性・炎症（heel pad syndrome）', pct: '約16%', cause: '踵骨下の脂肪体（heel pad）は踵着地時の衝撃吸収を担うが、加齢・過体重・繰り返す衝撃により変性・薄化が生じる。足底腱膜炎とは踵骨内側結節の付着部圧痛（腱膜炎）vs. 踵骨直下の広い範囲の圧痛（脂肪体）で鑑別する。' },
+        { name: '足根管症候群（脛骨神経絞扼）', pct: '約8%', cause: '内果後方〜足底の足根管での脛骨神経絞扼により足底のしびれ・灼熱感・疼痛が生じる。内果後方でのTinel sign確認が評価指標。扁平足（回内足）による足根管内容量減少が絞扼を増強させると考えられる。' },
+        { name: '足底線維腫症（plantar fibromatosis）', pct: '約12%', cause: '足底腱膜内に線維性結節が形成される病態で、足底腱膜炎とは異なり踵骨付着部ではなく足底中央部（アーチ部）に触知可能な硬結を伴う疼痛が特徴。Windlass testでも疼痛が誘発されうるが、圧痛部位が踵骨内側結節ではなく足底中央に限局する点で鑑別する。' },
+        { name: '踵骨疲労骨折', pct: '約7%', cause: 'ランニングなど反復した縦方向の衝撃荷重により踵骨に疲労骨折が生じる。足底腱膜炎と類似の踵部痛を呈するが、踵骨を左右から圧迫した際の疼痛誘発や安静時にも改善しない持続痛が特徴的であり、症状が遷延する場合はX線・MRI評価を優先する。' },
+        { name: '足底外側神経（バクスター神経）絞扼', pct: '約5%', cause: '外転筋群と踵骨内側の間で足底外側神経第一枝（バクスター神経）が絞扼され、足底腱膜炎と類似するが踵骨内側やや底側への放散痛・灼熱感を伴う点で鑑別する。足根管症候群のTinel signに近い部位での誘発痛の確認が重要。' },
+        { name: '足部アライメント異常（扁平足・回内足）の関与', pct: 'ほぼ全例に機能的要因として関与', cause: '内側縦アーチの低下（扁平足・回内足）は足底腱膜を慢性的に伸張させ付着部への持続的な牽引ストレスを生む。navicular drop test・アーチ高率の計測でアライメント異常を評価し、足底挿板（インソール）や足部アライメント改善運動を介入に取り入れることが重要。' }
+      ],
+      management: '下腿三頭筋の伸張性改善・足関節背屈ROM改善・股関節・膝関節伸展筋力強化・足底腱膜ストレッチ（Windlass testの治療応用）が基本。扁平足例には足底挿板の使用が有効。起床時の疼痛には就寝時のアンクルスプリント使用が症状軽減に寄与することがある。Tinel sign陽性・しびれを伴う場合は足根管症候群を疑い神経学的評価を追加する。'
+    },
+    rules: [
+      { tests: ['windlass', 'plantar-fascia-palpation'], result: 'positive', boost: { name: '足底腱膜炎（踵骨付着部）', pct: '両所見陽性で診断精度向上', cause: 'Windlass test陽性と踵骨内側結節付着部への圧痛が共に陽性の場合、足底腱膜炎の可能性が高い。足底腱膜への伸張ストレスの増大原因として、①下腿三頭筋の筋力低下（代償的足底腱膜緊張増大）、②足関節背屈制限（アーチ低下・下腿前傾不足）、③股関節・膝関節伸展筋力低下（支持モーメント不足→底屈モーメント補完）、④内側縦アーチ低下（扁平足による慢性伸張）が主要な機能的要因として考えられる。これらを複合的に評価・治療することが再発予防に重要。' } }
+    ]
+  }
+};
+
+// ============================================================
+// EVIDENCE WEIGHTING（検査の優位性を考慮した確率再計算）
+// ------------------------------------------------------------
+// 各評価項目には「陽性尤度比相当」の重みをカテゴリー別に設定。
+// 整形外科的特殊テスト（ortho）は感度・特異度が比較的高く、
+// 触診・ROM・MMT・姿勢観察は補助的所見として扱う。
+// 陽性(positive)＝確率上昇、偽陽性(false)＝弱い上昇、陰性(negative)＝確率低下。
+// ============================================================
+const LR_BY_CATEGORY = {
+  ortho:        { positive: 4.0, false: 1.6,  negative: 0.30 },
+  palpation:    { positive: 2.3, false: 1.3,  negative: 0.55 },
+  neurological: { positive: 3.2, false: 1.4,  negative: 0.40 },
+  rom:          { positive: 1.8, false: 1.2,  negative: 0.60 },
+  mmt:          { positive: 1.7, false: 1.15, negative: 0.60 },
+  posture:      { positive: 1.7, false: 1.15, negative: 0.60 }
+};
+
+// T(idx, category) = カテゴリー標準の重みを該当する鑑別候補(idx)に適用
+// TC(idx, {positive,false,negative}) = 個別テストの特性に応じたカスタム重み
+function T(idx, cat) { return { idx, lr: LR_BY_CATEGORY[cat] }; }
+function TC(idx, lr) { return { idx, lr }; }
+
+// EVIDENCE[部位ID][テストID] = このテストが結果に応じて動かす鑑別候補（conditions配列のindex）
+const EVIDENCE = {
+  'hip-anterior': {
+    thomas: [T(0, 'ortho')],
+    ely: [TC(0, { positive: 1.8, false: 1.2, negative: 0.7 }), TC(4, { positive: 3.2, false: 1.4, negative: 0.4 })],
+    faber: [T(1, 'ortho')],
+    fadir: [T(1, 'ortho'), T(5, 'ortho')],
+    quadrant: [T(1, 'ortho'), T(5, 'ortho')],
+    'hip-flexor-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'adductor-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(6, { positive: 1.8, false: 1.2, negative: 0.65 })],
+    'femoral-nerve-stretch': [T(3, 'ortho')],
+    'hip-ext-rom': [T(0, 'rom'), T(4, 'rom'), T(5, 'rom')],
+    'hip-dynamic-stability': [T(1, 'posture'), T(6, 'posture')],
+    'hip-abductor-mmt': [T(1, 'mmt')]
+  },
+  'hip-lateral': {
+    ober: [T(1, 'ortho')],
+    trendelenburg: [T(0, 'ortho')],
+    'gluteus-medius-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(3, { positive: 2.4, false: 1.3, negative: 0.5 })],
+    'tfl-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(5, { positive: 2.4, false: 1.3, negative: 0.5 })],
+    'greater-trochanter-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'hip-internal-rotation': [T(2, 'rom'), T(4, 'rom')],
+    'hip-abductor-mmt-lat': [T(0, 'mmt'), T(3, 'mmt')],
+    'knee-valgus-single-leg': [T(0, 'posture')]
+  },
+  'lumbar-pain': {
+    'lumbar-ext-rot': [T(0, 'ortho'), TC(5, { positive: 3.5, false: 1.5, negative: 0.40 })],
+    lasegue: [T(1, 'ortho')],
+    bragard: [TC(1, { positive: 4.5, false: 1.6, negative: 0.30 })],
+    'pelvic-rock': [T(2, 'ortho')],
+    'multifidus-palpation': [TC(3, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(4, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'thoracolumbar-fascia': [T(2, 'palpation'), TC(4, { positive: 3.2, false: 1.4, negative: 0.40 })],
+    'sij-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'lumbar-rom': [T(0, 'rom')],
+    'thomas-lumbar': [T(0, 'rom'), T(6, 'rom')],
+    'hip-ext-mmt': [T(0, 'mmt'), T(6, 'mmt')],
+    'abdominal-mmt': [T(2, 'mmt')],
+    'lumbar-alignment': [T(0, 'posture'), T(6, 'posture')],
+    'hip-flex-flexibility': [T(0, 'rom'), T(6, 'rom')]
+  },
+  'knee-medial': {
+    'valgus-stress': [T(1, 'ortho'), TC(6, { positive: 1.6, false: 1.2, negative: 0.75 })],
+    'dial-test': [T(1, 'ortho'), TC(6, { positive: 2.0, false: 1.3, negative: 0.60 })],
+    'mcl-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'pesanserine-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'trigger-discrimination': [T(0, 'ortho')],
+    'semimembranosus-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'medial-meniscus-palpation': [TC(3, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(5, { positive: 2.4, false: 1.3, negative: 0.50 })],
+    mcmurray: [T(3, 'ortho'), T(5, 'ortho')],
+    'varus-stress': [T(6, 'ortho')],
+    'knee-rom-medial': [T(1, 'rom'), T(4, 'rom')],
+    'hip-abductor-mmt-knee': [T(0, 'mmt'), T(4, 'mmt')],
+    'tibia-rotation': [T(2, 'posture'), T(3, 'posture')]
+  },
+  'knee-lateral': {
+    'varus-stress-lat': [T(1, 'ortho'), TC(5, { positive: 1.8, false: 1.2, negative: 0.70 })],
+    'ober-knee': [T(0, 'ortho')],
+    'lcl-popliteus-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(4, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'biceps-femoris-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(6, { positive: 2.2, false: 1.3, negative: 0.55 })],
+    'itband-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'noble-compression': [TC(0, { positive: 4.5, false: 1.6, negative: 0.30 })],
+    'tibia-rotation-lat': [T(1, 'posture'), T(2, 'posture'), T(4, 'posture')],
+    'knee-varus-instability': [T(3, 'posture'), T(5, 'posture')],
+    'hip-abductor-mmt-lat': [T(0, 'mmt')]
+  },
+  'knee-anterior': {
+    'patellar-compression': [T(0, 'ortho'), T(4, 'ortho')],
+    'patellar-tilt': [T(0, 'ortho'), T(5, 'ortho')],
+    'tibial-tuberosity-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'patellar-tendon-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(3, { positive: 2.4, false: 1.3, negative: 0.50 })],
+    'hoffa-fat-pad-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'quad-mmt': [T(0, 'mmt'), T(3, 'mmt')],
+    'quad-flexibility': [T(1, 'rom'), T(3, 'rom'), T(5, 'rom')],
+    'ankle-dorsiflexion-rom': [T(0, 'rom')],
+    'knee-flexion-contracture': [T(0, 'ortho'), T(4, 'ortho')],
+    'single-leg-squat': [T(0, 'posture')]
+  },
+  'ankle-posterior': {
+    thompson: [TC(0, { positive: 8.0, false: 2.0, negative: 0.50 })],
+    'achilles-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(5, { positive: 2.4, false: 1.3, negative: 0.50 })],
+    'posterior-tib-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'peroneal-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'kager-fat-pad-palpation': [TC(4, { positive: 3.2, false: 1.4, negative: 0.40 })],
+    'triangular-bone': [T(3, 'ortho'), T(6, 'ortho')],
+    'ankle-plantar-rom': [T(0, 'rom'), T(4, 'rom'), T(6, 'rom')],
+    'calf-mmt': [T(0, 'mmt'), T(5, 'mmt')]
+  },
+  'ankle-anterior': {
+    'anterior-drawer': [T(0, 'ortho'), TC(3, { positive: 1.6, false: 1.2, negative: 0.75 }), T(5, 'ortho')],
+    'talar-tilt': [T(0, 'ortho'), TC(3, { positive: 3.2, false: 1.4, negative: 0.40 }), T(5, 'ortho')],
+    'atfl-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'anterior-joint-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(4, { positive: 2.8, false: 1.3, negative: 0.50 })],
+    'tarsal-sinus-palpation': [TC(2, { positive: 3.0, false: 1.4, negative: 0.45 })],
+    'ankle-dorsiflexion': [T(1, 'rom'), T(4, 'rom')],
+    'navicular-drop': [T(1, 'posture'), T(5, 'posture')],
+    'peroneus-mmt': [T(0, 'mmt')]
+  },
+  'ankle-plantar': {
+    windlass: [T(0, 'ortho'), TC(3, { positive: 2.0, false: 1.3, negative: 0.60 })],
+    'plantar-fascia-palpation': [TC(0, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(3, { positive: 1.8, false: 1.2, negative: 0.65 })],
+    'heel-fat-pad-palpation': [TC(1, { positive: 3.0, false: 1.4, negative: 0.45 }), TC(4, { positive: 2.2, false: 1.3, negative: 0.55 }), TC(5, { positive: 1.8, false: 1.2, negative: 0.65 })],
+    'tibial-nerve': [T(2, 'neurological'), TC(5, { positive: 2.6, false: 1.3, negative: 0.50 })],
+    'ankle-dorsiflexion-plantar': [T(0, 'rom')],
+    'arch-height': [T(0, 'posture'), T(3, 'posture')],
+    'calf-mmt-plantar': [T(0, 'mmt'), T(4, 'mmt')],
+    'hip-knee-ext-mmt': [T(0, 'mmt')]
+  }
+};
+
+// "約40%" 等の文字列から数値を抽出。「ほぼ全例」等の定性的記述はnullを返す（動的計算の対象外）
+function parseBasePct(pctStr) {
+  const m = String(pctStr).match(/(\d+)\s*%/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// 実施された評価とその結果（陽性/偽陽性/陰性）を基に、各鑑別候補の確率を再計算する。
+// 手法：各候補の基準確率を初期重みとし、関連する検査の尤度比を乗算 → 候補間で正規化（合計100%）。
+// これにより「どの検査を行い、どんな結果だったか」で数値が変化し、
+// 整形外科テスト＞触診＞ROM/MMT/姿勢観察 の順に結果への影響度が大きくなる。
+function computeDynamicConditions(subId, diagData) {
+  const conditions = diagData.default.conditions;
+  const evidenceMap = EVIDENCE[subId] || {};
+  const baseScores = conditions.map(c => parseBasePct(c.pct));
+  const scores = baseScores.slice();
+  const quantIdx = [];
+  baseScores.forEach((s, i) => { if (s !== null) quantIdx.push(i); });
+
+  // このテストの結果が、実際に何かしらの鑑別候補の重みを動かしたかどうか
+  let anyEvidenceApplied = false;
+  state.checkedTests.forEach(testId => {
+    const result = state.testResults[testId];
+    if (!result) return;
+    const targets = evidenceMap[testId];
+    if (!targets) return;
+    targets.forEach(t => {
+      if (baseScores[t.idx] === null) return;
+      const lr = t.lr[result];
+      if (typeof lr === 'number') {
+        scores[t.idx] *= lr;
+        anyEvidenceApplied = true;
+      }
+    });
+  });
+
+  // まだ関連する検査結果が入力されていない場合は、資料上の基準値をそのまま表示する
+  if (!anyEvidenceApplied) {
+    return conditions.map(c => ({ name: c.name, cause: c.cause, displayPct: c.pct, isDynamic: false }));
+  }
+
+  const total = quantIdx.reduce((sum, i) => sum + scores[i], 0);
+  const normalized = {};
+  if (total > 0) {
+    const raw = quantIdx.map(i => {
+      const val = scores[i] / total * 100;
+      return { i, val, floor: Math.floor(val) };
+    });
+    const floorSum = raw.reduce((s, r) => s + r.floor, 0);
+    const remainder = 100 - floorSum;
+    raw.sort((a, b) => (b.val - b.floor) - (a.val - a.floor));
+    raw.forEach(r => { r.final = r.floor; });
+    for (let k = 0; k < remainder; k++) raw[k % raw.length].final += 1;
+    raw.forEach(r => { normalized[r.i] = r.final; });
+  }
+
+  return conditions.map((c, i) => {
+    if (baseScores[i] === null) {
+      return { name: c.name, cause: c.cause, displayPct: c.pct, isDynamic: false };
+    }
+    const newPct = normalized[i] !== undefined ? normalized[i] : baseScores[i];
+    const basePct = baseScores[i];
+    let trend = 'flat';
+    if (newPct > basePct) trend = 'up';
+    else if (newPct < basePct) trend = 'down';
+    return { name: c.name, cause: c.cause, displayPct: newPct + '%', basePct, isDynamic: true, trend };
+  });
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let state = { region: null, subregion: null, checkedTests: new Set(), testResults: {} };
+
+// ============================================================
+// FUNCTIONS
+// ============================================================
+function goStep(n) {
+  if (n === 2 && !state.region) return;
+  if (n === 3 && !state.subregion) return;
+  if (n === 4 && state.checkedTests.size === 0) return;
+
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  document.querySelectorAll('.step-nav-item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.remove('active', 'done');
+    if (s === n) item.classList.add('active');
+    else if (s < n) item.classList.add('done');
+  });
+}
+
+function selectRegion(regionId) {
+  state.region = regionId;
+  state.subregion = null;
+  state.checkedTests.clear();
+  state.testResults = {};
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + regionId).classList.add('selected');
+  buildSubregions();
+  goStep(2);
+}
+
+function buildSubregions() {
+  const list = document.getElementById('subregion-list');
+  list.innerHTML = '';
+  (SUBREGIONS[state.region] || []).forEach(sub => {
+    const el = document.createElement('div');
+    el.className = 'subregion-card';
+    el.id = 'src-' + sub.id;
+    el.innerHTML = `<div class="subregion-label">${sub.label}</div><div class="subregion-desc">${sub.desc}</div>`;
+    el.onclick = () => selectSubregion(sub);
+    list.appendChild(el);
+  });
+}
+
+function selectSubregion(sub) {
+  state.subregion = sub;
+  state.checkedTests.clear();
+  state.testResults = {};
+  document.querySelectorAll('.subregion-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('src-' + sub.id)?.classList.add('selected');
+  buildTests();
+  updateBreadcrumb();
+  goStep(3);
+}
+
+function buildTests() {
+  const tests = TESTS[state.subregion.id] || [];
+  const list = document.getElementById('test-list');
+  list.innerHTML = '';
+  if (!tests.length) { list.innerHTML = '<div style="padding:32px;text-align:center;color:#718096">この部位の評価項目は準備中です。</div>'; return; }
+  tests.forEach(test => {
+    const el = document.createElement('div');
+    el.className = 'test-card';
+    el.id = 'tc-' + test.id;
+    el.innerHTML = `
+      <div class="test-card-header" onclick="toggleTest('${test.id}')">
+        <div class="test-checkbox" id="chk-${test.id}"></div>
+        <div class="test-info">
+          <div class="test-name">${test.name}</div>
+          <div class="test-purpose">目的：${test.purpose}</div>
+        </div>
+        <span class="test-category-badge ${test.badge}">${getCategoryLabel(test.category)}</span>
+      </div>
+      <div class="test-result-panel">
+        <div class="result-label">評価結果を選択してください：</div>
+        <div class="result-buttons">
+          <button class="result-btn" onclick="setResult('${test.id}','positive',this)">陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','false',this)">偽陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','negative',this)">陰性</button>
+        </div>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+function getCategoryLabel(cat) {
+  const map = { ortho:'整形外科テスト', palpation:'圧痛・触診', neurological:'神経学的評価', rom:'ROM', mmt:'MMT', posture:'姿勢・アライメント' };
+  return map[cat] || cat;
+}
+
+function toggleTest(testId) {
+  const card = document.getElementById('tc-' + testId);
+  if (state.checkedTests.has(testId)) {
+    state.checkedTests.delete(testId);
+    delete state.testResults[testId];
+    card.classList.remove('checked');
+  } else {
+    state.checkedTests.add(testId);
+    card.classList.add('checked');
+  }
+  updateEvalBtn();
+}
+
+function setResult(testId, result, btn) {
+  state.testResults[testId] = result;
+  btn.closest('.test-result-panel').querySelectorAll('.result-btn').forEach(b => b.classList.remove('active-positive','active-false','active-negative'));
+  btn.classList.add('active-' + result);
+  updateEvalBtn();
+}
+
+function updateEvalBtn() {
+  document.getElementById('eval-btn').disabled = state.checkedTests.size === 0;
+}
+
+function updateBreadcrumb() {
+  const reg = REGIONS[state.region];
+  const html = `<span class="crumb">${reg.icon} ${reg.name}</span><span class="sep">›</span><span class="crumb">${state.subregion.label}</span>`;
+  document.getElementById('breadcrumb').innerHTML = html;
+  document.getElementById('breadcrumb2').innerHTML = html;
+}
+
+function showResult() {
+  updateBreadcrumb();
+  buildResult();
+  goStep(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== 推奨治療法データ（追加） ======
+const TREATMENTS = {
+  "neck-pain": [
+    {
+      "name": "頸部アライメント改善（チンタック／頭部後方移動）",
+      "note": ""
+    },
+    {
+      "name": "深頸屈筋群の筋力強化（頭部屈曲エクササイズ）",
+      "note": ""
+    },
+    {
+      "name": "胸郭・胸椎の可動性向上（胸椎伸展モビライゼーション）",
+      "note": ""
+    },
+    {
+      "name": "板状筋群・僧帽筋上部・肩甲挙筋の過緊張軽減（ストレッチ・リリース）",
+      "note": ""
+    },
+    {
+      "name": "姿勢・デスクワーク環境の指導",
+      "note": "Spurling陽性＋神経症状は医師へ紹介"
+    }
+  ],
+  "neck-numb": [
+    {
+      "name": "小胸筋のストレッチ（牽引型TOSへの対応）",
+      "note": ""
+    },
+    {
+      "name": "前・中斜角筋の過緊張軽減・リリース",
+      "note": ""
+    },
+    {
+      "name": "胸郭（肋鎖間隙）の可動域改善",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練（肩甲骨後傾・内転）",
+      "note": ""
+    },
+    {
+      "name": "頸部アライメント矯正・神経モビライゼーション",
+      "note": "脈拍消失・チアノーゼ等の血管症状は血管外科へ"
+    }
+  ],
+  "sho-upper": [
+    {
+      "name": "腱板構成筋（棘上筋・棘下筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "後方関節包のストレッチ（拘縮改善）",
+      "note": ""
+    },
+    {
+      "name": "肩峰下スペース確保のための運動療法",
+      "note": ""
+    },
+    {
+      "name": "急性炎症期は負荷調整・疼痛管理",
+      "note": "Drop arm陽性など完全断裂疑いは整形外科へ"
+    }
+  ],
+  "sho-ant-upper": [
+    {
+      "name": "肩甲下筋・腱板疎部周囲の機能改善",
+      "note": ""
+    },
+    {
+      "name": "上腕二頭筋長頭腱の負荷管理・ストレッチ",
+      "note": ""
+    },
+    {
+      "name": "後方軟部組織ストレッチ・上腕骨頭前方変位の改善",
+      "note": ""
+    },
+    {
+      "name": "前方不安定性に配慮した段階的筋力強化",
+      "note": "関節唇損傷疑いはMRI／整形外科へ"
+    }
+  ],
+  "sho-lateral": [
+    {
+      "name": "腱板構成筋（特に外旋筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "QLS周囲（上腕三頭筋長頭・大小円筋）の軟部組織モビライゼーション",
+      "note": ""
+    },
+    {
+      "name": "腋窩神経絞扼疑いは神経モビライゼーション",
+      "note": ""
+    }
+  ],
+  "sho-post": [
+    {
+      "name": "後方関節包のストレッチ（水平内転）",
+      "note": ""
+    },
+    {
+      "name": "腱板構成筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "広背筋・上腕三頭筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "体幹・下肢の連動性改善（必要に応じ下肢アプローチ）",
+      "note": ""
+    }
+  ],
+  "elbow-medial": [
+    {
+      "name": "前腕屈筋群の伸張性改善・筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肘関節ROM改善（屈曲・伸展）",
+      "note": ""
+    },
+    {
+      "name": "投球フォーム・負荷管理（MCL保護）",
+      "note": ""
+    },
+    {
+      "name": "段階的な靭帯機能回復訓練",
+      "note": "尺骨神経症状が持続する場合は整形外科へ"
+    }
+  ],
+  "elbow-lateral": [
+    {
+      "name": "前腕伸筋群のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "遠心性筋力強化（短橈側手根伸筋を中心に）",
+      "note": ""
+    },
+    {
+      "name": "急性期は安静・炎症管理",
+      "note": ""
+    },
+    {
+      "name": "疼痛をモニタリングした段階的負荷訓練",
+      "note": ""
+    },
+    {
+      "name": "上橈尺関節の安定化訓練",
+      "note": ""
+    }
+  ],
+  "hand-numb": [
+    {
+      "name": "絞扼部位の特定後にアプローチ（しびれ分布・Tinel）",
+      "note": ""
+    },
+    {
+      "name": "手関節ROM改善・母指球筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "前腕回内・回外の可動域改善",
+      "note": ""
+    },
+    {
+      "name": "正中／尺骨神経のモビライゼーション",
+      "note": "筋萎縮・重度筋力低下は整形外科・神経内科へ"
+    }
+  ],
+  "wrist-ulnar": [
+    {
+      "name": "前腕回内・回外ROM改善",
+      "note": ""
+    },
+    {
+      "name": "DRUJ安定化訓練・握力強化",
+      "note": ""
+    },
+    {
+      "name": "TFCC損傷例は中間位固定・安静",
+      "note": ""
+    },
+    {
+      "name": "症状持続時はMRI・超音波／整形外科へ",
+      "note": ""
+    }
+  ],
+  "wrist-radial": [
+    {
+      "name": "母指内転筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "長母指外転筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "前腕回内・回外ROM改善",
+      "note": ""
+    },
+    {
+      "name": "急性炎症期は安静・装具による固定",
+      "note": "CM関節症進行例は装具療法・整形外科へ"
+    }
+  ],
+  "back-pain": [
+    {
+      "name": "多裂筋・体幹深部筋の機能回復（ドローイン等）",
+      "note": ""
+    },
+    {
+      "name": "腸腰筋・固有背筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "骨盤アライメント矯正・仙腸関節の安定化",
+      "note": ""
+    },
+    {
+      "name": "急性期も軽度の活動を継続（絶対安静を避ける）",
+      "note": "神経根症状が著明な場合は医師へ紹介"
+    }
+  ],
+  "hip-anterior": [
+    {
+      "name": "腸腰筋の伸張性改善（ストレッチ）",
+      "note": ""
+    },
+    {
+      "name": "大殿筋・中殿筋・深層外旋六筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "股関節の動的安定性改善",
+      "note": ""
+    },
+    {
+      "name": "深い屈曲姿勢（低い椅子・深いしゃがみ）の一時的制限",
+      "note": "FAI・関節唇損傷疑いはMRI／整形外科へ"
+    }
+  ],
+  "hip-lateral": [
+    {
+      "name": "中殿筋・小殿筋・深層外旋六筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "大腿筋膜張筋・腸脛靭帯のストレッチ（Ober陽性例を優先）",
+      "note": ""
+    },
+    {
+      "name": "骨盤前額面の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "片脚立位・歩行での骨盤側方制御訓練",
+      "note": ""
+    }
+  ],
+  "lumbar-pain": [
+    {
+      "name": "多裂筋・体幹深部筋の機能回復（ドローイン・ホロウイング）",
+      "note": ""
+    },
+    {
+      "name": "腸腰筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "骨盤アライメント矯正",
+      "note": ""
+    },
+    {
+      "name": "急性期も軽度の活動を継続",
+      "note": "Laségue陽性・神経根症状著明は医師へ紹介"
+    }
+  ],
+  "knee-medial": [
+    {
+      "name": "殿筋群（大殿筋・中殿筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "膝外反を改善する下肢アライメント訓練",
+      "note": ""
+    },
+    {
+      "name": "鵞足構成筋（薄筋・縫工筋・半腱様筋）の伸張性改善",
+      "note": ""
+    },
+    {
+      "name": "MCL損傷例は段階的負荷・動的安定化訓練",
+      "note": ""
+    }
+  ],
+  "knee-lateral": [
+    {
+      "name": "腸脛靭帯・大腿筋膜張筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "股関節外転筋・外旋筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "下腿回旋異常の改善",
+      "note": ""
+    },
+    {
+      "name": "ランニング距離・傾斜の管理（Noble陽性例）",
+      "note": "PLS障害疑いは整形外科へ"
+    }
+  ],
+  "knee-anterior": [
+    {
+      "name": "内側広筋の選択的強化",
+      "note": ""
+    },
+    {
+      "name": "外側広筋・腸脛靭帯のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "足関節背屈ROM改善・股関節外転筋の強化",
+      "note": ""
+    },
+    {
+      "name": "オスグッド例は成長期の運動負荷管理",
+      "note": ""
+    }
+  ],
+  "ankle-posterior": [
+    {
+      "name": "下腿三頭筋の伸張性改善・遠心性筋力強化",
+      "note": ""
+    },
+    {
+      "name": "足部アライメント改善（回内足は足底挿板）",
+      "note": ""
+    },
+    {
+      "name": "急性期は安静・炎症管理",
+      "note": "Thompson陽性は腱断裂疑い→整形外科へ"
+    }
+  ],
+  "ankle-anterior": [
+    {
+      "name": "腓骨筋群の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "固有感覚訓練（バランストレーニング）",
+      "note": ""
+    },
+    {
+      "name": "足部アライメント改善",
+      "note": ""
+    },
+    {
+      "name": "再捻挫予防（テーピング・装具）",
+      "note": "骨棘による前方インピンジメント疑いは整形外科へ"
+    }
+  ],
+  "ankle-plantar": [
+    {
+      "name": "足底腱膜のストレッチ（Windlass機構の治療応用）",
+      "note": ""
+    },
+    {
+      "name": "下腿三頭筋の伸張性改善・足関節背屈ROM改善",
+      "note": ""
+    },
+    {
+      "name": "股関節・膝関節伸展筋力の強化",
+      "note": ""
+    },
+    {
+      "name": "扁平足は足底挿板／起床時痛は就寝時アンクルスプリント",
+      "note": "しびれを伴う場合は足根管症候群を疑い神経学的評価を追加"
+    }
+  ]
+};
+function renderTreatments(subId){
+  const tx = (typeof TREATMENTS!=='undefined') ? TREATMENTS[subId] : null;
+  if(!tx || !tx.length) return '';
+  const items = tx.map(function(it){
+    return '<li><span class="tx-name">'+it.name+'</span>'+(it.note?'<span class="tx-note">'+it.note+'</span>':'')+'</li>';
+  }).join('');
+  return '<div class="result-block tx-block">'
+    + '<div class="result-block-header"><span class="result-block-icon">\uD83D\uDCAA</span> \u63A8\u5968\u3055\u308C\u308B\u6CBB\u7642\u6CD5</div>'
+    + '<div class="result-block-body"><ul class="tx-list">'+items+'</ul>'
+    + '<div class="tx-foot">\u203B\u8A55\u4FA1\u6240\u898B\u306B\u5FDC\u3058\u3066\u512A\u5148\u9806\u4F4D\u3092\u5224\u65AD\u3057\u3001\u75DB\u307F\u30FB\u7981\u5FCC\u306B\u914D\u616E\u3057\u3066\u6BB5\u968E\u7684\u306B\u5B9F\u65BD\u3057\u3066\u304F\u3060\u3055\u3044\u3002</div>'
+    + '</div></div>';
+}
+
+function buildResult() {
+  const content = document.getElementById('result-content');
+  const subId = state.subregion.id;
+  const diagData = DIAGNOSES[subId];
+  if (!diagData) { content.innerHTML = '<div style="padding:20px;background:#eef;border-radius:8px;">この部位の詳細鑑別データは準備中です。</div>'; return; }
+
+  const checkedArr = Array.from(state.checkedTests);
+  const evidenceRows = checkedArr.map(testId => {
+    const t = (TESTS[subId] || []).find(x => x.id === testId);
+    return { name: t ? t.name : testId, result: state.testResults[testId] || '未選択' };
+  });
+
+  let boostedCondition = null;
+  if (diagData.rules) {
+    for (const rule of diagData.rules) {
+      if (rule.tests.every(tid => state.checkedTests.has(tid) && state.testResults[tid] === rule.result)) {
+        boostedCondition = rule.boost;
+        break;
+      }
+    }
+  }
+
+  const positiveCount = checkedArr.filter(t => state.testResults[t] === 'positive').length;
+  const totalChecked = checkedArr.length;
+  const confidence = positiveCount === 0 ? '評価実施のみ' : positiveCount >= 3 ? '複数陽性あり（精密検査考慮）' : '一部陽性あり';
+
+  let html = `
+    <div class="result-header">
+      <div class="result-tag">▶ 鑑別診断</div>
+      <h3>${boostedCondition ? boostedCondition.name : diagData.default.name}</h3>
+      <span class="result-confidence">評価数: ${totalChecked}項目 ／ 陽性: ${positiveCount}項目 ／ ${confidence}</span>
+    </div>
+    <div class="result-blocks">`;
+
+  if (boostedCondition) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">⚡</span> 評価パターンによる上位鑑別</div>
+        <div class="result-block-body"><strong>${boostedCondition.name}</strong><br><strong>原因の考察：</strong>${boostedCondition.cause}<div style="margin-top:10px;font-size:0.82rem;color:#666;">※以下の鑑別条件も合わせて参照してください。</div></div>
+      </div>`;
+  }
+
+  html += `<div class="result-block"><div class="result-block-header"><span class="result-block-icon">📊</span> 考えられる原因と発生頻度・根拠</div><div class="result-block-body">`;
+  html += `<div style="font-size:0.78rem;color:#718096;margin-bottom:10px;line-height:1.6;">※％は基準発生頻度に対し、実施した評価の結果（陽性／偽陽性／陰性）を検査の種類ごとの優位性（整形外科的特殊テスト＞触診・神経学的検査＞ROM・MMT・姿勢観察の順に影響度大）で重み付けし再計算した値です。評価項目・結果を変えるたびに数値が変動します。</div>`;
+  const dynConditions = computeDynamicConditions(subId, diagData);
+  dynConditions.forEach(c => {
+    const trendMark = c.isDynamic && c.trend === 'up' ? ' <span style="color:#c0392b;font-size:0.8rem;">▲上昇</span>'
+      : c.isDynamic && c.trend === 'down' ? ' <span style="color:#1a6fa8;font-size:0.8rem;">▼低下</span>' : '';
+    const baseNote = c.isDynamic && c.trend !== 'flat' ? `<span style="font-size:0.72rem;color:#a0aec0;"> （基準値${c.basePct}%）</span>` : '';
+    html += `<div class="cause-item"><div class="cause-pct">${c.displayPct}${trendMark}</div><div class="cause-text"><div class="cause-name">${c.name}${baseNote}</div><div class="cause-detail">原因：${c.cause}</div></div></div>`;
+  });
+  html += `</div></div>`;
+
+  if (evidenceRows.length > 0) {
+    html += `<div class="result-block"><div class="result-block-header"><span class="result-block-icon">📋</span> 今回の評価結果一覧</div><div class="result-block-body" style="padding:0;"><table class="evidence-table"><tr><th>評価項目</th><th>結果</th></tr>`;
+    evidenceRows.forEach(row => {
+      const cls = row.result === 'positive' ? 'ev-pos' : row.result === 'false' ? 'ev-false' : row.result === 'negative' ? 'ev-neg' : '';
+      const label = row.result === 'positive' ? '陽性' : row.result === 'false' ? '偽陽性' : row.result === 'negative' ? '陰性' : row.result;
+      html += `<tr><td>${row.name}</td><td class="${cls}">${label}</td></tr>`;
+    });
+    html += `</table></div></div>`;
+  }
+
+  html += `
+    ${renderTreatments(subId)}
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">🏥</span> 治療・評価の方向性（理学療法的視点）</div>
+      <div class="result-block-body">${diagData.default.management}</div>
+    </div>
+    <div class="caution-box"><span class="caution-icon">⚠️</span><div><strong>注意事項：</strong>本ツールは工藤慎太郎「運動機能障害のなぜ？がわかる評価戦略」に基づく学習・臨床思考支援ツールです。医療診断の代替ではありません。神経症状悪化・腫脹・発熱・安静時痛など危険信号（red flags）を認める場合は速やかに医師へご紹介ください。</div></div>
+    </div>`;
+
+  content.innerHTML = html;
+}
+
+function resetAll() {
+  state = { region: null, subregion: null, checkedTests: new Set(), testResults: {} };
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('subregion-list').innerHTML = '';
+  document.getElementById('test-list').innerHTML = '';
+  document.getElementById('result-content').innerHTML = '';
+  document.getElementById('eval-btn').disabled = true;
+  goStep(1);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健やか式症状鑑別 上半身Ver.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap');
+
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2563a8;
+    --accent: #e85d26;
+    --accent2: #2ecc96;
+    --accent3: #f0a500;
+    --step1: #2563a8;
+    --step2: #d63636;
+    --step3: #2eaa6e;
+    --step4: #7c3aed;
+    --bg: #f4f6fa;
+    --bg-card: #ffffff;
+    --text: #1a202c;
+    --text-sub: #4a5568;
+    --border: #e2e8f0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.14);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 24px 32px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(26,58,92,0.25);
+  }
+  .header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .header-icon { font-size: 36px; }
+  .header-text h1 { font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.02em; }
+  .header-text p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+
+  /* ===== MAIN ===== */
+  .app-main { max-width: 960px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  /* ===== STEP INDICATOR ===== */
+  .step-nav {
+    display: flex;
+    gap: 0;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .step-nav-item {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #a0aec0;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .step-nav-item.active {
+    color: white;
+  }
+  .step-nav-item[data-step="1"].active { background: var(--step1); border-bottom-color: var(--step1); }
+  .step-nav-item[data-step="2"].active { background: var(--step2); border-bottom-color: var(--step2); }
+  .step-nav-item[data-step="3"].active { background: var(--step3); border-bottom-color: var(--step3); }
+  .step-nav-item[data-step="4"].active { background: var(--step4); border-bottom-color: var(--step4); }
+  .step-nav-item.done { color: var(--text-sub); background: #f0f4ff; border-bottom-color: #c3d0e8; }
+  .step-num { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+
+  /* ===== SECTIONS ===== */
+  .step-section { display: none; animation: fadeIn 0.35s ease; }
+  .step-section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 900;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .step-badge.s1 { background: var(--step1); }
+  .step-badge.s2 { background: var(--step2); }
+  .step-badge.s3 { background: var(--step3); }
+  .step-badge.s4 { background: var(--step4); }
+
+  .section-title h2 { font-size: 1.15rem; font-weight: 700; color: var(--primary); }
+  .section-subtitle { font-size: 0.83rem; color: var(--text-sub); margin-top: 2px; }
+
+  /* ===== REGION CARDS (STEP 1) ===== */
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .region-card {
+    background: var(--bg-card);
+    border: 2.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 12px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .region-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--primary-light); }
+  .region-card.selected { border-color: var(--primary-light); background: #eef3ff; box-shadow: 0 0 0 3px rgba(37,99,168,0.18); }
+  .region-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+  .region-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+
+  /* ===== SUBREGION GRID (STEP 2) ===== */
+  .subregion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .subregion-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .subregion-card:hover { border-color: var(--step2); background: #fff5f5; }
+  .subregion-card.selected { border-color: var(--step2); background: #fff5f5; box-shadow: 0 0 0 3px rgba(214,54,54,0.12); }
+  .subregion-label { font-weight: 700; font-size: 0.9rem; color: var(--step2); margin-bottom: 4px; }
+  .subregion-desc { font-size: 0.78rem; color: var(--text-sub); }
+
+  /* ===== BACK BUTTON ===== */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border: 2px solid var(--border);
+    border-radius: 99px;
+    background: white;
+    color: var(--text-sub);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    margin-bottom: 20px;
+  }
+  .back-btn:hover { border-color: var(--primary-light); color: var(--primary-light); }
+
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.83rem;
+    color: var(--text-sub);
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .breadcrumb .crumb { font-weight: 600; color: var(--primary); }
+  .breadcrumb .sep { color: #cbd5e0; }
+
+  /* ===== TEST CARDS (STEP 3) ===== */
+  .test-list { display: flex; flex-direction: column; gap: 12px; }
+  .test-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .test-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+  .test-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: white;
+  }
+  .test-card.checked .test-checkbox { background: var(--step3); border-color: var(--step3); }
+  .test-card.checked .test-checkbox::after { content: '✓'; color: white; font-size: 14px; font-weight: 700; }
+  .test-info { flex: 1; }
+  .test-name { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+  .test-purpose { font-size: 0.78rem; color: var(--text-sub); margin-top: 3px; }
+  .test-category-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .badge-ortho { background: #e0f0ff; color: #1a5fa8; }
+  .badge-palpation { background: #fff0e0; color: #a85a00; }
+  .badge-neurological { background: #f0e8ff; color: #6830b0; }
+  .badge-rom { background: #e8fff0; color: #0a8040; }
+  .badge-mmt { background: #fff0f5; color: #b0286a; }
+  .badge-posture { background: #f5f5e8; color: #6b5a00; }
+
+  /* Result selector */
+  .test-result-panel {
+    display: none;
+    padding: 0 16px 14px 52px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .test-card.checked .test-result-panel { display: flex; }
+  .result-label { font-size: 0.82rem; font-weight: 600; color: var(--text-sub); }
+  .result-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .result-btn {
+    padding: 6px 16px;
+    border-radius: 99px;
+    border: 2px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    transition: all 0.18s;
+    color: var(--text-sub);
+  }
+  .result-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .result-btn.active-positive { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+  .result-btn.active-false { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+  .result-btn.active-negative { background: #dcfce7; border-color: #22c55e; color: #15803d; }
+
+  /* ===== EVALUATE BUTTON ===== */
+  .evaluate-btn-wrap { margin-top: 24px; text-align: center; }
+  .evaluate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    transition: all 0.22s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .evaluate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.4); }
+  .evaluate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== RESULT SECTION (STEP 4) ===== */
+  .result-header {
+    background: linear-gradient(135deg, var(--step4), #9c5ff0);
+    color: white;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.25);
+  }
+  .result-header .result-tag { font-size: 0.8rem; opacity: 0.85; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .result-header h3 { font-size: 1.5rem; font-weight: 900; margin-bottom: 6px; }
+  .result-header .result-confidence {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .result-blocks { display: flex; flex-direction: column; gap: 16px; }
+
+  .result-block {
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .result-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f8f9fc;
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+  }
+  .result-block-icon { font-size: 1.2rem; }
+  .result-block-body { padding: 16px; font-size: 0.88rem; line-height: 1.9; color: var(--text); }
+  .result-block-body strong { color: var(--primary); }
+
+  .cause-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cause-item:last-child { border-bottom: none; }
+  .cause-pct {
+    font-size: 1.0rem;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .cause-text { flex: 1; }
+  .cause-name { font-weight: 700; font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
+  .cause-detail { font-size: 0.82rem; color: var(--text-sub); }
+
+  /* Evidence table */
+  .evidence-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .evidence-table th { background: #f0f4ff; color: var(--primary); padding: 8px 12px; text-align: left; font-weight: 700; }
+  .evidence-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; }
+  .evidence-table tr:last-child td { border-bottom: none; }
+  .ev-pos { color: #b91c1c; font-weight: 700; }
+  .ev-false { color: #854d0e; font-weight: 700; }
+  .ev-neg { color: #15803d; font-weight: 700; }
+
+  /* Caution box */
+  .caution-box {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.83rem;
+    color: #78350f;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .caution-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* New eval button */
+  .new-eval-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: white;
+    border: 2.5px solid var(--primary-light);
+    border-radius: 99px;
+    color: var(--primary-light);
+    font-weight: 700;
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+    margin-top: 24px;
+  }
+  .new-eval-btn:hover { background: var(--primary-light); color: white; }
+
+  /* No selection message */
+  .info-msg {
+    background: #eef3ff;
+    border: 1.5px solid #c3d0e8;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-size: 0.88rem;
+    color: var(--primary);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-sub);
+  }
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+
+  @media (max-width: 600px) {
+    .app-header { padding: 16px 16px 14px; }
+    .header-text h1 { font-size: 1.2rem; }
+    .app-main { padding: 20px 12px 60px; }
+    .region-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .step-nav-item { font-size: 0.68rem; padding: 10px 4px; }
+  }
+
+  .tx-block .result-block-header { background: linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; }
+  .tx-list { list-style:none; margin:0; padding:0; }
+  .tx-list li { position:relative; padding:9px 0 9px 24px; border-bottom:1px solid #eef2f4; line-height:1.7; font-size:0.9rem; }
+  .tx-list li:last-child { border-bottom:none; }
+  .tx-list li::before { content:''; position:absolute; left:5px; top:16px; width:9px; height:9px; border-radius:50%; background:#0f766e; }
+  .tx-name { font-weight:700; color:#1f2d3a; }
+  .tx-note { display:block; font-size:0.8rem; color:#9a6b00; margin-top:3px; }
+  .tx-foot { margin-top:12px; font-size:0.8rem; color:#8a97a0; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <span class="header-icon">🩺</span>
+    <div class="header-text">
+      <h1>健やか式症状鑑別　上半身 Ver.</h1>
+      <p>頸部・肩・肘・前腕・手首の痛み・しびれ評価支援ツール｜工藤慎太郎「運動機能障害のなぜ？がわかる評価戦略」準拠</p>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- Step Navigation -->
+  <nav class="step-nav">
+    <div class="step-nav-item active" data-step="1" onclick="goStep(1)">
+      <span class="step-num">①</span>部位選択
+    </div>
+    <div class="step-nav-item" data-step="2" onclick="goStep(2)">
+      <span class="step-num">②</span>痛みの部位
+    </div>
+    <div class="step-nav-item" data-step="3" onclick="goStep(3)">
+      <span class="step-num">③</span>評価入力
+    </div>
+    <div class="step-nav-item" data-step="4" onclick="goStep(4)">
+      <span class="step-num">④</span>鑑別結果
+    </div>
+  </nav>
+
+  <!-- ===== STEP 1: Region Selection ===== -->
+  <section class="step-section active" id="step-1">
+    <div class="section-title">
+      <span class="step-badge s1">1</span>
+      <div>
+        <h2>部位を選択してください</h2>
+        <p class="section-subtitle">痛みやしびれが生じている部位はどこですか？</p>
+      </div>
+    </div>
+    <div class="region-grid">
+      <div class="region-card" onclick="selectRegion('neck')" id="rc-neck">
+        <span class="region-icon">🔵</span>
+        <div class="region-name">頸部</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">首・頸椎</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('shoulder')" id="rc-shoulder">
+        <span class="region-icon">💪</span>
+        <div class="region-name">肩</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">肩甲上腕関節</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('elbow')" id="rc-elbow">
+        <span class="region-icon">🦾</span>
+        <div class="region-name">肘</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">肘関節</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('forearm')" id="rc-forearm">
+        <span class="region-icon">✋</span>
+        <div class="region-name">前腕・手首</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">手関節・手部</div>
+      </div>
+      <div class="region-card" onclick="selectRegion('back')" id="rc-back">
+        <span class="region-icon">🦴</span>
+        <div class="region-name">背部・腰部</div>
+        <div class="subregion-desc" style="font-size:0.75rem;color:#718096;margin-top:4px;">胸腰椎・仙腸関節</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STEP 2: Subregion ===== -->
+  <section class="step-section" id="step-2">
+    <button class="back-btn" onclick="goStep(1)">← 部位選択へ戻る</button>
+    <div class="section-title">
+      <span class="step-badge s2">2</span>
+      <div>
+        <h2>痛みの部位を選択してください</h2>
+        <p class="section-subtitle">どの方向・部位に痛みがありますか？</p>
+      </div>
+    </div>
+    <div class="subregion-grid" id="subregion-list"></div>
+  </section>
+
+  <!-- ===== STEP 3: Evaluation ===== -->
+  <section class="step-section" id="step-3">
+    <button class="back-btn" onclick="goStep(2)">← 痛みの部位へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="section-title">
+      <span class="step-badge s3">3</span>
+      <div>
+        <h2>評価項目を選択・入力してください</h2>
+        <p class="section-subtitle">実施した評価にチェックを入れ、結果（陽性／偽陽性／陰性）を選択してください。複数選択可。</p>
+      </div>
+    </div>
+    <div class="test-list" id="test-list"></div>
+    <div class="evaluate-btn-wrap">
+      <button class="evaluate-btn" onclick="showResult()" id="eval-btn" disabled>
+        🔍 評価結果を表示する
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 4: Result ===== -->
+  <section class="step-section" id="step-4">
+    <button class="back-btn" onclick="goStep(3)">← 評価入力へ戻る</button>
+    <div class="breadcrumb" id="breadcrumb2"></div>
+    <div class="section-title">
+      <span class="step-badge s4">4</span>
+      <div>
+        <h2>鑑別結果</h2>
+        <p class="section-subtitle">評価結果に基づく鑑別診断と原因考察</p>
+      </div>
+    </div>
+    <div id="result-content"></div>
+    <div style="text-align:center">
+      <button class="new-eval-btn" onclick="resetAll()">🔄 新しい評価を開始する</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// DATA DEFINITIONS
+// ============================================================
+
+const REGIONS = {
+  neck: { name: '頸部', icon: '🔵' },
+  shoulder: { name: '肩', icon: '💪' },
+  elbow: { name: '肘', icon: '🦾' },
+  forearm: { name: '前腕・手首', icon: '✋' },
+  back: { name: '背部・腰部', icon: '🦴' }
+};
+
+const SUBREGIONS = {
+  neck: [
+    { id: 'neck-pain', label: '頸部の痛み', desc: '首の後方・側方の疼痛' },
+    { id: 'neck-numb', label: '頸部由来のしびれ', desc: '上肢への放散痛・しびれ' }
+  ],
+  shoulder: [
+    { id: 'sho-upper', label: '肩上方の痛み', desc: '肩峰・棘上筋領域' },
+    { id: 'sho-ant-upper', label: '肩前上方の痛み', desc: '肩甲下筋・腱板疎部・関節唇' },
+    { id: 'sho-lateral', label: '肩外側の痛み', desc: '三角筋・腋窩神経領域' },
+    { id: 'sho-post', label: '肩後方の痛み', desc: '上腕三頭筋長頭・後方関節包' }
+  ],
+  elbow: [
+    { id: 'elbow-medial', label: '肘内側の痛み', desc: '内側側副靭帯・前腕屈筋群・尺骨神経' },
+    { id: 'elbow-lateral', label: '肘外側の痛み', desc: '前腕伸筋群・関節包・橈尺関節' }
+  ],
+  forearm: [
+    { id: 'hand-numb', label: '手部のしびれ', desc: '正中神経・尺骨神経・橈骨神経' },
+    { id: 'wrist-ulnar', label: '手関節尺側部の痛み', desc: 'TFCC・下橈尺関節・尺側手根伸筋腱' },
+    { id: 'wrist-radial', label: '手関節橈側部の痛み', desc: '長母指外転筋・母指CM関節' }
+  ],
+  back: [
+    { id: 'back-pain', label: '胸腰部の痛み', desc: '腰椎椎間関節・椎間板・仙腸関節・多裂筋' }
+  ]
+};
+
+// TESTS database
+const TESTS = {
+  'neck-pain': [
+    { id:'spurling', name:'Spurling test', category:'ortho', purpose:'椎間関節の圧縮・剪断ストレス。頸部伸展＋回旋＋垂直圧迫で神経根症状誘発を確認（脊柱管狭窄症の評価にも使用）', badge:'badge-ortho' },
+    { id:'neck-palpation-facet', name:'椎間関節・棘突起の圧痛所見', category:'palpation', purpose:'棘突起間・椎間関節部位の圧痛を直接触診。圧縮ストレス由来の疼痛かを確認する', badge:'badge-palpation' },
+    { id:'neck-extension-rom', name:'頸部伸展・側屈ROM計測', category:'rom', purpose:'伸展時の疼痛誘発パターンと可動域制限の確認。伸展＋側屈で椎間孔が狭窄し神経症状が出るか評価', badge:'badge-rom' },
+    { id:'neck-flexion-rom', name:'頸部屈曲ROM計測（FCA）', category:'rom', purpose:'屈曲時の後方組織への伸張ストレス確認。頸部前弯維持能力（インナーマッスル機能）の評価', badge:'badge-rom' },
+    { id:'deep-neck-flex', name:'深頸部屈筋群MMT（頭部屈曲テスト）', category:'mmt', purpose:'頸椎の前弯を保持する頭長筋・頸長筋（深頸屈筋群）の機能評価。筋のインバランス評価', badge:'badge-mmt' },
+    { id:'neck-alignment', name:'頭部アライメント評価（耳珠と肩峰の位置関係）', category:'posture', purpose:'頭部前方位・ストレートネックの確認。頸部アライメント不良による筋のインバランスを評価', badge:'badge-posture' },
+    { id:'splenius-palpation', name:'頭板状筋・頸板状筋の圧痛触診', category:'palpation', purpose:'固有背筋外側群の圧痛確認。乳様突起とC4棘突起を結んだ線上を触診し筋スパズムを評価', badge:'badge-palpation' },
+    { id:'semispinalis-palpation', name:'頭半棘筋・頸半棘筋の圧痛触診', category:'palpation', purpose:'固有背筋内側群の圧痛確認。頸部前弯保持に重要な半棘筋の機能低下・過緊張の評価', badge:'badge-palpation' },
+    { id:'trapezius-palpation', name:'僧帽筋上部線維・肩甲挙筋の圧痛触診', category:'palpation', purpose:'アライメント不良による筋スパズム・圧痛の確認。肩甲帯の固定筋の状態を評価', badge:'badge-palpation' }
+  ],
+  'neck-numb': [
+    { id:'adson', name:'Adson test（前中斜角筋神経症状誘発テスト）', category:'ortho', purpose:'斜角筋隙での腕神経叢・鎖骨下動脈の圧迫確認。橈骨動脈の脈拍消失・患側症状で陽性（TOS評価）', badge:'badge-ortho' },
+    { id:'morley', name:'Morley test（大鎖骨上窩Tinel sign）', category:'ortho', purpose:'鎖骨上窩での腕神経叢を母指圧迫。局所圧痛・末梢への放散痛で陽性。斜角筋隙TOS評価に有用', badge:'badge-ortho' },
+    { id:'east', name:'EAST test（Roos test）', category:'ortho', purpose:'上肢挙上位（90°外転・外旋）での手指開閉運動を3分実施。症状増悪でTOS陽性', badge:'badge-ortho' },
+    { id:'spurling-numb', name:'Spurling test（神経根絞扼）', category:'ortho', purpose:'頸部伸展＋回旋＋垂直圧迫で椎間孔を狭窄させ、神経根症状（しびれ・放散痛）を誘発', badge:'badge-ortho' },
+    { id:'numb-distribution', name:'しびれの分布確認（デルマトーム評価）', category:'neurological', purpose:'しびれの分布からC5〜Th1のどの神経根が関与しているか推測。上腕外側＝C5,6、前腕橈側＝C6、指背側＝C6,7,8など', badge:'badge-neurological' },
+    { id:'scalene-palpation', name:'前・中斜角筋の圧痛触診', category:'palpation', purpose:'大鎖骨上窩で前斜角筋・中斜角筋を触診し圧痛確認。斜角筋隙の緊張がTOS発症に関与', badge:'badge-palpation' },
+    { id:'subclavius-palpation', name:'鎖骨下筋の圧痛触診', category:'palpation', purpose:'鎖骨外側1/3を後方に押し込み鎖骨下筋の圧痛確認。肋鎖間隙でのTOS評価', badge:'badge-palpation' },
+    { id:'pec-minor-palpation', name:'小胸筋の伸張性評価・圧痛触診', category:'palpation', purpose:'小胸筋の伸張性低下は肩甲骨前傾・外転を増強させ小胸筋下間隙でのTOS発症に関与', badge:'badge-palpation' },
+    { id:'thorax-mobility', name:'胸郭の可動性評価（側方拡張）', category:'rom', purpose:'胸郭の可動性低下が頸部アライメント不良・肩甲胸郭関節安定性低下に関与し、TOS症状に影響', badge:'badge-rom' }
+  ],
+  'sho-upper': [
+    { id:'neer', name:'Neer test', category:'ortho', purpose:'肩関節内旋位での挙上運動。肩峰下インピンジメント（棘上筋・肩峰下滑液包の圧縮）の評価', badge:'badge-ortho' },
+    { id:'hawkins', name:'Hawkins-Kennedy test', category:'ortho', purpose:'90°水平内転位での肩内旋。rotational glideでのanterior pathにおける大結節の移動を評価。感度0.83', badge:'badge-ortho' },
+    { id:'empty-can', name:'Empty can test（Jobe test）', category:'ortho', purpose:'肩関節外転・肘伸展・前腕回内位での内転方向への抵抗運動。棘上筋の疼痛誘発・筋力評価', badge:'badge-ortho' },
+    { id:'full-can', name:'Full can test', category:'ortho', purpose:'外転・肘伸展・前腕回外位での内転抵抗。棘上筋評価。上腕二頭筋長頭腱の代償が少ない', badge:'badge-ortho' },
+    { id:'ext-rotation-lag', name:'External rotation lag sign', category:'ortho', purpose:'肩関節他動外旋→自動外旋の差を評価。棘下筋・小円筋の筋力低下の確認', badge:'badge-ortho' },
+    { id:'drop-arm', name:'Drop arm sign', category:'ortho', purpose:'肩関節他動外転90°からの自動保持を評価。棘上筋断裂が疑われる場合に実施', badge:'badge-ortho' },
+    { id:'supraspinatus-palpation', name:'棘上筋の圧痛触診（肩甲骨内旋位での起始部・停止部）', category:'palpation', purpose:'肩甲骨を内旋位で保持し棘上筋の圧丸みを触知。停止部は肩峰から遠位に指を移動させ触診', badge:'badge-palpation' },
+    { id:'infraspinatus-palpation', name:'棘下筋の圧痛触診', category:'palpation', purpose:'棘下窩からの触診。三角筋深層に入り込む停止部（superior facet・middle facet上部）の圧痛確認', badge:'badge-palpation' },
+    { id:'sab-tenderness', name:'肩峰下滑液包の圧痛（肩峰直下）', category:'palpation', purpose:'肩峰直下における圧痛確認。超音波やMRIとの併用が必要。棘上筋・棘下筋との鑑別に重要', badge:'badge-palpation' },
+    { id:'suprascapular-nerve', name:'肩甲上神経の絞扼評価（肩甲切痕部圧痛）', category:'neurological', purpose:'棘上筋・棘下筋の関連痛（肩関節上部）。肩甲切痕・棘窩切痕での圧痛と筋力低下の組み合わせ評価', badge:'badge-neurological' },
+    { id:'scapulothoracic-stability', name:'肩甲胸郭関節の安定性評価（翼状肩甲・下角浮き）', category:'posture', purpose:'前鋸筋下部・大菱形筋の筋力低下による肩甲骨下角の浮き上がり確認。肩甲骨安定化機構の評価', badge:'badge-posture' },
+    { id:'rotator-cuff-mmt', name:'腱板構成筋MMT（外旋・内旋・外転）', category:'mmt', purpose:'棘上筋（外転）・棘下筋（外旋）・肩甲下筋（内旋）の筋力評価。腱板筋力低下を定量評価', badge:'badge-mmt' }
+  ],
+  'sho-ant-upper': [
+    { id:'bear-hug', name:'Bear hug test', category:'ortho', purpose:'肩関節内旋・肩甲下筋上部線維の機能評価。被検者の手を対側肩に置いた状態での外旋抵抗', badge:'badge-ortho' },
+    { id:'lift-off', name:'Lift-off test（Gerber test）', category:'ortho', purpose:'背部に置いた手を後方に押す動作の評価。肩甲下筋下部線維の機能を評価', badge:'badge-ortho' },
+    { id:'tendon-sparse-palpation', name:'腱板疎部の圧痛触診', category:'palpation', purpose:'上腕骨頭前上方（烏口突起外側）の圧痛確認。腱板疎部の炎症・拘縮の評価', badge:'badge-palpation' },
+    { id:'subscapularis-palpation', name:'肩甲下筋の圧痛触診', category:'palpation', purpose:'肩関節前方で肩甲骨腹側面（肩甲下窩）への触診。上腕骨内旋位で前腕を外側から触知', badge:'badge-palpation' },
+    { id:'anterior-instability', name:'前方不安定性テスト（Apprehension test）', category:'ortho', purpose:'2nd position（外転90°・外旋）で前方不安定感（恐怖感）の確認。関節唇・下関節上腕靭帯の評価', badge:'badge-ortho' },
+    { id:'relocation-test', name:'Relocation test', category:'ortho', purpose:'Apprehension testで陽性後、後方圧迫を加えて症状改善を確認。前方不安定性の特異度が高い', badge:'badge-ortho' },
+    { id:'anterior-translation', name:'上腕骨頭の前方変位評価（Load and shift test）', category:'ortho', purpose:'肩甲骨・鎖骨固定での上腕骨頭の前後移動を評価。アライメント異常の定量的評価', badge:'badge-ortho' },
+    { id:'glenohumeral-internal-rotation', name:'肩関節内旋ROM（後方関節包の拘縮評価）', category:'rom', purpose:'内旋可動域制限は後方軟部組織の拘縮を示す。前方への力学的ストレス増大に関与', badge:'badge-rom' },
+    { id:'biceps-tendon-palpation', name:'上腕二頭筋長頭腱の圧痛触診（結節間溝）', category:'palpation', purpose:'上腕骨結節間溝での上腕二頭筋長頭腱の圧痛確認。Speed testと組み合わせて評価', badge:'badge-palpation' },
+    { id:'speed-test', name:'Speed test', category:'ortho', purpose:'肘関節伸展・前腕回外位での前方举上に対する抵抗。上腕二頭筋長頭腱の炎症・損傷を評価', badge:'badge-ortho' }
+  ],
+  'sho-lateral': [
+    { id:'axillary-nerve', name:'腋窩神経支配領域の感覚評価', category:'neurological', purpose:'三角筋外側・肩外側の皮膚感覚低下確認。四辺形間隙（QLS）での腋窩神経絞扼の評価', badge:'badge-neurological' },
+    { id:'deltoid-mmt', name:'三角筋MMT（外転力）', category:'mmt', purpose:'腋窩神経支配の三角筋筋力低下の確認。棘上筋との鑑別に重要（外転0-60°=棘上筋、60-90°=三角筋）', badge:'badge-mmt' },
+    { id:'qls-palpation', name:'四辺形間隙（QLS）の圧痛触診', category:'palpation', purpose:'上腕骨外科頸後方・大円筋下縁での腋窩神経絞扼部位の圧痛確認', badge:'badge-palpation' },
+    { id:'deltoid-palpation', name:'三角筋・三角筋下滑液包の圧痛触診', category:'palpation', purpose:'三角筋中部・前部・後部の圧痛確認。三角筋下滑液包の炎症との鑑別', badge:'badge-palpation' },
+    { id:'neer-lat', name:'Neer test（インピンジメント確認）', category:'ortho', purpose:'肩峰下インピンジメントによる外側痛の確認。棘上筋・三角筋の役割分担を評価', badge:'badge-ortho' },
+    { id:'hawkins-lat', name:'Hawkins-Kennedy test', category:'ortho', purpose:'肩外側への圧縮ストレス確認。腱板構成筋の機能低下による大結節の通路変化を評価', badge:'badge-ortho' },
+    { id:'cuff-mmt-lat', name:'腱板構成筋MMT（外旋・外転抵抗）', category:'mmt', purpose:'棘上筋・棘下筋の筋力低下確認。肩甲胸郭関節安定性低下との関連評価', badge:'badge-mmt' }
+  ],
+  'sho-post': [
+    { id:'triceps-long-palpation', name:'上腕三頭筋長頭の圧痛触診', category:'palpation', purpose:'肩甲骨関節下結節から上腕骨後面への走行を触診。後方への伸張ストレスで疼痛増悪', badge:'badge-palpation' },
+    { id:'post-capsule-palpation', name:'後方関節包の圧痛触診', category:'palpation', purpose:'上腕骨頭後方の関節包の圧痛確認。後方軟部組織拘縮の有無を評価', badge:'badge-palpation' },
+    { id:'latissimus-palpation', name:'広背筋の圧痛触診', category:'palpation', purpose:'腸骨稜・棘突起から上腕骨小結節稜への走行を触診。肩後方への摩擦ストレス評価', badge:'badge-palpation' },
+    { id:'horizontal-adduction', name:'水平内転ストレステスト', category:'ortho', purpose:'肩関節水平内転での後方組織への伸張ストレス確認。後方関節包・広背筋の拘縮評価', badge:'badge-ortho' },
+    { id:'internal-rotation-post', name:'内旋ROM（肩関節後方）', category:'rom', purpose:'内旋可動域低下は後方軟部組織の拘縮（posterior capsule tightness）を反映', badge:'badge-rom' },
+    { id:'scapular-stability-post', name:'肩甲胸郭関節の安定性（肩甲骨内転・後傾）', category:'posture', purpose:'腱板構成筋・広背筋の機能低下。肩甲骨の動的安定化機構の評価', badge:'badge-posture' },
+    { id:'latissimus-mmt', name:'広背筋MMT（肩関節伸展・内旋・内転）', category:'mmt', purpose:'広背筋の筋力低下確認。体幹安定化機能低下との関連評価', badge:'badge-mmt' }
+  ],
+  'elbow-medial': [
+    { id:'valgus-stress', name:'外反ストレステスト（内側側副靭帯評価）', category:'ortho', purpose:'肘関節外反負荷に対して靭帯の緊張感消失・関節裂隙の開大を確認。MCL損傷評価（軽度屈曲位で実施）', badge:'badge-ortho' },
+    { id:'mcl-palpation', name:'内側側副靭帯（MCL）の圧痛触診', category:'palpation', purpose:'上腕骨内側上顆→尺骨鉤状突起のAOL走行を触診。肘関節軽度屈曲位・外反でMCLの緊張増大', badge:'badge-palpation' },
+    { id:'flex-carpi-palpation', name:'前腕屈筋群の圧痛触診・柔軟性評価', category:'palpation', purpose:'円回内筋・橈側手根屈筋・尺側手根屈筋などの圧痛確認。外反時の伸張ストレスと筋の関与を評価', badge:'badge-palpation' },
+    { id:'ulnar-nerve', name:'尺骨神経の評価（Tinel sign・肘部管症候群）', category:'neurological', purpose:'肘部管（内側上顆後方）でのTinel sign確認。4・5指のしびれ・鷲手変形の有無を評価', badge:'badge-neurological' },
+    { id:'elbow-rom-medial', name:'肘関節屈曲/伸展ROM計測', category:'rom', purpose:'屈曲・伸展可動域の制限確認。前腕屈筋群の伸張性低下・上腕筋・関節包の短縮評価', badge:'badge-rom' },
+    { id:'carrying-angle', name:'外反肘角度（Carrying angle）の計測', category:'posture', purpose:'外反肘（骨形態）の確認。外反肘増大でMCLへの負荷増大、前腕屈筋群・尺骨神経への影響を評価', badge:'badge-posture' },
+    { id:'pronator-palpation', name:'円回内筋・前腕屈筋群の筋力評価（MMT）', category:'mmt', purpose:'前腕屈筋群の弱化確認。筋力低下が外反時の外反モーメント吸収能力低下に関与', badge:'badge-mmt' }
+  ],
+  'elbow-lateral': [
+    { id:'thomsen', name:'Thomsen test（前腕伸筋群テスト）', category:'ortho', purpose:'肘伸展・手関節背屈抵抗で肘外側部の疼痛誘発。短橈側手根伸筋・総指伸筋の評価', badge:'badge-ortho' },
+    { id:'chair-test', name:'Chair test（椅子持ち上げテスト）', category:'ortho', purpose:'肘伸展・前腕回内位での椅子把持・持ち上げで疼痛誘発。短橈側手根伸筋の関与が強い', badge:'badge-ortho' },
+    { id:'middle-finger', name:'Middle finger extension test', category:'ortho', purpose:'中指の伸展抵抗での肘外側部疼痛誘発。総指伸筋の関与を評価。Thomsen testとの比較が重要', badge:'badge-ortho' },
+    { id:'extensor-palpation', name:'前腕伸筋群の圧痛触診（外側上顆起始部）', category:'palpation', purpose:'外側上顆での短橈側手根伸筋・総指伸筋の圧痛確認。付着部変性（腱症）の評価', badge:'badge-palpation' },
+    { id:'radial-joint-palpation', name:'橈尺関節・滑膜ヒダの圧痛触診', category:'palpation', purpose:'橈骨頭外側での圧痛確認。橈尺関節滑膜ヒダの障害（plicaの評価）', badge:'badge-palpation' },
+    { id:'varus-stress', name:'内反ストレステスト（外側側副靭帯評価）', category:'ortho', purpose:'肘関節内反負荷で外側側副靭帯の評価。外側不安定性（PLRI）の確認', badge:'badge-ortho' },
+    { id:'pronation-supination-rom', name:'前腕回内/回外ROM計測', category:'rom', purpose:'前腕回内可動域制限の確認。上橈尺関節不安定性・回外筋の伸張性低下の評価', badge:'badge-rom' },
+    { id:'extensor-mmt', name:'前腕伸筋群MMT（手関節背屈・手指伸展）', category:'mmt', purpose:'前腕伸筋群の弱化確認。筋力低下によるアームカール・グリップ動作での代償評価', badge:'badge-mmt' }
+  ],
+  'hand-numb': [
+    { id:'phalen', name:'Phalen test（手根管症候群）', category:'ortho', purpose:'手関節最大掌屈位60秒保持。正中神経絞扼（手根管内）によるしびれ・疼痛誘発（感度75%）', badge:'badge-ortho' },
+    { id:'tinel-carpal', name:'Tinel sign（手根管部）', category:'ortho', purpose:'手根管部での正中神経上のTinel sign確認。正中神経絞扼の評価（特異度は高い）', badge:'badge-ortho' },
+    { id:'tinel-guyon', name:'Tinel sign（Guyon管・尺骨神経）', category:'ortho', purpose:'豆状骨・有鈎骨鈎間のGuyon管での尺骨神経Tinel sign確認', badge:'badge-ortho' },
+    { id:'finger-sensation', name:'指の感覚分布評価（デルマトーム）', category:'neurological', purpose:'1〜2指：正中神経、4〜5指：尺骨神経、前腕橈側：橈骨神経後骨間枝。分布から絞扼部位を推測', badge:'badge-neurological' },
+    { id:'grip-pinch', name:'握力・ピンチ力測定', category:'mmt', purpose:'正中神経障害（母指球筋萎縮・対立障害）・尺骨神経障害（小指球筋萎縮・内在筋筋力低下）の評価', badge:'badge-mmt' },
+    { id:'wrist-flex-ext-rom', name:'手関節掌屈/背屈ROM計測', category:'rom', purpose:'手根管内圧は掌屈・背屈最終域で上昇。可動域制限と神経絞扼の関連を評価', badge:'badge-rom' },
+    { id:'pronation-supination-hand', name:'前腕回内/回外ROM計測', category:'rom', purpose:'前腕回内・回外の制限確認。正中神経（円回内筋付近）・後骨間神経（回外筋）絞扼の評価', badge:'badge-rom' },
+    { id:'thenar-palpation', name:'母指球筋・小指球筋の柔軟性・萎縮評価', category:'palpation', purpose:'正中神経（母指球筋）・尺骨神経（小指球筋）支配筋の萎縮・圧痛確認', badge:'badge-palpation' }
+  ],
+  'wrist-ulnar': [
+    { id:'tfcc-compression', name:'TFCC圧縮テスト（手関節尺屈＋前腕回転）', category:'ortho', purpose:'手関節を尺屈し前腕を回内・回外することでTFCCへの圧縮ストレスを加え疼痛誘発', badge:'badge-ortho' },
+    { id:'druj-stability', name:'下橈尺関節不安定性テスト（DRUJ評価）', category:'ortho', purpose:'橈骨・尺骨の相対変位を評価。前腕中間位での橈骨と尺骨頭の前後移動量の左右差を確認', badge:'badge-ortho' },
+    { id:'ecuf-palpation', name:'尺側手根伸筋腱（ECU）の圧痛触診', category:'palpation', purpose:'尺骨茎状突起遠位での尺側手根伸筋腱の圧痛確認。尺骨小窩でのTFCC損傷との鑑別', badge:'badge-palpation' },
+    { id:'tfcc-palpation', name:'TFCCの圧痛触診（尺骨小窩）', category:'palpation', purpose:'尺骨茎状突起と尺骨頭の間の尺骨小窩での圧痛確認。TFCC損傷の主要な評価所見', badge:'badge-palpation' },
+    { id:'grip-strength-ulnar', name:'握力測定（前腕回内・中間位での比較）', category:'mmt', purpose:'握力低下の確認。TFCCや尺骨神経障害による機能低下を評価', badge:'badge-mmt' },
+    { id:'pronation-supination-ulnar', name:'前腕回内/回外ROM計測', category:'rom', purpose:'回内・回外の制限確認。下橈尺関節不安定性・TFCC損傷による可動域制限の評価', badge:'badge-rom' }
+  ],
+  'wrist-radial': [
+    { id:'finkelstein', name:'Finkelstein test', category:'ortho', purpose:'母指をこぶしで包んで尺屈。長母指外転筋・短母指伸筋腱（de Quervain病）の評価', badge:'badge-ortho' },
+    { id:'thumb-cm-stress', name:'母指CM関節ストレステスト（grind test）', category:'ortho', purpose:'母指CM関節を軸圧＋回旋させ疼痛誘発。母指CM関節変形性関節症（関節軟骨変性）の評価', badge:'badge-ortho' },
+    { id:'abpl-palpation', name:'長母指外転筋・短母指伸筋腱の圧痛触診', category:'palpation', purpose:'第1腱区画（橈骨茎状突起遠位）での圧痛確認。de Quervain腱鞘炎の主要所見', badge:'badge-palpation' },
+    { id:'thumb-cm-palpation', name:'母指CM関節の圧痛・変形確認', category:'palpation', purpose:'母指CM関節の圧痛・骨性膨隆・Squarehand変形の確認。CM関節変形性関節症の評価', badge:'badge-palpation' },
+    { id:'pronation-supination-radial', name:'前腕回内/回外ROM計測', category:'rom', purpose:'前腕回内・回外の制限確認。長母指外転筋の筋力低下・拘縮との関連評価', badge:'badge-rom' },
+    { id:'thumb-extension-mmt', name:'長母指外転筋・短母指伸筋MMT', category:'mmt', purpose:'母指外転・伸展力の評価。筋力低下によるCM関節内転筋の短縮が関節変性を促進', badge:'badge-mmt' }
+  ],
+  'back-pain': [
+    { id:'extension-rotation', name:'腰椎伸展・回旋運動（椎間関節疼痛誘発）', category:'ortho', purpose:'直立位での伸展＋回旋で椎間関節に圧縮ストレスを加え疼痛誘発。腰部椎間関節症の評価', badge:'badge-ortho' },
+    { id:'lasegue', name:'Laségue sign（下肢伸展挙上テスト）', category:'ortho', purpose:'70〜90°以下での大腿後面〜膝窩の坐骨神経症状で陽性。L5・S1神経根への圧縮ストレス評価', badge:'badge-ortho' },
+    { id:'bragard', name:'Bragard test', category:'ortho', purpose:'Laségue signの変法。症状出現角度から5°下げて足関節背屈追加。坐骨神経症状悪化でヘルニア疑い', badge:'badge-ortho' },
+    { id:'pelvic-rock', name:'Pelvic rock test（仙腸関節疼痛誘発）', category:'ortho', purpose:'側臥位での腸骨への圧迫（剪断ストレス）。仙腸関節部への疼痛誘発で仙腸関節障害を評価', badge:'badge-ortho' },
+    { id:'multifidus-palpation', name:'多裂筋・固有背筋の圧痛触診', category:'palpation', purpose:'棘突起間・椎間関節部での圧痛確認。多裂筋の筋硬度・スパズム評価（腰椎安定化機能の評価）', badge:'badge-palpation' },
+    { id:'thoracolumbar-fascia', name:'胸腰筋膜の圧痛触診', category:'palpation', purpose:'胸腰筋膜（腸骨稜・棘突起間）の圧痛・緊張確認。固有背筋との連続性・腹横筋機能との関連評価', badge:'badge-palpation' },
+    { id:'sij-palpation', name:'仙腸関節・上後腸骨棘（PSIS）の圧痛触診', category:'palpation', purpose:'PSISおよびその内側・下方の仙腸関節部の圧痛確認。仙腸関節障害の評価', badge:'badge-palpation' },
+    { id:'hip-flex-ext-mmt', name:'股関節屈筋群・伸展筋群MMT', category:'mmt', purpose:'腸腰筋（屈曲）・大殿筋（伸展）の筋力評価。筋力低下が骨盤前傾増大→腰椎前弯増強に関与', badge:'badge-mmt' },
+    { id:'abdominal-mmt', name:'体幹屈筋群（腹横筋・腹斜筋）の機能評価', category:'mmt', purpose:'体幹深部筋の機能確認。腹横筋・内腹斜筋の弱化は胸腰筋膜・仙腸関節の安定性低下に直結', badge:'badge-mmt' },
+    { id:'lumbar-flexion-rom', name:'腰椎屈曲/伸展ROM計測（フィンガーフロアテスト含む）', category:'rom', purpose:'腰椎屈曲可動域の制限確認。腸腰筋短縮・固有背筋の短縮・椎間板後方への伸張ストレス評価', badge:'badge-rom' },
+    { id:'hip-flexor-flexibility', name:'股関節屈筋群の柔軟性評価（Thomas test）', category:'rom', purpose:'腸腰筋・大腿直筋の短縮確認。腸腰筋短縮は骨盤前傾増大→腰椎前弯増強→椎間関節への圧縮↑', badge:'badge-rom' },
+    { id:'lumbar-alignment', name:'腰椎アライメント評価（骨盤前後傾・腰椎前弯角）', category:'posture', purpose:'骨盤前傾・マルアライメントの確認。過度の前弯は椎間関節圧縮増大・後弯は椎間板後方伸張増大', badge:'badge-posture' }
+  ]
+};
+
+// DIAGNOSIS DATABASE
+const DIAGNOSES = {
+  'neck-pain': {
+    default: {
+      name: '頸部痛（機能性・筋由来）',
+      conditions: [
+        {
+          name: '頸部椎間関節症・椎間関節炎',
+          pct: '約40%',
+          cause: '頸部の機械的な疼痛の中で最も頻度が高い。頸椎の伸展・回旋運動時に椎間関節面に圧縮＋剪断ストレスが加わり疼痛が生じる。頭部前方位（前突き姿勢）による頸椎前弯の増強が椎間関節への圧縮を増大させることが主な原因と考えられる。'
+        },
+        {
+          name: '頸部固有背筋外側群（頭板状筋・頸板状筋）の筋スパズム',
+          pct: '約30%',
+          cause: '頸部アライメント不良（頭部前方位・ストレートネック）による伸張ストレスの慢性化と、過剰な同時収縮により筋スパズムが形成される。特に頭部前方位では頸部屈筋の筋力低下を外側群の過活動で代償し、さらなる筋疲労・過緊張を招く悪循環が形成されると考えられる。'
+        },
+        {
+          name: '頸部深部屈筋群（頭長筋・頸長筋）の機能低下による筋のインバランス',
+          pct: '約20%',
+          cause: '頸椎の前弯を保持するインナーマッスル（頭長筋・頸長筋）の筋力低下が、外側群（固有背筋）や僧帽筋・肩甲挙筋の過緊張を引き起こす。ストレートネックでは頸部屈筋・伸筋の同時収縮が必要となり、慢性的な筋疲労から筋性疼痛が生じる。'
+        },
+        {
+          name: '僧帽筋上部線維・肩甲挙筋の過緊張・圧痛',
+          pct: '約10%',
+          cause: '肩甲帯の固定筋として機能する僧帽筋上部・肩甲挙筋は、アライメント不良による肩甲帯挙上と組み合わさり過緊張を呈しやすい。特にデスクワーク等での持続的な静的負荷が発症要因と考えられる。'
+        }
+      ],
+      management: '頸部アライメント改善（頭部後方移動）・深頸屈筋群の筋力強化・胸郭の可動性向上が基本的治療戦略。Spurling test陽性かつ神経症状を伴う場合は医師への紹介を優先する。'
+    },
+    rules: [
+      { tests: ['spurling'], result: 'positive', boost: { name: '頸部椎間関節症・神経根症（C5-C7）', pct: '陽性時 特異度↑', cause: 'Spurling test陽性は椎間孔での神経根絞扼を示唆。頸部伸展＋回旋での症状再現は頸椎後関節への圧縮と椎間孔狭窄の両方が関与している可能性が高い。頸部アライメント不良（頭部前方位）が椎間孔狭窄を慢性化させると考えられる。' } },
+      { tests: ['deep-neck-flex'], result: 'positive', boost: { name: '深頸屈筋群低下による筋インバランス（筋性頸部痛）', pct: '筋性因子が主因', cause: '頸部深部屈筋群（頭長筋・頸長筋）のMMTで陽性（筋力低下）。この場合、頸椎の前弯を保持する内在筋機能が破綻し、外在筋（板状筋群・僧帽筋）の過活動による代償性収縮が筋性疼痛の主因となっていると考えられる。' } }
+    ]
+  },
+  'neck-numb': {
+    default: {
+      name: '頸部由来しびれ（TOS／神経根症）',
+      conditions: [
+        {
+          name: '胸郭出口症候群（TOS）－斜角筋隙型',
+          pct: '混在型含め約75%',
+          cause: '斜角筋隙（前斜角筋と中斜角筋の間）での腕神経叢・鎖骨下動脈の絞扼が原因。頸部アライメント不良（頭部前方位）による斜角筋の過緊張が絞扼を増強させる。圧迫型18.7%、牽引型6.1%、混在型75.4%と報告されており、多くが複数部位での重複絞扼である。'
+        },
+        {
+          name: 'TOS－肋鎖間隙型',
+          pct: '約20%',
+          cause: '鎖骨と第1肋骨の間での腕神経叢・鎖骨下動脈の絞扼。上肢挙上位での症状増悪が特徴的。鎖骨下筋の過緊張・肩甲胸郭関節安定性低下が絞扼を増強させると考えられる。'
+        },
+        {
+          name: 'TOS－小胸筋下間隙型（過外転症候群）',
+          pct: '約10%',
+          cause: '小胸筋下での腕神経叢の牽引絞扼。上肢の過外転・挙上位での症状が特徴。小胸筋の伸張性低下が肩甲骨前傾・外転を増強し絞扼を慢性化させると考えられる。'
+        },
+        {
+          name: '頸椎神経根症（椎間孔狭窄）',
+          pct: '独立したものは約10%',
+          cause: '頸椎椎間孔での神経根絞扼。Spurling test陽性が特徴。頸部アライメント不良・骨棘形成・椎間板変性が関与。デルマトームに沿った分布のしびれが特徴的（C6：母指・示指側、C7：中指など）。'
+        }
+      ],
+      management: '胸郭の可動性改善・肩甲胸郭関節安定性向上・頸部アライメント矯正が基本戦略。血管性症状（脈拍消失・チアノーゼ）を伴う場合は血管外科への紹介が必要。神経学的所見が悪化する場合は医師への紹介を優先する。'
+    },
+    rules: [
+      { tests: ['adson'], result: 'positive', boost: { name: '斜角筋隙型TOS（血管・神経圧迫）', pct: '特異度高（陽性時）', cause: 'Adson test陽性（橈骨動脈脈拍消失）は斜角筋隙での血管圧迫型TOSを強く示唆。ただし感度は低いため陰性でも除外不可。頸部アライメント不良による前・中斜角筋の過緊張が絞扼の主要原因と考えられる。' } },
+      { tests: ['morley'], result: 'positive', boost: { name: '斜角筋隙型TOS（腕神経叢絞扼）', pct: '陽性時：斜角筋隙型を強く示唆', cause: 'Morley test陽性（大鎖骨上窩での放散痛）は腕神経叢の斜角筋隙絞扼を示唆。斜角筋の過緊張は頸部アライメント不良（頭部前方位）により引き起こされ、上肢の慢性的な放散痛・しびれの原因となると考えられる。' } }
+    ]
+  },
+  'sho-upper': {
+    default: {
+      name: '肩上方の痛み（インピンジメント症候群関連）',
+      conditions: [
+        {
+          name: '腱板損傷・腱板炎（棘上筋・棘下筋）',
+          pct: '約65%',
+          cause: '肩峰下インピンジメントにより棘上筋・棘下筋の腱板停止部（大結節 superior facet / middle facet）に繰り返す圧縮ストレスが加わり微細損傷が蓄積する。腱板構成筋の筋力低下により上腕骨頭の上方変位が生じ、第2肩関節でのスペースがさらに減少するという悪循環が形成される。肩甲胸郭関節の安定性低下がこれを助長する。'
+        },
+        {
+          name: '肩峰下滑液包炎（SAB炎）',
+          pct: '約20%',
+          cause: '肩峰下インピンジメントにより肩峰下滑液包に繰り返す摩擦・圧縮ストレスが加わり炎症が生じる。腱板構成筋の筋力低下による上腕骨頭の上方変位と、肩甲胸郭関節安定性低下による肩甲骨の異常运动が発症を促進させると考えられる。'
+        },
+        {
+          name: '肩甲上神経絞扼症候群',
+          pct: '約10%',
+          cause: '肩甲切痕・棘窩切痕での肩甲上神経の絞扼により棘上筋・棘下筋に関連痛が生じる。肩甲骨の過度な内旋・下制が肩甲上神経に牽引力を加え絞扼を増強させると考えられる。'
+        },
+        {
+          name: '肩甲胸郭関節安定性低下（翼状肩甲）',
+          pct: '多くの例に併存',
+          cause: '前鋸筋下部・大菱形筋の筋力低下により肩甲骨下角が浮き上がる翼状肩甲が生じ、肩甲骨の正常な運動軌跡（upward rotation）が障害される。これにより肩峰下スペースが減少しインピンジメント症状が生じる。'
+        }
+      ],
+      management: '腱板構成筋（特に棘上筋・棘下筋）の筋力強化と肩甲胸郭関節の安定化訓練が基本。上方軟部組織拘縮には関節包後方へのストレッチが有効。Neer / Hawkins陽性例では肩峰下インピンジメント改善のための運動療法を優先する。'
+    },
+    rules: [
+      { tests: ['empty-can', 'neer'], result: 'positive', boost: { name: '棘上筋腱板損傷（インピンジメント陽性）', pct: '確率大幅上昇', cause: 'Empty can testとNeer testが共に陽性の場合、棘上筋の腱板損傷（部分断裂〜完全断裂）が強く示唆される。棘上筋の機能低下により腱板の上腕骨頭求心位保持能力が低下し、挙上運動で大結節が肩峰下スペースを通過できなくなると考えられる。MRI・超音波での画像確認が推奨される。' } },
+      { tests: ['drop-arm'], result: 'positive', boost: { name: '棘上筋完全断裂（Drop arm sign陽性）', pct: '完全断裂を強く示唆', cause: 'Drop arm sign陽性は棘上筋の完全断裂を示唆する重要所見。三角筋の代償があっても外転位保持ができない場合、腱板の連続性消失が疑われる。外科的治療の適応を検討するため整形外科への紹介が必要な場合がある。' } }
+    ]
+  },
+  'sho-ant-upper': {
+    default: {
+      name: '肩前上方の痛み（肩甲下筋・腱板疎部・関節唇・上腕二頭筋長頭腱）',
+      conditions: [
+        {
+          name: '肩甲下筋損傷・炎症',
+          pct: '約35%',
+          cause: '肩関節外旋運動による肩前方への伸張ストレスが肩甲下筋腱停止部（小結節）に繰り返し加わる。肩甲下筋の伸張性低下（拘縮）が上腕骨頭の前方変位を引き起こし、さらに伸張ストレスが増大するという悪循環が形成される。腱板構成筋の機能低下と肩甲骨の安定性低下が関与する。'
+        },
+        {
+          name: '腱板疎部損傷・拘縮',
+          pct: '約25%',
+          cause: '腱板疎部（烏口上腕靭帯・上関節上腕靭帯からなる領域）の損傷や拘縮。特に外旋時の伸張ストレスと挙上時の圧縮ストレスが繰り返し加わり炎症が生じる。肩関節不安定性や使いすぎ（オーバーユース）が発症に関与。'
+        },
+        {
+          name: '関節唇損傷（SLAP病変・Bankart病変）',
+          pct: '約25%',
+          cause: '上腕骨頭の前方変位による関節唇（上方〜前方）への過度な圧縮・剪断ストレスが損傷を引き起こす。肩甲上腕関節の不安定性（上腕骨頭と関節窩の位置関係不良）が根本的原因であり、投球スポーツや転倒による外傷も多い。'
+        },
+        {
+          name: '上腕二頭筋長頭腱炎・断裂',
+          pct: '約15%',
+          cause: '上腕骨頭の前方変位や肩関節後方軟部組織拘縮により、上腕二頭筋長頭腱が結節間溝での摩擦ストレスを受け炎症・断裂に至る。腱板構成筋の機能低下時に二頭筋長頭腱が代償として過剰活動することも損傷を促進する。'
+        }
+      ],
+      management: '肩甲上腕関節の後方軟部組織ストレッチ・上腕骨頭前方変位の改善・腱板構成筋強化が基本。Apprehension test陽性例は不安定性に配慮した段階的負荷訓練が必要。関節唇損傷が疑われる場合はMRIによる画像確認を優先する。'
+    },
+    rules: [
+      { tests: ['anterior-instability', 'relocation-test'], result: 'positive', boost: { name: '前方不安定性（関節唇損傷・IGHL損傷）', pct: '確率大幅上昇', cause: 'Apprehension testとRelocation testが共に陽性の場合、肩関節前方不安定性（下関節上腕靭帯・関節唇の機能不全）が強く示唆される。上腕骨頭と関節窩の位置関係不良（上腕骨頭の前方変位）が外旋・外転時の不安定感を生み出す主因と考えられる。' } }
+    ]
+  },
+  'sho-lateral': {
+    default: {
+      name: '肩外側の痛み（三角筋・腋窩神経・腱板構成筋）',
+      conditions: [
+        {
+          name: '腱板構成筋の筋力低下によるインピンジメント（大結節通過障害）',
+          pct: '約50%',
+          cause: '腱板構成筋の機能低下により上腕骨頭の求心位保持が不十分となり、大結節が肩峰下スペースを通過する際に摩擦ストレスが三角筋・腱板に及ぶ。肩外側の疼痛は三角筋への伸張・摩擦ストレスが主な要因と考えられる。'
+        },
+        {
+          name: '腋窩神経絞扼（四辺形間隙症候群）',
+          pct: '約30%',
+          cause: '上腕骨外科頸後方の四辺形間隙（QLS：上方=小円筋、下方=大円筋、内側=上腕三頭筋長頭、外側=上腕骨）での腋窩神経絞扼。外旋・外転運動で絞扼が増強し三角筋外側・肩外側の感覚障害と筋力低下が生じる。'
+        },
+        {
+          name: '肩甲胸郭関節安定性低下',
+          pct: '約20%',
+          cause: '前鋸筋・菱形筋の機能低下による肩甲骨の異常運動が、肩関節挙上時の肩峰下スペースを減少させ三角筋・腱板への圧縮ストレスを増大させる。肩甲骨のupward rotationが低下することで特に外転60〜120°で疼痛が生じやすい。'
+        }
+      ],
+      management: '腱板構成筋強化（特に外旋筋）・肩甲胸郭関節安定化訓練・QLS付近の軟部組織モビライゼーションが基本。腋窩神経絞扼が疑われる場合は上腕三頭筋長頭・大円筋・小円筋のストレッチと肩関節周囲筋の筋力改善を優先する。'
+    },
+    rules: []
+  },
+  'sho-post': {
+    default: {
+      name: '肩後方の痛み（上腕三頭筋長頭・後方関節包・広背筋）',
+      conditions: [
+        {
+          name: '後方関節包・上腕三頭筋長頭の伸張性低下',
+          pct: '約40%',
+          cause: '肩関節後方軟部組織（後方関節包・後方腱板）の拘縮が上腕骨頭を前上方に押し出す。これにより挙上・内旋運動時に前方構造への圧縮ストレスが増大し、後方からの牽引を代償しようとする筋収縮が疼痛を誘発する。投球スポーツでは繰り返す外旋〜内旋の加速負荷が後方拘縮を形成する。'
+        },
+        {
+          name: '上腕三頭筋長頭の炎症・機能不全',
+          pct: '約25%',
+          cause: '肩関節伸展・内転・外旋時（伸張ストレス）に上腕三頭筋長頭（起始部：関節下結節）への力学的負荷が増大する。特に肩関節屈曲・外転位での内旋時（cocking phase）に最大伸張を受け、慢性的な炎症が生じると考えられる。'
+        },
+        {
+          name: '腱板構成筋の筋力低下・肩甲胸郭関節安定性低下',
+          pct: '約20%',
+          cause: '腱板構成筋の機能低下→上腕骨頭求心位保持不全→後方組織への過度な伸張という連鎖が生じる。肩甲胸郭関節安定性低下（前鋸筋・菱形筋の筋力低下）も肩甲骨の異常回旋を引き起こし後方痛を助長する。'
+        },
+        {
+          name: '広背筋の機能低下・拘縮',
+          pct: '約15%',
+          cause: '広背筋は肩関節伸展・内旋・内転に作用する。広背筋の筋力低下→体幹安定化機能の低下が連鎖する。また広背筋の拘縮は肩関節外旋・屈曲の制限を引き起こし、これを代償する運動が肩後方への伸張ストレスを増大させる。'
+        }
+      ],
+      management: '後方関節包のストレッチ（horizontal adduction）・腱板構成筋強化・広背筋・上腕三頭筋のストレッチが基本。股関節柔軟性低下（骨盤・体幹の連動性低下）が肩後方痛に関与している場合は下肢へのアプローチも必要。'
+    },
+    rules: []
+  },
+  'elbow-medial': {
+    default: {
+      name: '肘内側の痛み（MCL損傷・前腕屈筋群障害・尺骨神経障害）',
+      conditions: [
+        {
+          name: '前腕屈筋群の機能障害（炎症・疲労）',
+          pct: '約45%',
+          cause: '前腕屈筋群（円回内筋・橈側手根屈筋・掌長筋・尺側手根屈筋・浅指屈筋）の繰り返す遠心性収縮（ブレーキ収縮）が起始部（内側上顆）への伸張ストレスを増大させ炎症・疲労が生じる。特に前腕屈筋群の伸張性低下や弱化が外反モーメント吸収能力を低下させ、MCLや神経への負荷増大に繋がる。'
+        },
+        {
+          name: '内側側副靭帯（MCL）損傷・亜断裂',
+          pct: '約30%',
+          cause: '外反ストレス（投球・テニスのサーブ等）の反復により前斜走線維（AOL）に慢性的な微細断裂が蓄積する。MCLの最大破断強度約32Nmに対し1回の投球でも外反負荷が加わり、繰り返しの投球で慢性損傷に至る。外反肘・肘関節屈曲伸展可動域制限がMCLへの負荷を増大させる。'
+        },
+        {
+          name: '尺骨神経障害（肘部管症候群）',
+          pct: '約15%',
+          cause: '肘部管（内側上顆後方の尺骨神経溝）での尺骨神経の絞扼・牽引による神経症状。外反肘・肘屈曲位での神経への牽引増大が関与。上腕二頭筋・上腕三頭筋内側頭の過緊張がさらに絞扼を増強させると考えられる。4・5指のしびれ・鷲手変形が特徴。'
+        },
+        {
+          name: '外反肘（骨形態）の関与',
+          pct: '多くの例に背景因子として存在',
+          cause: '外反肘（Carrying angleの増大）は肘内側への力学的負荷を恒常的に増大させる骨形態的要因。外反肘自体は運動療法で改善不可能だが、前腕屈筋群・肩関節周囲筋の機能改善で外反モーメントへの対応能力を高めることが重要。'
+        }
+      ],
+      management: '前腕屈筋群の伸張性改善と筋力強化・肘関節ROM改善（屈曲伸展可動域）が基本。外反ストレステスト陽性・MCL損傷確認例は投球負荷の管理と靭帯機能回復訓練が必要。尺骨神経症状（しびれ・筋力低下）が持続する場合は整形外科紹介が必要。'
+    },
+    rules: [
+      { tests: ['valgus-stress'], result: 'positive', boost: { name: 'MCL損傷（外反不安定性）', pct: '陽性時：MCL損傷を示唆', cause: '外反ストレステスト陽性は内側側副靭帯（AOL）の機能不全を示す。投球動作での繰り返す外反負荷（1投球あたり約35Nmの外反トルク）によりAOLに慢性的な微細断裂が蓄積し靭帯の弛緩が生じると考えられる。前腕屈筋群の弱化が外反モーメントを吸収できず、MCLへの負担を増大させていることが根本原因として考えられる。' } }
+    ]
+  },
+  'elbow-lateral': {
+    default: {
+      name: '肘外側の痛み（前腕伸筋群腱症・橈尺関節障害）',
+      conditions: [
+        {
+          name: '短橈側手根伸筋腱症（外側上顆炎・テニス肘）',
+          pct: '約60%',
+          cause: '外側上顆に起始する短橈側手根伸筋（ECRB）への繰り返す遠心性収縮ストレスにより付着部腱変性が生じる。ECRBは純粋な腱性部のみで構成され（筋腱移行部がない）、強い牽引ストレスが集中する解剖学的特徴が損傷しやすさに関与。手関節背屈・把持動作での疼痛が特徴的。前腕伸筋群の伸張性低下・弱化が発症を促進させると考えられる。'
+        },
+        {
+          name: '総指伸筋腱症',
+          pct: '約20%',
+          cause: '総指伸筋（共同腱を有し外側上顆起始）への繰り返す遠心性収縮ストレス。Middle finger extension testで陽性。Thomsen testと合わせてECRBとの鑑別が重要。手指伸展動作の繰り返しが発症因子となることが多い。'
+        },
+        {
+          name: '上橈尺関節不安定性・滑膜ヒダ障害',
+          pct: '約15%',
+          cause: '橈骨頭外側での滑膜ヒダ（plicaの障害）または上橈尺関節不安定性。前腕回内可動域制限が上橈尺関節への剪断ストレスを増大させる。特に前腕回内・回外時の疼痛が特徴的。'
+        },
+        {
+          name: '前腕伸筋群の伸張性低下・弱化（機能的要因）',
+          pct: 'ほぼ全例に関与',
+          cause: '前腕伸筋群の伸張性低下により外側上顆への牽引ストレスが慢性化。弱化により反復動作での遠心性収縮能力が低下し腱の変性が進行する。肘関節屈曲・伸展可動域制限が伸張ストレスをさらに増大させる。'
+        }
+      ],
+      management: '前腕伸筋群の伸張性改善（ストレッチ）と遠心性筋力強化が基本。急性期は安静・炎症管理。亜急性〜慢性期はThomsens test / Chair testでの疼痛評価を指標に段階的に負荷訓練。上橈尺関節不安定性例は前腕回外筋の機能改善と関節安定化訓練が必要。'
+    },
+    rules: [
+      { tests: ['thomsen', 'chair-test', 'middle-finger'], result: 'positive', boost: { name: '外側上顆炎（テニス肘）確定的疑い', pct: '3テスト陽性で診断精度向上', cause: 'Thomsen test・Chair test・Middle finger extension testの3テスト陽性は外側上顆炎（特に短橈側手根伸筋腱症）を強く示唆する。短橈側手根伸筋は最深層に位置し純粋な腱性部のみで構成されているため、大きな張力が細い腱に集中し付着部変性を引き起こすと考えられる。' } }
+    ]
+  },
+  'hand-numb': {
+    default: {
+      name: '手部のしびれ（正中神経・尺骨神経・橈骨神経絞扼）',
+      conditions: [
+        {
+          name: '手根管症候群（正中神経絞扼）',
+          pct: '約45%',
+          cause: '手根管内での正中神経絞扼が最多。手関節掌屈/背屈最終域での手根管内圧上昇が神経への圧縮ストレスを増大させる。母指球筋・小指球筋の柔軟性低下による手根管内圧上昇、前腕回内/回外可動域制限（円回内筋付近での二重絞扼）も関与。1〜3指・4指橈側のしびれ・疼痛が特徴。'
+        },
+        {
+          name: 'Guyon管症候群（尺骨神経絞扼）',
+          pct: '約20%',
+          cause: '豆状骨・有鈎骨鈎間のGuyon管での尺骨神経絞扼。4〜5指・手関節尺側のしびれが特徴。握力低下・内在筋（骨間筋）の筋力低下を伴う。手関節掌屈/背屈可動域低下・尺側手根屈筋の伸張性低下が絞扼を増強させると考えられる。'
+        },
+        {
+          name: '前骨間神経・後骨間神経絞扼（正中神経・橈骨神経の深枝）',
+          pct: '約15%',
+          cause: '正中神経の深枝（前骨間神経）が円回内筋付近で、橈骨神経の深枝（後骨間神経）が回外筋（Frohseアーケード）付近で絞扼。前腕回内/回外可動域制限・円回内筋の過緊張が絞扼を増強させると考えられる。'
+        },
+        {
+          name: '頸部由来のしびれ（二重絞扼・神経根症）',
+          pct: '約20%',
+          cause: '末梢での絞扼と頸椎神経根レベルでの絞扼が重複する「二重絞扼（double crush）」現象。頸部アライメント不良による神経根への慢性的ストレスが末梢神経の感受性を高める（ダブルクラッシュ）。デルマトームに沿った分布と筋力低下パターンが頸椎病変の鑑別に重要。'
+        }
+      ],
+      management: '絞扼部位の特定（しびれの分布・Tinel sign・誘発テスト）を優先。手根管症候群は手関節ROM改善・母指球筋柔軟性・前腕回内回外改善が基本。頸部由来との重複例では頸部アプローチも必要。症状が重篤（筋萎縮・重度筋力低下）な場合は整形外科・神経内科への紹介が必要。'
+    },
+    rules: [
+      { tests: ['phalen', 'tinel-carpal'], result: 'positive', boost: { name: '手根管症候群（正中神経絞扼）確定的疑い', pct: '両テスト陽性で診断精度向上', cause: 'Phalen testとTinel sign（手根管部）が共に陽性の場合、手根管症候群の可能性が高い。手関節掌屈最終域での手根管内圧上昇・正中神経への直接圧迫が疼痛・しびれを誘発している。手関節掌屈/背屈可動域制限・母指球筋の柔軟性低下・前腕回内可動域制限が絞扼を慢性化させている主要因と考えられる。' } }
+    ]
+  },
+  'wrist-ulnar': {
+    default: {
+      name: '手関節尺側部の痛み（TFCC損傷・下橈尺関節障害）',
+      conditions: [
+        {
+          name: 'TFCC（三角線維軟骨複合体）損傷',
+          pct: '約55%',
+          cause: '前腕回内/回外時の下橈尺関節への剪断ストレスと手関節尺屈・圧縮ストレスによりTFCCに繰り返す力学的負荷が加わり損傷が生じる。前腕回内/回外可動域制限（可動域低下が代償的に尺骨への負荷を増大）、握力低下による手関節安定化機能の低下が発症を促進させると考えられる。尺骨小窩（fovea）での圧痛が特徴的な所見。'
+        },
+        {
+          name: '下橈尺関節（DRUJ）不安定性',
+          pct: '約25%',
+          cause: 'TFCC損傷を背景に下橈尺関節の安定化機構が破綻し不安定性が生じる。前腕回内・回外時の橈骨と尺骨の相対移動が増大し関節面への異常ストレスが疼痛を引き起こす。長母指内転筋の短縮・長母指外転筋の筋力低下もDRUJ安定性に関与する。'
+        },
+        {
+          name: '尺側手根伸筋腱（ECU）腱鞘炎・損傷',
+          pct: '約15%',
+          cause: '尺骨茎状突起遠位部でのECU腱への繰り返す摩擦ストレス。手関節背屈可動域低下・前腕回内/回外制限がECUへの代償的負荷を増大させる。グリップや手首回旋動作の多いスポーツ・作業で発症しやすい。'
+        }
+      ],
+      management: '前腕回内/回外ROM改善・DRUJ安定化訓練・握力強化が基本。TFCC損傷確定例では手関節を中間位で固定し安静を優先。症状が持続する場合はMRI・超音波による画像診断が必要。不安定性が著明な場合は整形外科への紹介が必要。'
+    },
+    rules: []
+  },
+  'wrist-radial': {
+    default: {
+      name: '手関節橈側部の痛み（de Quervain病・母指CM関節症）',
+      conditions: [
+        {
+          name: 'de Quervain腱鞘炎（長母指外転筋・短母指伸筋腱鞘炎）',
+          pct: '約55%',
+          cause: '橈骨茎状突起遠位の第1腱区画（長母指外転筋・短母指伸筋）への繰り返す摩擦ストレスにより腱鞘炎が生じる。母指内転筋の短縮によるCM関節の内転変位が第1腱区画への圧迫を増大させ、長母指外転筋の筋力低下が代償的過活動を引き起こすと考えられる。Finkelstein test陽性が特徴的所見。'
+        },
+        {
+          name: '母指CM関節変形性関節症',
+          pct: '約30%',
+          cause: '母指CM関節（手根中手関節）の軟骨変性による疼痛。母指内転筋の短縮による第1中手骨の内転・内旋変位と長母指外転筋の筋力低下が関節への圧縮ストレスを増大させ変性を進行させる。母指球筋・小指球筋の柔軟性低下も手根管内圧上昇を介して間接的に関与。Grind test陽性・Square hand変形が特徴。'
+        },
+        {
+          name: '前腕回内/回外可動域制限の関与',
+          pct: '多くの例に機能的要因として存在',
+          cause: '前腕回内・回外の可動域制限は長母指外転筋・短母指伸筋の腱への代償的ストレスを増大させ、de Quervain腱鞘炎の発症を促進させると考えられる。下橈尺関節不安定性との関連も評価が必要。'
+        }
+      ],
+      management: '母指内転筋ストレッチ・長母指外転筋筋力強化・前腕回内回外ROM改善が基本。急性炎症期は安静と炎症管理を優先。CM関節変形が進行している場合は装具療法と整形外科への紹介を検討する。'
+    },
+    rules: [
+      { tests: ['finkelstein'], result: 'positive', boost: { name: 'de Quervain腱鞘炎', pct: '陽性時：de Quervainを強く示唆', cause: 'Finkelstein test陽性はde Quervain腱鞘炎（長母指外転筋・短母指伸筋腱鞘炎）の特徴的所見。母指内転筋の短縮によるCM関節の内転変位が第1腱区画への圧迫を慢性的に増大させ、長母指外転筋・短母指伸筋腱の炎症が形成されると考えられる。産後・育児中・手作業の多い職業での発症が多い。' } }
+    ]
+  },
+  'back-pain': {
+    default: {
+      name: '胸腰部・腰背部の痛み（椎間関節症・椎間板・仙腸関節障害）',
+      conditions: [
+        {
+          name: '腰部椎間関節症・椎間関節性腰痛',
+          pct: '約40%',
+          cause: '腰椎の伸展・回旋運動時に椎間関節面に圧縮＋剪断ストレスが加わり疼痛が生じる。腸腰筋の短縮による骨盤前傾増大・腰椎前弯増強が椎間関節への圧縮ストレスを慢性化させる。体幹屈筋群（腹横筋・腹斜筋）の筋力低下による体幹安定化機能の低下も椎間関節への負荷増大に関与する。'
+        },
+        {
+          name: '腰部椎間板障害（椎間板ヘルニア・椎間板性腰痛）',
+          pct: '約30%',
+          cause: '腰椎屈曲・回旋複合動作での椎間板後方への伸張ストレス増大が線維輪の断裂・髄核の後方突出を引き起こす。固有背筋の筋力低下（特に多裂筋）による腰椎前弯減少（腰椎後弯位）が椎間板後部への圧縮ストレスを増大させる主因。Laségue sign・Bragard test陽性が神経根症状の指標。'
+        },
+        {
+          name: '仙腸関節障害',
+          pct: '約15%',
+          cause: '仙腸関節への剪断ストレス増大により疼痛が生じる。固有背筋（腸骨後面への付着）の筋力低下と体幹屈筋群（腹横筋・内腹斜筋：胸腰筋膜を介した仙腸関節圧迫力）の弱化が仙腸関節の安定化機構（force closure）を破綻させ疼痛が生じる。Pelvic rock test陽性が特徴的所見。'
+        },
+        {
+          name: '多裂筋・固有背筋の機能低下（筋性腰痛）',
+          pct: '約15%（機能的要因はほぼ全例に関与）',
+          cause: '多裂筋は腰椎の節間安定化に最も重要な内在筋であり、その機能低下は腰椎の不安定性を招く。特に急性腰痛後の多裂筋萎縮は再発リスクを高める。深層多裂筋（深葉：椎体間安定化）と浅層多裂筋（浅葉：腰椎伸展）の機能評価が重要。'
+        }
+      ],
+      management: '多裂筋・体幹深部筋の機能回復・腸腰筋柔軟性改善・骨盤アライメント矯正が基本戦略。Laségue sign陽性・神経根症状が著明な場合は医師への紹介を優先。急性期は痛みを増悪させない範囲での軽度の活動が推奨される（絶対安静は避ける）。'
+    },
+    rules: [
+      { tests: ['lasegue', 'bragard'], result: 'positive', boost: { name: '腰椎椎間板ヘルニア（神経根症状）', pct: '両テスト陽性でヘルニア疑い↑', cause: 'Laségue signとBragard testが共に陽性の場合、腰椎椎間板ヘルニアによる神経根絞扼の可能性が高まる。固有背筋（特に多裂筋）の筋力低下による腰椎後弯が椎間板後部への圧縮ストレスを増大させ、髄核の後方突出が神経根を絞扼していると考えられる。下肢症状が著明な場合は整形外科・神経外科への紹介を優先する。' } },
+      { tests: ['pelvic-rock'], result: 'positive', boost: { name: '仙腸関節障害', pct: '陽性時：仙腸関節障害を示唆', cause: 'Pelvic rock test陽性は仙腸関節由来の疼痛を示唆する。固有背筋・腹横筋・内腹斜筋のforce closure機能が低下し、仙腸関節の動的安定化が破綻していることが根本原因と考えられる。骨盤前傾アライメントの改善と多関節協調訓練が有効。' } }
+    ]
+  }
+};
+
+// ============================================================
+// EVIDENCE WEIGHTING（検査の優位性を考慮した確率再計算）
+// ------------------------------------------------------------
+// 各評価項目には「陽性尤度比相当」の重みをカテゴリー別に設定。
+// 整形外科的特殊テスト（ortho）は感度・特異度が比較的高く、
+// 触診・ROM・MMT・姿勢観察は補助的所見として扱う。
+// 陽性(positive)＝確率上昇、偽陽性(false)＝弱い上昇、陰性(negative)＝確率低下。
+// ============================================================
+const LR_BY_CATEGORY = {
+  ortho:        { positive: 4.0, false: 1.6,  negative: 0.30 },
+  palpation:    { positive: 2.3, false: 1.3,  negative: 0.55 },
+  neurological: { positive: 3.2, false: 1.4,  negative: 0.40 },
+  rom:          { positive: 1.8, false: 1.2,  negative: 0.60 },
+  mmt:          { positive: 1.7, false: 1.15, negative: 0.60 },
+  posture:      { positive: 1.7, false: 1.15, negative: 0.60 }
+};
+
+// T(idx, category) = カテゴリー標準の重みを該当する鑑別候補(idx)に適用
+// TC(idx, {positive,false,negative}) = 個別テストの特性に応じたカスタム重み
+function T(idx, cat) { return { idx, lr: LR_BY_CATEGORY[cat] }; }
+function TC(idx, lr) { return { idx, lr }; }
+
+// EVIDENCE[部位ID][テストID] = このテストが結果に応じて動かす鑑別候補（conditions配列のindex）
+const EVIDENCE = {
+  'neck-pain': {
+    spurling: [TC(0, { positive: 4.5, false: 1.6, negative: 0.30 })],
+    'neck-palpation-facet': [T(0, 'palpation')],
+    'neck-extension-rom': [T(0, 'rom')],
+    'neck-flexion-rom': [T(2, 'rom')],
+    'deep-neck-flex': [TC(2, { positive: 3.5, false: 1.3, negative: 0.50 })],
+    'neck-alignment': [T(2, 'posture'), T(1, 'posture')],
+    'splenius-palpation': [T(1, 'palpation')],
+    'semispinalis-palpation': [T(1, 'palpation')],
+    'trapezius-palpation': [T(3, 'palpation')]
+  },
+  'neck-numb': {
+    adson: [TC(0, { positive: 4.0, false: 1.5, negative: 0.50 })],
+    morley: [TC(0, { positive: 4.0, false: 1.5, negative: 0.50 })],
+    east: [T(1, 'ortho'), T(2, 'ortho')],
+    'spurling-numb': [T(3, 'ortho')],
+    'numb-distribution': [T(3, 'neurological')],
+    'scalene-palpation': [T(0, 'palpation')],
+    'subclavius-palpation': [T(1, 'palpation')],
+    'pec-minor-palpation': [T(2, 'palpation')],
+    'thorax-mobility': [T(1, 'rom')]
+  },
+  'sho-upper': {
+    neer: [T(0, 'ortho'), T(1, 'ortho')],
+    hawkins: [T(0, 'ortho'), T(1, 'ortho')],
+    'empty-can': [TC(0, { positive: 3.5, false: 1.5, negative: 0.40 })],
+    'full-can': [T(0, 'ortho')],
+    'ext-rotation-lag': [T(0, 'ortho')],
+    'drop-arm': [TC(0, { positive: 6.0, false: 1.8, negative: 0.60 })],
+    'supraspinatus-palpation': [T(0, 'palpation')],
+    'infraspinatus-palpation': [T(0, 'palpation')],
+    'sab-tenderness': [T(1, 'palpation')],
+    'suprascapular-nerve': [T(2, 'neurological')],
+    'scapulothoracic-stability': [T(3, 'posture')],
+    'rotator-cuff-mmt': [T(0, 'mmt')]
+  },
+  'sho-ant-upper': {
+    'bear-hug': [T(0, 'ortho')],
+    'lift-off': [T(0, 'ortho')],
+    'tendon-sparse-palpation': [T(1, 'palpation')],
+    'subscapularis-palpation': [T(0, 'palpation')],
+    'anterior-instability': [TC(2, { positive: 3.5, false: 1.5, negative: 0.50 })],
+    'relocation-test': [TC(2, { positive: 4.5, false: 1.6, negative: 0.35 })],
+    'anterior-translation': [T(2, 'ortho')],
+    'glenohumeral-internal-rotation': [T(2, 'rom')],
+    'biceps-tendon-palpation': [T(3, 'palpation')],
+    'speed-test': [T(3, 'ortho')]
+  },
+  'sho-lateral': {
+    'axillary-nerve': [T(1, 'neurological')],
+    'deltoid-mmt': [T(1, 'mmt')],
+    'qls-palpation': [T(1, 'palpation')],
+    'deltoid-palpation': [T(0, 'palpation')],
+    'neer-lat': [T(0, 'ortho')],
+    'hawkins-lat': [T(0, 'ortho')],
+    'cuff-mmt-lat': [T(0, 'mmt')]
+  },
+  'sho-post': {
+    'triceps-long-palpation': [T(1, 'palpation')],
+    'post-capsule-palpation': [T(0, 'palpation')],
+    'latissimus-palpation': [T(3, 'palpation')],
+    'horizontal-adduction': [T(0, 'ortho')],
+    'internal-rotation-post': [T(0, 'rom')],
+    'scapular-stability-post': [T(2, 'posture')],
+    'latissimus-mmt': [T(3, 'mmt')]
+  },
+  'elbow-medial': {
+    'valgus-stress': [TC(1, { positive: 4.5, false: 1.6, negative: 0.30 })],
+    'mcl-palpation': [T(1, 'palpation')],
+    'flex-carpi-palpation': [T(0, 'palpation')],
+    'ulnar-nerve': [T(2, 'neurological')],
+    'elbow-rom-medial': [T(0, 'rom')],
+    'carrying-angle': [T(3, 'posture')],
+    'pronator-palpation': [T(0, 'mmt')]
+  },
+  'elbow-lateral': {
+    thomsen: [T(0, 'ortho')],
+    'chair-test': [T(0, 'ortho')],
+    'middle-finger': [T(1, 'ortho')],
+    'extensor-palpation': [T(0, 'palpation'), T(1, 'palpation')],
+    'radial-joint-palpation': [T(2, 'palpation')],
+    'varus-stress': [T(2, 'ortho')],
+    'pronation-supination-rom': [T(2, 'rom')],
+    'extensor-mmt': [T(0, 'mmt')]
+  },
+  'hand-numb': {
+    phalen: [T(0, 'ortho')],
+    'tinel-carpal': [TC(0, { positive: 3.5, false: 1.5, negative: 0.45 })],
+    'tinel-guyon': [T(1, 'ortho')],
+    'finger-sensation': [T(0, 'neurological'), T(1, 'neurological')],
+    'grip-pinch': [T(0, 'mmt'), T(1, 'mmt')],
+    'wrist-flex-ext-rom': [T(0, 'rom'), T(1, 'rom')],
+    'pronation-supination-hand': [T(2, 'rom')],
+    'thenar-palpation': [T(0, 'palpation'), T(1, 'palpation')]
+  },
+  'wrist-ulnar': {
+    'tfcc-compression': [T(0, 'ortho')],
+    'druj-stability': [T(1, 'ortho')],
+    'ecuf-palpation': [T(2, 'palpation')],
+    'tfcc-palpation': [T(0, 'palpation')],
+    'grip-strength-ulnar': [T(0, 'mmt')],
+    'pronation-supination-ulnar': [T(0, 'rom'), T(1, 'rom')]
+  },
+  'wrist-radial': {
+    finkelstein: [T(0, 'ortho')],
+    'thumb-cm-stress': [T(1, 'ortho')],
+    'abpl-palpation': [T(0, 'palpation')],
+    'thumb-cm-palpation': [T(1, 'palpation')],
+    'pronation-supination-radial': [T(0, 'rom')],
+    'thumb-extension-mmt': [T(0, 'mmt')]
+  },
+  'back-pain': {
+    'extension-rotation': [T(0, 'ortho')],
+    lasegue: [T(1, 'ortho')],
+    bragard: [TC(1, { positive: 4.5, false: 1.6, negative: 0.30 })],
+    'pelvic-rock': [T(2, 'ortho')],
+    'multifidus-palpation': [T(3, 'palpation')],
+    'thoracolumbar-fascia': [T(2, 'palpation')],
+    'sij-palpation': [T(2, 'palpation')],
+    'hip-flex-ext-mmt': [T(0, 'mmt')],
+    'abdominal-mmt': [T(2, 'mmt')],
+    'lumbar-flexion-rom': [T(1, 'rom')],
+    'hip-flexor-flexibility': [T(0, 'rom')],
+    'lumbar-alignment': [T(0, 'posture'), T(1, 'posture')]
+  }
+};
+
+// "約40%" 等の文字列から数値を抽出。「ほぼ全例」等の定性的記述はnullを返す（動的計算の対象外）
+function parseBasePct(pctStr) {
+  const m = String(pctStr).match(/(\d+)\s*%/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// 実施された評価とその結果（陽性/偽陽性/陰性）を基に、各鑑別候補の確率を再計算する。
+// 手法：各候補の基準確率を初期重みとし、関連する検査の尤度比を乗算 → 候補間で正規化（合計100%）。
+// これにより「どの検査を行い、どんな結果だったか」で数値が変化し、
+// 整形外科テスト＞触診・神経学的検査＞ROM/MMT/姿勢観察 の順に結果への影響度が大きくなる。
+function computeDynamicConditions(subId, diagData) {
+  const conditions = diagData.default.conditions;
+  const evidenceMap = EVIDENCE[subId] || {};
+  const baseScores = conditions.map(c => parseBasePct(c.pct));
+  const scores = baseScores.slice();
+  const quantIdx = [];
+  baseScores.forEach((s, i) => { if (s !== null) quantIdx.push(i); });
+
+  // このテストの結果が、実際に何かしらの鑑別候補の重みを動かしたかどうか
+  let anyEvidenceApplied = false;
+  state.checkedTests.forEach(testId => {
+    const result = state.testResults[testId];
+    if (!result) return;
+    const targets = evidenceMap[testId];
+    if (!targets) return;
+    targets.forEach(t => {
+      if (baseScores[t.idx] === null) return;
+      const lr = t.lr[result];
+      if (typeof lr === 'number') {
+        scores[t.idx] *= lr;
+        anyEvidenceApplied = true;
+      }
+    });
+  });
+
+  // まだ関連する検査結果が入力されていない場合は、資料上の基準値をそのまま表示する
+  if (!anyEvidenceApplied) {
+    return conditions.map(c => ({ name: c.name, cause: c.cause, displayPct: c.pct, isDynamic: false }));
+  }
+
+  const total = quantIdx.reduce((sum, i) => sum + scores[i], 0);
+  const normalized = {};
+  if (total > 0) {
+    const raw = quantIdx.map(i => {
+      const val = scores[i] / total * 100;
+      return { i, val, floor: Math.floor(val) };
+    });
+    const floorSum = raw.reduce((s, r) => s + r.floor, 0);
+    const remainder = 100 - floorSum;
+    raw.sort((a, b) => (b.val - b.floor) - (a.val - a.floor));
+    raw.forEach(r => { r.final = r.floor; });
+    for (let k = 0; k < remainder; k++) raw[k % raw.length].final += 1;
+    raw.forEach(r => { normalized[r.i] = r.final; });
+  }
+
+  return conditions.map((c, i) => {
+    if (baseScores[i] === null) {
+      return { name: c.name, cause: c.cause, displayPct: c.pct, isDynamic: false };
+    }
+    const newPct = normalized[i] !== undefined ? normalized[i] : baseScores[i];
+    const basePct = baseScores[i];
+    let trend = 'flat';
+    if (newPct > basePct) trend = 'up';
+    else if (newPct < basePct) trend = 'down';
+    return { name: c.name, cause: c.cause, displayPct: newPct + '%', basePct, isDynamic: true, trend };
+  });
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  region: null,
+  subregion: null,
+  checkedTests: new Set(),
+  testResults: {} // testId -> 'positive'/'false'/'negative'
+};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goStep(n) {
+  // Validate navigation
+  if (n === 2 && !state.region) return;
+  if (n === 3 && !state.subregion) return;
+  if (n === 4 && state.checkedTests.size === 0) return;
+
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+
+  document.querySelectorAll('.step-nav-item').forEach(item => {
+    const s = parseInt(item.dataset.step);
+    item.classList.remove('active', 'done');
+    if (s === n) item.classList.add('active');
+    else if (s < n) item.classList.add('done');
+  });
+}
+
+// ============================================================
+// STEP 1: Region
+// ============================================================
+function selectRegion(regionId) {
+  state.region = regionId;
+  state.subregion = null;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rc-' + regionId).classList.add('selected');
+
+  // Build subregions
+  buildSubregions();
+  goStep(2);
+}
+
+// ============================================================
+// STEP 2: Subregion
+// ============================================================
+function buildSubregions() {
+  const list = document.getElementById('subregion-list');
+  list.innerHTML = '';
+  const subs = SUBREGIONS[state.region] || [];
+  subs.forEach(sub => {
+    const el = document.createElement('div');
+    el.className = 'subregion-card';
+    el.id = 'src-' + sub.id;
+    el.innerHTML = `<div class="subregion-label">${sub.label}</div><div class="subregion-desc">${sub.desc}</div>`;
+    el.onclick = () => selectSubregion(sub);
+    list.appendChild(el);
+  });
+}
+
+function selectSubregion(sub) {
+  state.subregion = sub;
+  state.checkedTests.clear();
+  state.testResults = {};
+
+  document.querySelectorAll('.subregion-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('src-' + sub.id)?.classList.add('selected');
+
+  buildTests();
+  updateBreadcrumb();
+  goStep(3);
+}
+
+// ============================================================
+// STEP 3: Tests
+// ============================================================
+function buildTests() {
+  const tests = TESTS[state.subregion.id] || [];
+  const list = document.getElementById('test-list');
+  list.innerHTML = '';
+
+  if (tests.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">🔍</div><p>この部位の評価項目は準備中です。</p></div>';
+    return;
+  }
+
+  tests.forEach(test => {
+    const el = document.createElement('div');
+    el.className = 'test-card';
+    el.id = 'tc-' + test.id;
+    el.innerHTML = `
+      <div class="test-card-header" onclick="toggleTest('${test.id}')">
+        <div class="test-checkbox" id="chk-${test.id}"></div>
+        <div class="test-info">
+          <div class="test-name">${test.name}</div>
+          <div class="test-purpose">目的：${test.purpose}</div>
+        </div>
+        <span class="test-category-badge ${test.badge}">${getCategoryLabel(test.category)}</span>
+      </div>
+      <div class="test-result-panel">
+        <div class="result-label">評価結果を選択してください：</div>
+        <div class="result-buttons">
+          <button class="result-btn" onclick="setResult('${test.id}','positive',this)">陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','false',this)">偽陽性</button>
+          <button class="result-btn" onclick="setResult('${test.id}','negative',this)">陰性</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function getCategoryLabel(cat) {
+  const map = { ortho:'整形外科テスト', palpation:'圧痛・触診', neurological:'神経学的評価', rom:'ROM', mmt:'MMT', posture:'姿勢・アライメント' };
+  return map[cat] || cat;
+}
+
+function toggleTest(testId) {
+  const card = document.getElementById('tc-' + testId);
+  if (state.checkedTests.has(testId)) {
+    state.checkedTests.delete(testId);
+    delete state.testResults[testId];
+    card.classList.remove('checked');
+  } else {
+    state.checkedTests.add(testId);
+    card.classList.add('checked');
+  }
+  updateEvalBtn();
+}
+
+function setResult(testId, result, btn) {
+  state.testResults[testId] = result;
+  const panel = btn.closest('.test-result-panel');
+  panel.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active-positive','active-false','active-negative'));
+  const cls = result === 'positive' ? 'active-positive' : result === 'false' ? 'active-false' : 'active-negative';
+  btn.classList.add(cls);
+  updateEvalBtn();
+}
+
+function updateEvalBtn() {
+  const btn = document.getElementById('eval-btn');
+  btn.disabled = state.checkedTests.size === 0;
+}
+
+function updateBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  const bc2 = document.getElementById('breadcrumb2');
+  const reg = REGIONS[state.region];
+  const html = `<span class="crumb">${reg.icon} ${reg.name}</span><span class="sep">›</span><span class="crumb">${state.subregion.label}</span>`;
+  bc.innerHTML = html;
+  bc2.innerHTML = html;
+}
+
+// ============================================================
+// STEP 4: Result
+// ============================================================
+function showResult() {
+  updateBreadcrumb();
+  buildResult();
+  goStep(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ====== 推奨治療法データ（追加） ======
+const TREATMENTS = {
+  "neck-pain": [
+    {
+      "name": "頸部アライメント改善（チンタック／頭部後方移動）",
+      "note": ""
+    },
+    {
+      "name": "深頸屈筋群の筋力強化（頭部屈曲エクササイズ）",
+      "note": ""
+    },
+    {
+      "name": "胸郭・胸椎の可動性向上（胸椎伸展モビライゼーション）",
+      "note": ""
+    },
+    {
+      "name": "板状筋群・僧帽筋上部・肩甲挙筋の過緊張軽減（ストレッチ・リリース）",
+      "note": ""
+    },
+    {
+      "name": "姿勢・デスクワーク環境の指導",
+      "note": "Spurling陽性＋神経症状は医師へ紹介"
+    }
+  ],
+  "neck-numb": [
+    {
+      "name": "小胸筋のストレッチ（牽引型TOSへの対応）",
+      "note": ""
+    },
+    {
+      "name": "前・中斜角筋の過緊張軽減・リリース",
+      "note": ""
+    },
+    {
+      "name": "胸郭（肋鎖間隙）の可動域改善",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練（肩甲骨後傾・内転）",
+      "note": ""
+    },
+    {
+      "name": "頸部アライメント矯正・神経モビライゼーション",
+      "note": "脈拍消失・チアノーゼ等の血管症状は血管外科へ"
+    }
+  ],
+  "sho-upper": [
+    {
+      "name": "腱板構成筋（棘上筋・棘下筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "後方関節包のストレッチ（拘縮改善）",
+      "note": ""
+    },
+    {
+      "name": "肩峰下スペース確保のための運動療法",
+      "note": ""
+    },
+    {
+      "name": "急性炎症期は負荷調整・疼痛管理",
+      "note": "Drop arm陽性など完全断裂疑いは整形外科へ"
+    }
+  ],
+  "sho-ant-upper": [
+    {
+      "name": "肩甲下筋・腱板疎部周囲の機能改善",
+      "note": ""
+    },
+    {
+      "name": "上腕二頭筋長頭腱の負荷管理・ストレッチ",
+      "note": ""
+    },
+    {
+      "name": "後方軟部組織ストレッチ・上腕骨頭前方変位の改善",
+      "note": ""
+    },
+    {
+      "name": "前方不安定性に配慮した段階的筋力強化",
+      "note": "関節唇損傷疑いはMRI／整形外科へ"
+    }
+  ],
+  "sho-lateral": [
+    {
+      "name": "腱板構成筋（特に外旋筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肩甲胸郭関節の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "QLS周囲（上腕三頭筋長頭・大小円筋）の軟部組織モビライゼーション",
+      "note": ""
+    },
+    {
+      "name": "腋窩神経絞扼疑いは神経モビライゼーション",
+      "note": ""
+    }
+  ],
+  "sho-post": [
+    {
+      "name": "後方関節包のストレッチ（水平内転）",
+      "note": ""
+    },
+    {
+      "name": "腱板構成筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "広背筋・上腕三頭筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "体幹・下肢の連動性改善（必要に応じ下肢アプローチ）",
+      "note": ""
+    }
+  ],
+  "elbow-medial": [
+    {
+      "name": "前腕屈筋群の伸張性改善・筋力強化",
+      "note": ""
+    },
+    {
+      "name": "肘関節ROM改善（屈曲・伸展）",
+      "note": ""
+    },
+    {
+      "name": "投球フォーム・負荷管理（MCL保護）",
+      "note": ""
+    },
+    {
+      "name": "段階的な靭帯機能回復訓練",
+      "note": "尺骨神経症状が持続する場合は整形外科へ"
+    }
+  ],
+  "elbow-lateral": [
+    {
+      "name": "前腕伸筋群のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "遠心性筋力強化（短橈側手根伸筋を中心に）",
+      "note": ""
+    },
+    {
+      "name": "急性期は安静・炎症管理",
+      "note": ""
+    },
+    {
+      "name": "疼痛をモニタリングした段階的負荷訓練",
+      "note": ""
+    },
+    {
+      "name": "上橈尺関節の安定化訓練",
+      "note": ""
+    }
+  ],
+  "hand-numb": [
+    {
+      "name": "絞扼部位の特定後にアプローチ（しびれ分布・Tinel）",
+      "note": ""
+    },
+    {
+      "name": "手関節ROM改善・母指球筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "前腕回内・回外の可動域改善",
+      "note": ""
+    },
+    {
+      "name": "正中／尺骨神経のモビライゼーション",
+      "note": "筋萎縮・重度筋力低下は整形外科・神経内科へ"
+    }
+  ],
+  "wrist-ulnar": [
+    {
+      "name": "前腕回内・回外ROM改善",
+      "note": ""
+    },
+    {
+      "name": "DRUJ安定化訓練・握力強化",
+      "note": ""
+    },
+    {
+      "name": "TFCC損傷例は中間位固定・安静",
+      "note": ""
+    },
+    {
+      "name": "症状持続時はMRI・超音波／整形外科へ",
+      "note": ""
+    }
+  ],
+  "wrist-radial": [
+    {
+      "name": "母指内転筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "長母指外転筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "前腕回内・回外ROM改善",
+      "note": ""
+    },
+    {
+      "name": "急性炎症期は安静・装具による固定",
+      "note": "CM関節症進行例は装具療法・整形外科へ"
+    }
+  ],
+  "back-pain": [
+    {
+      "name": "多裂筋・体幹深部筋の機能回復（ドローイン等）",
+      "note": ""
+    },
+    {
+      "name": "腸腰筋・固有背筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "骨盤アライメント矯正・仙腸関節の安定化",
+      "note": ""
+    },
+    {
+      "name": "急性期も軽度の活動を継続（絶対安静を避ける）",
+      "note": "神経根症状が著明な場合は医師へ紹介"
+    }
+  ],
+  "hip-anterior": [
+    {
+      "name": "腸腰筋の伸張性改善（ストレッチ）",
+      "note": ""
+    },
+    {
+      "name": "大殿筋・中殿筋・深層外旋六筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "股関節の動的安定性改善",
+      "note": ""
+    },
+    {
+      "name": "深い屈曲姿勢（低い椅子・深いしゃがみ）の一時的制限",
+      "note": "FAI・関節唇損傷疑いはMRI／整形外科へ"
+    }
+  ],
+  "hip-lateral": [
+    {
+      "name": "中殿筋・小殿筋・深層外旋六筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "大腿筋膜張筋・腸脛靭帯のストレッチ（Ober陽性例を優先）",
+      "note": ""
+    },
+    {
+      "name": "骨盤前額面の安定化訓練",
+      "note": ""
+    },
+    {
+      "name": "片脚立位・歩行での骨盤側方制御訓練",
+      "note": ""
+    }
+  ],
+  "lumbar-pain": [
+    {
+      "name": "多裂筋・体幹深部筋の機能回復（ドローイン・ホロウイング）",
+      "note": ""
+    },
+    {
+      "name": "腸腰筋の柔軟性改善",
+      "note": ""
+    },
+    {
+      "name": "骨盤アライメント矯正",
+      "note": ""
+    },
+    {
+      "name": "急性期も軽度の活動を継続",
+      "note": "Laségue陽性・神経根症状著明は医師へ紹介"
+    }
+  ],
+  "knee-medial": [
+    {
+      "name": "殿筋群（大殿筋・中殿筋）の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "膝外反を改善する下肢アライメント訓練",
+      "note": ""
+    },
+    {
+      "name": "鵞足構成筋（薄筋・縫工筋・半腱様筋）の伸張性改善",
+      "note": ""
+    },
+    {
+      "name": "MCL損傷例は段階的負荷・動的安定化訓練",
+      "note": ""
+    }
+  ],
+  "knee-lateral": [
+    {
+      "name": "腸脛靭帯・大腿筋膜張筋のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "股関節外転筋・外旋筋の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "下腿回旋異常の改善",
+      "note": ""
+    },
+    {
+      "name": "ランニング距離・傾斜の管理（Noble陽性例）",
+      "note": "PLS障害疑いは整形外科へ"
+    }
+  ],
+  "knee-anterior": [
+    {
+      "name": "内側広筋の選択的強化",
+      "note": ""
+    },
+    {
+      "name": "外側広筋・腸脛靭帯のストレッチ",
+      "note": ""
+    },
+    {
+      "name": "足関節背屈ROM改善・股関節外転筋の強化",
+      "note": ""
+    },
+    {
+      "name": "オスグッド例は成長期の運動負荷管理",
+      "note": ""
+    }
+  ],
+  "ankle-posterior": [
+    {
+      "name": "下腿三頭筋の伸張性改善・遠心性筋力強化",
+      "note": ""
+    },
+    {
+      "name": "足部アライメント改善（回内足は足底挿板）",
+      "note": ""
+    },
+    {
+      "name": "急性期は安静・炎症管理",
+      "note": "Thompson陽性は腱断裂疑い→整形外科へ"
+    }
+  ],
+  "ankle-anterior": [
+    {
+      "name": "腓骨筋群の筋力強化",
+      "note": ""
+    },
+    {
+      "name": "固有感覚訓練（バランストレーニング）",
+      "note": ""
+    },
+    {
+      "name": "足部アライメント改善",
+      "note": ""
+    },
+    {
+      "name": "再捻挫予防（テーピング・装具）",
+      "note": "骨棘による前方インピンジメント疑いは整形外科へ"
+    }
+  ],
+  "ankle-plantar": [
+    {
+      "name": "足底腱膜のストレッチ（Windlass機構の治療応用）",
+      "note": ""
+    },
+    {
+      "name": "下腿三頭筋の伸張性改善・足関節背屈ROM改善",
+      "note": ""
+    },
+    {
+      "name": "股関節・膝関節伸展筋力の強化",
+      "note": ""
+    },
+    {
+      "name": "扁平足は足底挿板／起床時痛は就寝時アンクルスプリント",
+      "note": "しびれを伴う場合は足根管症候群を疑い神経学的評価を追加"
+    }
+  ]
+};
+function renderTreatments(subId){
+  const tx = (typeof TREATMENTS!=='undefined') ? TREATMENTS[subId] : null;
+  if(!tx || !tx.length) return '';
+  const items = tx.map(function(it){
+    return '<li><span class="tx-name">'+it.name+'</span>'+(it.note?'<span class="tx-note">'+it.note+'</span>':'')+'</li>';
+  }).join('');
+  return '<div class="result-block tx-block">'
+    + '<div class="result-block-header"><span class="result-block-icon">\uD83D\uDCAA</span> \u63A8\u5968\u3055\u308C\u308B\u6CBB\u7642\u6CD5</div>'
+    + '<div class="result-block-body"><ul class="tx-list">'+items+'</ul>'
+    + '<div class="tx-foot">\u203B\u8A55\u4FA1\u6240\u898B\u306B\u5FDC\u3058\u3066\u512A\u5148\u9806\u4F4D\u3092\u5224\u65AD\u3057\u3001\u75DB\u307F\u30FB\u7981\u5FCC\u306B\u914D\u616E\u3057\u3066\u6BB5\u968E\u7684\u306B\u5B9F\u65BD\u3057\u3066\u304F\u3060\u3055\u3044\u3002</div>'
+    + '</div></div>';
+}
+
+function buildResult() {
+  const content = document.getElementById('result-content');
+  const subId = state.subregion.id;
+  const diagData = DIAGNOSES[subId];
+
+  if (!diagData) {
+    content.innerHTML = '<div class="info-msg">ℹ️ この部位の詳細鑑別データは準備中です。</div>';
+    return;
+  }
+
+  // Collect evidence
+  const checkedArr = Array.from(state.checkedTests);
+  const evidenceRows = checkedArr.map(testId => {
+    const tests = TESTS[subId] || [];
+    const t = tests.find(x => x.id === testId);
+    const result = state.testResults[testId] || '未選択';
+    return { name: t ? t.name : testId, result };
+  });
+
+  // Apply rules
+  let mainDiag = diagData.default;
+  let boostedCondition = null;
+  if (diagData.rules) {
+    for (const rule of diagData.rules) {
+      const allMatch = rule.tests.every(tid => state.checkedTests.has(tid) && state.testResults[tid] === rule.result);
+      if (allMatch) {
+        boostedCondition = rule.boost;
+        break;
+      }
+    }
+  }
+
+  // Count positives
+  const positiveCount = checkedArr.filter(t => state.testResults[t] === 'positive').length;
+  const totalChecked = checkedArr.length;
+  const confidence = positiveCount === 0 ? '評価実施のみ' : positiveCount >= 3 ? '複数陽性あり（精密検査考慮）' : '一部陽性あり';
+
+  // Build HTML
+  let html = '';
+
+  // Header
+  html += `
+    <div class="result-header">
+      <div class="result-tag">▶ 鑑別診断</div>
+      <h3>${boostedCondition ? boostedCondition.name : mainDiag.name}</h3>
+      <span class="result-confidence">評価数: ${totalChecked}項目 ／ 陽性: ${positiveCount}項目 ／ ${confidence}</span>
+    </div>
+    <div class="result-blocks">
+  `;
+
+  // Boosted condition box
+  if (boostedCondition) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">⚡</span> 評価パターンによる上位鑑別</div>
+        <div class="result-block-body">
+          <strong>${boostedCondition.name}</strong><br>
+          <strong>原因の考察：</strong>${boostedCondition.cause}
+          <div style="margin-top:10px; font-size:0.82rem; color:#666;">※以下の鑑別条件も合わせて参照してください。</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Conditions (causes) — 検査結果に応じて動的に確率を再計算
+  html += `
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">📊</span> 考えられる原因と発生頻度・根拠</div>
+      <div class="result-block-body">
+        <div style="font-size:0.78rem;color:#718096;margin-bottom:10px;line-height:1.6;">※％は基準発生頻度に対し、実施した評価の結果（陽性／偽陽性／陰性）を検査の種類ごとの優位性（整形外科的特殊テスト＞触診・神経学的検査＞ROM・MMT・姿勢観察の順に影響度大）で重み付けし再計算した値です。評価項目・結果を変えるたびに数値が変動します。</div>
+  `;
+  const dynConditions = computeDynamicConditions(subId, diagData);
+  dynConditions.forEach(c => {
+    const trendMark = c.isDynamic && c.trend === 'up' ? ' <span style="color:#c0392b;font-size:0.8rem;">▲上昇</span>'
+      : c.isDynamic && c.trend === 'down' ? ' <span style="color:#1a6fa8;font-size:0.8rem;">▼低下</span>' : '';
+    const baseNote = c.isDynamic && c.trend !== 'flat' ? `<span style="font-size:0.72rem;color:#a0aec0;"> （基準値${c.basePct}%）</span>` : '';
+    html += `
+      <div class="cause-item">
+        <div class="cause-pct">${c.displayPct}${trendMark}</div>
+        <div class="cause-text">
+          <div class="cause-name">${c.name}${baseNote}</div>
+          <div class="cause-detail">原因：${c.cause}</div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div></div>`;
+
+  // Evidence table
+  if (evidenceRows.length > 0) {
+    html += `
+      <div class="result-block">
+        <div class="result-block-header"><span class="result-block-icon">📋</span> 今回の評価結果一覧</div>
+        <div class="result-block-body" style="padding:0;">
+          <table class="evidence-table">
+            <tr><th>評価項目</th><th>結果</th></tr>
+    `;
+    evidenceRows.forEach(row => {
+      const cls = row.result === '陽性' || row.result === 'positive' ? 'ev-pos' : row.result === '偽陽性' || row.result === 'false' ? 'ev-false' : row.result === '陰性' || row.result === 'negative' ? 'ev-neg' : '';
+      const label = row.result === 'positive' ? '陽性' : row.result === 'false' ? '偽陽性' : row.result === 'negative' ? '陰性' : row.result;
+      html += `<tr><td>${row.name}</td><td class="${cls}">${label}</td></tr>`;
+    });
+    html += `</table></div></div>`;
+  }
+
+  // Management
+  html += `
+    ${renderTreatments(subId)}
+    <div class="result-block">
+      <div class="result-block-header"><span class="result-block-icon">🏥</span> 治療・評価の方向性（理学療法的視点）</div>
+      <div class="result-block-body">${mainDiag.management}</div>
+    </div>
+  `;
+
+  // Caution
+  html += `
+    <div class="caution-box">
+      <span class="caution-icon">⚠️</span>
+      <div><strong>注意事項：</strong>本ツールは工藤慎太郎「運動機能障害のなぜ？がわかる評価戦略」に基づく学習・臨床思考支援ツールです。医療診断の代替ではありません。神経症状の悪化・腫脹・発熱・安静時痛など危険信号（red flags）を認める場合は速やかに医師へご紹介ください。</div>
+    </div>
+  `;
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetAll() {
+  state = { region: null, subregion: null, checkedTests: new Set(), testResults: {} };
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('subregion-list').innerHTML = '';
+  document.getElementById('test-list').innerHTML = '';
+  document.getElementById('result-content').innerHTML = '';
+  document.getElementById('eval-btn').disabled = true;
+  goStep(1);
+}
+</script>
+</body>
+</html>
